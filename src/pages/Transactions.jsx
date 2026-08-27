@@ -66,9 +66,60 @@ function getTodayString() {
 
   return `${today.getFullYear()}-${String(
     today.getMonth() + 1
-  ).padStart(2, "0")}-${String(
+  ).padStart(
+    2,
+    "0"
+  )}-${String(
     today.getDate()
-  ).padStart(2, "0")}`;
+  ).padStart(
+    2,
+    "0"
+  )}`;
+}
+
+
+/* =========================================================
+   MDR STORAGE
+========================================================= */
+
+const MDR_STORAGE_KEY =
+  "pluno_qris_mdr_percentage";
+
+const DEFAULT_MDR_PERCENTAGE =
+  0.7;
+
+
+/* =========================================================
+   READ MDR SETTING
+========================================================= */
+
+function getStoredMdrPercentage() {
+  const storedValue =
+    window.localStorage.getItem(
+      MDR_STORAGE_KEY
+    );
+
+  if (
+    storedValue === null ||
+    storedValue === ""
+  ) {
+    return DEFAULT_MDR_PERCENTAGE;
+  }
+
+  const value =
+    Number(
+      storedValue
+    );
+
+  if (
+    Number.isNaN(value) ||
+    value < 0 ||
+    value > 100
+  ) {
+    return DEFAULT_MDR_PERCENTAGE;
+  }
+
+  return value;
 }
 
 
@@ -108,12 +159,36 @@ function Transactions() {
   ] = useState(false);
 
   const [
+    showMdrSettings,
+    setShowMdrSettings,
+  ] = useState(false);
+
+  const [
+    mdrPercentage,
+    setMdrPercentage,
+  ] = useState(
+    getStoredMdrPercentage()
+  );
+
+  const [
+    mdrFormValue,
+    setMdrFormValue,
+  ] = useState(
+    String(
+      getStoredMdrPercentage()
+    )
+  );
+
+  const [
     selectedMonth,
     setSelectedMonth,
   ] = useState(
     String(
       new Date().getMonth() + 1
-    ).padStart(2, "0")
+    ).padStart(
+      2,
+      "0"
+    )
   );
 
   const [
@@ -137,19 +212,23 @@ function Transactions() {
     transaction_date:
       getTodayString(),
 
-    customer: "",
+    customer:
+      "",
 
     payment_type:
       "Down Payment",
 
-    description: "",
+    description:
+      "",
 
-    amount: "",
+    amount:
+      "",
 
     payment_method:
       "Cash",
 
-    information: "",
+    information:
+      "",
   });
 
 
@@ -183,8 +262,10 @@ function Transactions() {
   const yearOptions = [];
 
   for (
-    let year = currentYear - 5;
-    year <= currentYear + 5;
+    let year =
+      currentYear - 5;
+    year <=
+      currentYear + 5;
     year++
   ) {
     yearOptions.push(
@@ -206,22 +287,24 @@ function Transactions() {
       const {
         data,
         error,
-      } = await supabase
-        .from("transactions")
-        .select("*")
-        .order(
-          "transaction_date",
-          {
-            ascending: false,
-          }
-        )
-        .order(
-          "created_at",
-          {
-            ascending: false,
-          }
-        );
-
+      } =
+        await supabase
+          .from("transactions")
+          .select("*")
+          .order(
+            "transaction_date",
+            {
+              ascending:
+                false,
+            }
+          )
+          .order(
+            "created_at",
+            {
+              ascending:
+                false,
+            }
+          );
 
       if (error) {
 
@@ -241,7 +324,6 @@ function Transactions() {
         return;
       }
 
-
       setTransactions(
         data || []
       );
@@ -253,6 +335,126 @@ function Transactions() {
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+
+  /* =======================================================
+     MDR SETTINGS
+  ======================================================= */
+
+  const openMdrSettings =
+    () => {
+
+      setMdrFormValue(
+        String(
+          mdrPercentage
+        )
+      );
+
+      setErrorMessage("");
+
+      setShowMdrSettings(
+        true
+      );
+    };
+
+
+  const closeMdrSettings =
+    () => {
+
+      if (saving) {
+        return;
+      }
+
+      setShowMdrSettings(
+        false
+      );
+
+      setErrorMessage("");
+    };
+
+
+  const handleMdrChange =
+    (event) => {
+
+      const value =
+        event.target.value;
+
+      if (
+        value === ""
+      ) {
+        setMdrFormValue(
+          ""
+        );
+
+        return;
+      }
+
+      const numericValue =
+        Number(
+          value
+        );
+
+      if (
+        Number.isNaN(
+          numericValue
+        )
+      ) {
+        return;
+      }
+
+      if (
+        numericValue < 0 ||
+        numericValue > 100
+      ) {
+        return;
+      }
+
+      setMdrFormValue(
+        value
+      );
+    };
+
+
+  const saveMdrSettings =
+    () => {
+
+      const value =
+        Number(
+          mdrFormValue
+        );
+
+      if (
+        Number.isNaN(
+          value
+        ) ||
+        value < 0 ||
+        value > 100
+      ) {
+
+        setErrorMessage(
+          "QRIS MDR harus berada di antara 0% sampai 100%."
+        );
+
+        return;
+      }
+
+      setMdrPercentage(
+        value
+      );
+
+      window.localStorage.setItem(
+        MDR_STORAGE_KEY,
+        String(
+          value
+        )
+      );
+
+      setErrorMessage("");
+
+      setShowMdrSettings(
+        false
+      );
+    };
 
 
   /* =======================================================
@@ -291,13 +493,14 @@ function Transactions() {
             item.transaction_date.slice(
               0,
               4
-            ) === activeYear &&
+            ) ===
+              activeYear &&
             item.transaction_date.slice(
               5,
               7
-            ) === activeMonth
+            ) ===
+              activeMonth
           );
-
         }
       );
 
@@ -324,7 +527,8 @@ function Transactions() {
       ) =>
         total +
         Number(
-          item.amount || 0
+          item.amount ||
+            0
         ),
       0
     );
@@ -338,7 +542,8 @@ function Transactions() {
       ) =>
         total +
         Number(
-          item.mdr_amount || 0
+          item.mdr_amount ||
+            0
         ),
       0
     );
@@ -352,7 +557,8 @@ function Transactions() {
       ) =>
         total +
         Number(
-          item.net_amount || 0
+          item.net_amount ||
+            0
         ),
       0
     );
@@ -362,43 +568,57 @@ function Transactions() {
      OPEN ADD MODAL
   ======================================================= */
 
-  const openAddModal = () => {
+  const openAddModal =
+    () => {
 
-    setFormData({
-      transaction_date:
-        getTodayString(),
+      setFormData({
+        transaction_date:
+          getTodayString(),
 
-      customer: "",
+        customer:
+          "",
 
-      payment_type:
-        "Down Payment",
+        payment_type:
+          "Down Payment",
 
-      description: "",
+        description:
+          "",
 
-      amount: "",
+        amount:
+          "",
 
-      payment_method:
-        "Cash",
+        payment_method:
+          "Cash",
 
-      information: "",
-    });
+        information:
+          "",
+      });
 
-    setErrorMessage("");
+      setErrorMessage("");
 
-    setShowAddModal(true);
-  };
+      setShowAddModal(
+        true
+      );
+    };
 
 
   /* =======================================================
-     CLOSE MODAL
+     CLOSE ADD MODAL
   ======================================================= */
 
-  const closeAddModal = () => {
+  const closeAddModal =
+    () => {
 
-    if (saving) return;
+      if (saving) {
+        return;
+      }
 
-    setShowAddModal(false);
-  };
+      setShowAddModal(
+        false
+      );
+
+      setErrorMessage("");
+    };
 
 
   /* =======================================================
@@ -416,7 +636,8 @@ function Transactions() {
       setFormData(
         (current) => ({
           ...current,
-          [name]: value,
+          [name]:
+            value,
         })
       );
     };
@@ -438,6 +659,7 @@ function Transactions() {
       setFormData(
         (current) => ({
           ...current,
+
           amount:
             numericValue,
         })
@@ -450,7 +672,9 @@ function Transactions() {
   ======================================================= */
 
   const handleSubmit =
-    async (event) => {
+    async (
+      event
+    ) => {
 
       event.preventDefault();
 
@@ -458,7 +682,8 @@ function Transactions() {
 
       const amount =
         Number(
-          formData.amount || 0
+          formData.amount ||
+            0
         );
 
 
@@ -477,24 +702,31 @@ function Transactions() {
       }
 
 
-      setSaving(true);
+      setSaving(
+        true
+      );
 
 
       /* ===================================================
          MDR
       =================================================== */
 
-      const mdrPercentage =
+      const currentMdrPercentage =
         formData.payment_method ===
         "QRIS"
-          ? 0.7
+          ? Number(
+              mdrPercentage
+            )
           : 0;
 
 
       const mdrAmount =
         Math.round(
           amount *
-            (mdrPercentage / 100)
+            (
+              currentMdrPercentage /
+              100
+            )
         );
 
 
@@ -512,7 +744,9 @@ function Transactions() {
         error,
       } =
         await supabase
-          .from("transactions")
+          .from(
+            "transactions"
+          )
           .insert([
             {
               transaction_date:
@@ -533,7 +767,7 @@ function Transactions() {
                 formData.payment_method,
 
               mdr_percentage:
-                mdrPercentage,
+                currentMdrPercentage,
 
               mdr_amount:
                 mdrAmount,
@@ -561,7 +795,9 @@ function Transactions() {
           `Gagal menyimpan transaksi: ${error.message}`
         );
 
-        setSaving(false);
+        setSaving(
+          false
+        );
 
         return;
       }
@@ -599,9 +835,13 @@ function Transactions() {
       }
 
 
-      setSaving(false);
+      setSaving(
+        false
+      );
 
-      setShowAddModal(false);
+      setShowAddModal(
+        false
+      );
     };
 
 
@@ -610,33 +850,33 @@ function Transactions() {
   ======================================================= */
 
   const handleDelete =
-    async (item) => {
+    async (
+      item
+    ) => {
 
       const confirmed =
         window.confirm(
           `Hapus transaksi "${item.description}"?`
         );
 
-
       if (!confirmed) {
         return;
       }
 
-
       setErrorMessage("");
-
 
       const {
         error,
       } =
         await supabase
-          .from("transactions")
+          .from(
+            "transactions"
+          )
           .delete()
           .eq(
             "id",
             item.id
           );
-
 
       if (error) {
 
@@ -652,11 +892,12 @@ function Transactions() {
         return;
       }
 
-
       setTransactions(
         (current) =>
           current.filter(
-            (transaction) =>
+            (
+              transaction
+            ) =>
               transaction.id !==
               item.id
           )
@@ -668,455 +909,512 @@ function Transactions() {
      DOWNLOAD PDF
   ======================================================= */
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF =
+    () => {
 
-    if (
-      filteredTransactions.length === 0
-    ) {
+      if (
+        filteredTransactions.length ===
+        0
+      ) {
 
-      window.alert(
-        `Tidak ada transaksi untuk ${
-          monthNames[
-            Number(activeMonth) - 1
-          ]
-        } ${activeYear}.`
-      );
-
-      return;
-    }
-
-
-    const doc = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: "a4",
-    });
-
-
-    /* ===================================================
-       DOCUMENT TITLE
-    =================================================== */
-
-    doc.setFont(
-      "helvetica",
-      "normal"
-    );
-
-    doc.setFontSize(8);
-
-    doc.setTextColor(
-      100,
-      100,
-      100
-    );
-
-    doc.text(
-      "PLUNO INTERNAL SYSTEM",
-      14,
-      14
-    );
-
-
-    doc.setFontSize(20);
-
-    doc.setTextColor(
-      30,
-      30,
-      30
-    );
-
-    doc.text(
-      "Transaction Performance",
-      14,
-      24
-    );
-
-
-    doc.setFontSize(9);
-
-    doc.setTextColor(
-      100,
-      100,
-      100
-    );
-
-    doc.text(
-      `Transaction Report · ${
-        monthNames[
-          Number(activeMonth) - 1
-        ]
-      } ${activeYear}`,
-      14,
-      31
-    );
-
-
-    /* ===================================================
-       SUMMARY
-    =================================================== */
-
-    const summaryY = 40;
-
-
-    const summaryItems = [
-      {
-        label: "TRANSACTIONS",
-        value:
-          String(
-            totalTransaction
-          ),
-      },
-
-      {
-        label: "GROSS",
-        value:
-          formatRupiah(
-            totalGross
-          ),
-      },
-
-      {
-        label: "MDR",
-        value:
-          formatRupiah(
-            totalMDR
-          ),
-      },
-
-      {
-        label: "NET",
-        value:
-          formatRupiah(
-            totalNet
-          ),
-      },
-    ];
-
-
-    const summaryWidth = 66;
-    const summaryGap = 4;
-
-
-    summaryItems.forEach(
-      (
-        item,
-        index
-      ) => {
-
-        const x =
-          14 +
-          index *
-            (
-              summaryWidth +
-              summaryGap
-            );
-
-
-        doc.setDrawColor(
-          220,
-          220,
-          220
+        window.alert(
+          `Tidak ada transaksi untuk ${
+            monthNames[
+              Number(
+                activeMonth
+              ) - 1
+            ]
+          } ${activeYear}.`
         );
 
-        doc.setFillColor(
-          248,
-          248,
-          248
-        );
-
-        doc.rect(
-          x,
-          summaryY,
-          summaryWidth,
-          19,
-          "FD"
-        );
-
-
-        doc.setFontSize(7);
-
-        doc.setTextColor(
-          110,
-          110,
-          110
-        );
-
-        doc.text(
-          item.label,
-          x + 5,
-          summaryY + 7
-        );
-
-
-        doc.setFontSize(11);
-
-        doc.setTextColor(
-          30,
-          30,
-          30
-        );
-
-        doc.text(
-          item.value,
-          x + 5,
-          summaryY + 14
-        );
-
+        return;
       }
-    );
 
 
-    /* ===================================================
-       TABLE DATA
-    =================================================== */
+      const doc =
+        new jsPDF({
+          orientation:
+            "landscape",
 
-    const tableData =
-      filteredTransactions.map(
-        (item) => [
+          unit:
+            "mm",
 
-          formatDate(
-            item.transaction_date
-          ),
+          format:
+            "a4",
+        });
 
-          item.customer ||
-            "-",
 
-          item.payment_type ||
-            "Down Payment",
+      /* ===================================================
+         DOCUMENT TITLE
+      =================================================== */
 
-          item.description ||
-            "-",
-
-          item.payment_method ||
-            "-",
-
-          formatRupiah(
-            item.amount
-          ),
-
-          Number(
-            item.mdr_percentage ||
-              0
-          ) > 0
-            ? `${item.mdr_percentage}%`
-            : "-",
-
-          formatRupiah(
-            item.net_amount
-          ),
-
-        ]
+      doc.setFont(
+        "helvetica",
+        "normal"
       );
-
-
-    /* ===================================================
-       TABLE
-    =================================================== */
-
-    autoTable(
-      doc,
-      {
-
-        startY: 66,
-
-        head: [[
-          "DATE",
-          "CUSTOMER",
-          "PAYMENT TYPE",
-          "DESCRIPTION",
-          "PAYMENT",
-          "GROSS",
-          "MDR",
-          "NET",
-        ]],
-
-        body:
-          tableData,
-
-        theme: "grid",
-
-        styles: {
-          font:
-            "helvetica",
-
-          fontSize: 7,
-
-          fontStyle:
-            "normal",
-
-          textColor: [
-            50,
-            50,
-            50,
-          ],
-
-          lineColor: [
-            220,
-            220,
-            220,
-          ],
-
-          lineWidth: 0.2,
-
-          cellPadding: 3,
-
-          valign:
-            "middle",
-        },
-
-        headStyles: {
-          fillColor: [
-            30,
-            30,
-            30,
-          ],
-
-          textColor: [
-            240,
-            240,
-            240,
-          ],
-
-          fontSize: 6.5,
-
-          fontStyle:
-            "normal",
-
-          lineColor: [
-            30,
-            30,
-            30,
-          ],
-        },
-
-        alternateRowStyles: {
-          fillColor: [
-            248,
-            248,
-            248,
-          ],
-        },
-
-        columnStyles: {
-
-          0: {
-            cellWidth: 27,
-          },
-
-          1: {
-            cellWidth: 38,
-          },
-
-          2: {
-            cellWidth: 34,
-          },
-
-          3: {
-            cellWidth: 55,
-          },
-
-          4: {
-            cellWidth: 25,
-          },
-
-          5: {
-            cellWidth: 35,
-            halign:
-              "right",
-          },
-
-          6: {
-            cellWidth: 20,
-            halign:
-              "center",
-          },
-
-          7: {
-            cellWidth: 35,
-            halign:
-              "right",
-          },
-
-        },
-
-        margin: {
-          left: 14,
-          right: 14,
-        },
-
-      }
-    );
-
-
-    /* ===================================================
-       FOOTER
-    =================================================== */
-
-    const pageCount =
-      doc.internal.getNumberOfPages();
-
-
-    for (
-      let page = 1;
-      page <= pageCount;
-      page++
-    ) {
-
-      doc.setPage(
-        page
-      );
-
-
-      const pageHeight =
-        doc.internal.pageSize.height;
-
 
       doc.setFontSize(
-        6.5
+        8
       );
 
       doc.setTextColor(
-        130,
-        130,
-        130
+        100,
+        100,
+        100
       );
-
 
       doc.text(
         "PLUNO INTERNAL SYSTEM",
         14,
-        pageHeight - 8
+        14
       );
 
+
+      doc.setFontSize(
+        20
+      );
+
+      doc.setTextColor(
+        30,
+        30,
+        30
+      );
 
       doc.text(
-        `Page ${page} / ${pageCount}`,
-        283,
-        pageHeight - 8,
-        {
-          align:
-            "right",
-        }
+        "Transaction Performance",
+        14,
+        24
       );
 
-    }
+
+      doc.setFontSize(
+        9
+      );
+
+      doc.setTextColor(
+        100,
+        100,
+        100
+      );
+
+      doc.text(
+        `Transaction Report · ${
+          monthNames[
+            Number(
+              activeMonth
+            ) - 1
+          ]
+        } ${activeYear}`,
+        14,
+        31
+      );
 
 
-    /* ===================================================
-       FILE NAME
-    =================================================== */
+      /* ===================================================
+         SUMMARY
+      =================================================== */
 
-    const monthName =
-      monthNames[
-        Number(activeMonth) - 1
+      const summaryY =
+        40;
+
+
+      const summaryItems = [
+        {
+          label:
+            "TRANSACTIONS",
+
+          value:
+            String(
+              totalTransaction
+            ),
+        },
+
+        {
+          label:
+            "GROSS",
+
+          value:
+            formatRupiah(
+              totalGross
+            ),
+        },
+
+        {
+          label:
+            "MDR",
+
+          value:
+            formatRupiah(
+              totalMDR
+            ),
+        },
+
+        {
+          label:
+            "NET",
+
+          value:
+            formatRupiah(
+              totalNet
+            ),
+        },
       ];
 
 
-    doc.save(
-      `Transactions-${monthName}-${activeYear}.pdf`
-    );
+      const summaryWidth =
+        66;
 
-  };
+      const summaryGap =
+        4;
+
+
+      summaryItems.forEach(
+        (
+          item,
+          index
+        ) => {
+
+          const x =
+            14 +
+            index *
+              (
+                summaryWidth +
+                summaryGap
+              );
+
+
+          doc.setDrawColor(
+            220,
+            220,
+            220
+          );
+
+          doc.setFillColor(
+            248,
+            248,
+            248
+          );
+
+          doc.rect(
+            x,
+            summaryY,
+            summaryWidth,
+            19,
+            "FD"
+          );
+
+
+          doc.setFontSize(
+            7
+          );
+
+          doc.setTextColor(
+            110,
+            110,
+            110
+          );
+
+          doc.text(
+            item.label,
+            x + 5,
+            summaryY + 7
+          );
+
+
+          doc.setFontSize(
+            11
+          );
+
+          doc.setTextColor(
+            30,
+            30,
+            30
+          );
+
+          doc.text(
+            item.value,
+            x + 5,
+            summaryY + 14
+          );
+        }
+      );
+
+
+      /* ===================================================
+         TABLE DATA
+      =================================================== */
+
+      const tableData =
+        filteredTransactions.map(
+          (
+            item
+          ) => [
+
+            formatDate(
+              item.transaction_date
+            ),
+
+            item.customer ||
+              "-",
+
+            item.payment_type ||
+              "Down Payment",
+
+            item.description ||
+              "-",
+
+            item.payment_method ||
+              "-",
+
+            formatRupiah(
+              item.amount
+            ),
+
+            Number(
+              item.mdr_percentage ||
+                0
+            ) > 0
+              ? `${item.mdr_percentage}%`
+              : "-",
+
+            formatRupiah(
+              item.net_amount
+            ),
+          ]
+        );
+
+
+      /* ===================================================
+         TABLE
+      =================================================== */
+
+      autoTable(
+        doc,
+        {
+
+          startY:
+            66,
+
+          head: [[
+            "DATE",
+            "CUSTOMER",
+            "PAYMENT TYPE",
+            "DESCRIPTION",
+            "PAYMENT",
+            "GROSS",
+            "MDR",
+            "NET",
+          ]],
+
+          body:
+            tableData,
+
+          theme:
+            "grid",
+
+          styles: {
+
+            font:
+              "helvetica",
+
+            fontSize:
+              7,
+
+            fontStyle:
+              "normal",
+
+            textColor: [
+              50,
+              50,
+              50,
+            ],
+
+            lineColor: [
+              220,
+              220,
+              220,
+            ],
+
+            lineWidth:
+              0.2,
+
+            cellPadding:
+              3,
+
+            valign:
+              "middle",
+          },
+
+          headStyles: {
+
+            fillColor: [
+              30,
+              30,
+              30,
+            ],
+
+            textColor: [
+              240,
+              240,
+              240,
+            ],
+
+            fontSize:
+              6.5,
+
+            fontStyle:
+              "normal",
+
+            lineColor: [
+              30,
+              30,
+              30,
+            ],
+          },
+
+          alternateRowStyles: {
+
+            fillColor: [
+              248,
+              248,
+              248,
+            ],
+          },
+
+          columnStyles: {
+
+            0: {
+              cellWidth:
+                27,
+            },
+
+            1: {
+              cellWidth:
+                38,
+            },
+
+            2: {
+              cellWidth:
+                34,
+            },
+
+            3: {
+              cellWidth:
+                55,
+            },
+
+            4: {
+              cellWidth:
+                25,
+            },
+
+            5: {
+              cellWidth:
+                35,
+
+              halign:
+                "right",
+            },
+
+            6: {
+              cellWidth:
+                20,
+
+              halign:
+                "center",
+            },
+
+            7: {
+              cellWidth:
+                35,
+
+              halign:
+                "right",
+            },
+          },
+
+          margin: {
+            left:
+              14,
+
+            right:
+              14,
+          },
+        }
+      );
+
+
+      /* ===================================================
+         FOOTER
+      =================================================== */
+
+      const pageCount =
+        doc.internal.getNumberOfPages();
+
+
+      for (
+        let page = 1;
+        page <= pageCount;
+        page++
+      ) {
+
+        doc.setPage(
+          page
+        );
+
+
+        const pageHeight =
+          doc.internal
+            .pageSize
+            .height;
+
+
+        doc.setFontSize(
+          6.5
+        );
+
+        doc.setTextColor(
+          130,
+          130,
+          130
+        );
+
+
+        doc.text(
+          "PLUNO INTERNAL SYSTEM",
+          14,
+          pageHeight - 8
+        );
+
+
+        doc.text(
+          `Page ${page} / ${pageCount}`,
+          283,
+          pageHeight - 8,
+          {
+            align:
+              "right",
+          }
+        );
+      }
+
+
+      /* ===================================================
+         FILE NAME
+      =================================================== */
+
+      const monthName =
+        monthNames[
+          Number(
+            activeMonth
+          ) - 1
+        ];
+
+
+      doc.save(
+        `Transactions-${monthName}-${activeYear}.pdf`
+      );
+    };
 
 
   /* =======================================================
@@ -1187,7 +1485,9 @@ function Transactions() {
                 ) => (
 
                   <option
-                    key={month}
+                    key={
+                      month
+                    }
                     value={String(
                       index + 1
                     ).padStart(
@@ -1195,7 +1495,9 @@ function Transactions() {
                       "0"
                     )}
                   >
-                    {month}
+                    {
+                      month
+                    }
                   </option>
 
                 )
@@ -1225,16 +1527,71 @@ function Transactions() {
                 ) => (
 
                   <option
-                    key={year}
-                    value={year}
+                    key={
+                      year
+                    }
+                    value={
+                      year
+                    }
                   >
-                    {year}
+                    {
+                      year
+                    }
                   </option>
 
                 )
               )}
 
             </select>
+
+
+            {/* =================================================
+                MDR SETTINGS
+            ================================================= */}
+
+            <button
+              type="button"
+              className="transactions-mdr-settings"
+              onClick={
+                openMdrSettings
+              }
+              aria-label="QRIS MDR Settings"
+              title="QRIS MDR Settings"
+              style={{
+                width:
+                  "30px",
+                height:
+                  "30px",
+                padding:
+                  0,
+                border:
+                  "1px solid #333",
+                background:
+                  "#111",
+                color:
+                  "#aaa",
+                cursor:
+                  "pointer",
+                fontFamily:
+                  "inherit",
+                fontSize:
+                  "14px",
+                fontWeight:
+                  400,
+                lineHeight:
+                  1,
+                display:
+                  "flex",
+                alignItems:
+                  "center",
+                justifyContent:
+                  "center",
+                transition:
+                  "color 0.2s ease, border-color 0.2s ease, background 0.2s ease",
+              }}
+            >
+              ⚙
+            </button>
 
           </div>
 
@@ -1248,7 +1605,9 @@ function Transactions() {
         {errorMessage && (
 
           <div className="transactions-error">
-            {errorMessage}
+            {
+              errorMessage
+            }
           </div>
 
         )}
@@ -1267,7 +1626,9 @@ function Transactions() {
             </span>
 
             <strong>
-              {totalTransaction}
+              {
+                totalTransaction
+              }
             </strong>
 
           </div>
@@ -1467,7 +1828,9 @@ function Transactions() {
 
 
                         <td>
-                          {item.customer}
+                          {
+                            item.customer
+                          }
                         </td>
 
 
@@ -1493,7 +1856,9 @@ function Transactions() {
 
 
                         <td>
-                          {item.description}
+                          {
+                            item.description
+                          }
                         </td>
 
 
@@ -1850,10 +2215,12 @@ function Transactions() {
 
                   <strong>
 
-                    {formData.payment_method ===
-                    "QRIS"
-                      ? "0.7%"
-                      : "0%"}
+                    {
+                      formData.payment_method ===
+                      "QRIS"
+                        ? `${mdrPercentage}%`
+                        : "0%"
+                    }
 
                   </strong>
 
@@ -1881,7 +2248,8 @@ function Transactions() {
                             (
                               formData.payment_method ===
                               "QRIS"
-                                ? 0.007
+                                ? mdrPercentage /
+                                  100
                                 : 0
                             )
                         )
@@ -1897,7 +2265,9 @@ function Transactions() {
               {errorMessage && (
 
                 <div className="transactions-form-error">
-                  {errorMessage}
+                  {
+                    errorMessage
+                  }
                 </div>
 
               )}
@@ -1936,6 +2306,125 @@ function Transactions() {
               </div>
 
             </form>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =================================================
+          QRIS MDR SETTINGS MODAL
+      ================================================= */}
+
+      {showMdrSettings && (
+
+        <div className="transactions-overlay">
+
+          <div className="transactions-modal transactions-mdr-modal">
+
+            <div className="transactions-modal-header">
+
+              <div>
+
+                <span>
+                  PAYMENT PROCESSING
+                </span>
+
+                <h2>
+                  QRIS MDR
+                </h2>
+
+              </div>
+
+
+              <button
+                type="button"
+                className="transactions-close"
+                onClick={
+                  closeMdrSettings
+                }
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            <div className="transactions-mdr-settings-body">
+
+              <div className="transactions-field">
+
+                <label>
+                  MDR PERCENTAGE
+                </label>
+
+
+                <div className="transactions-mdr-input">
+
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={
+                      mdrFormValue
+                    }
+                    onChange={
+                      handleMdrChange
+                    }
+                    placeholder="0.7"
+                    autoFocus
+                  />
+
+
+                  <span>
+                    %
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {errorMessage && (
+
+              <div className="transactions-form-error">
+                {
+                  errorMessage
+                }
+              </div>
+
+            )}
+
+
+            <div className="transactions-modal-footer">
+
+              <button
+                type="button"
+                className="transactions-cancel"
+                onClick={
+                  closeMdrSettings
+                }
+              >
+                Cancel
+              </button>
+
+
+              <button
+                type="button"
+                className="transactions-save"
+                onClick={
+                  saveMdrSettings
+                }
+              >
+                Save
+              </button>
+
+            </div>
 
           </div>
 

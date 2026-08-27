@@ -178,14 +178,10 @@ function Sidebar({
 
           <div className="dashboard-brand">
 
-            <div className="dashboard-brand-mark">
-              P
-            </div>
-
             <div>
 
               <div className="dashboard-brand-name">
-                PLUNO
+                PLUNO STUDIO
               </div>
 
               <div className="dashboard-brand-subtitle">
