@@ -1505,20 +1505,14 @@ function Spending() {
 
         {/* =================================================
             OVERVIEW
-            SAMA DENGAN TRANSACTIONS
+            PLUNO STUDIO / FINANCE DIHAPUS
         ================================================= */}
 
         <div className="spending-section-heading">
 
           <div>
 
-            <div className="spending-section-label">
-              PLUNO STUDIO / FINANCE
-            </div>
 
-            <h2>
-              Spending
-            </h2>
 
           </div>
 
