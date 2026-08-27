@@ -1,0 +1,1051 @@
+/* =========================================================
+   TRANSACTIONS PAGE
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+.transactions-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  background: #111;
+  color: #eee;
+  font-family:
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.transactions-main {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  padding: 42px 52px 28px;
+  background: #111;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 34px;
+}
+
+.transactions-eyebrow {
+  margin-bottom: 9px;
+  color: #666;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 2px;
+}
+
+.transactions-header h1 {
+  margin: 0;
+  color: #eee;
+  font-size: 38px;
+  line-height: 1.05;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+
+.transactions-header p {
+  margin: 9px 0 0;
+  color: #666;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
+
+.transactions-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.transactions-add-button,
+.transactions-pdf-button {
+  height: 32px;
+  padding: 0 13px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 400;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.transactions-add-button {
+  border: 1px solid #eee;
+  background: #eee;
+  color: #111;
+}
+
+.transactions-add-button:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+.transactions-pdf-button {
+  border: 1px solid #292929;
+  background: #181818;
+  color: #999;
+}
+
+.transactions-pdf-button:hover {
+  background: #1d1d1d;
+  border-color: #444;
+  color: #eee;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.transactions-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 18px;
+}
+
+.transactions-section-label {
+  color: #666;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 2px;
+}
+
+.transactions-section-heading h2 {
+  margin: 7px 0 0;
+  color: #eee;
+  font-size: 17px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   MONTH / YEAR FILTER
+========================================================= */
+
+.transactions-performance-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.transactions-performance-filter select {
+  appearance: none;
+  min-width: 105px;
+  height: 31px;
+  padding: 7px 27px 7px 10px;
+  border: 1px solid #292929;
+  outline: none;
+  background-color: #181818;
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #666 50%
+    ),
+    linear-gradient(
+      135deg,
+      #666 50%,
+      transparent 50%
+    );
+  background-position:
+    calc(100% - 12px) 11px,
+    calc(100% - 8px) 11px;
+  background-size:
+    4px 4px,
+    4px 4px;
+  background-repeat: no-repeat;
+  color: #aaa;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 400;
+}
+
+.transactions-performance-filter select:hover {
+  border-color: #444;
+  color: #eee;
+}
+
+.transactions-performance-filter select:focus {
+  border-color: #555;
+}
+
+.transactions-performance-filter select option {
+  background: #181818;
+  color: #eee;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.transactions-error {
+  margin-bottom: 16px;
+  padding: 10px 13px;
+  border: 1px solid #382525;
+  background: #241919;
+  color: #b87878;
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.transactions-summary {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 18px;
+}
+
+.transactions-summary > div {
+  min-width: 0;
+  padding: 17px 19px;
+  border: 1px solid #292929;
+  background: #181818;
+}
+
+.transactions-summary span {
+  display: block;
+  margin-bottom: 8px;
+  color: #666;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.transactions-summary strong {
+  display: block;
+  color: #eee;
+  font-size: 16px;
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   TRANSACTION CARD
+========================================================= */
+
+.transactions-card {
+  width: 100%;
+  border: 1px solid #292929;
+  background: #181818;
+  overflow: hidden;
+}
+
+.transactions-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 17px 19px;
+  border-bottom: 1px solid #292929;
+  background: #181818;
+}
+
+.transactions-card-header span {
+  color: #666;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.transactions-card-header h2 {
+  margin: 6px 0 0;
+  color: #eee;
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   TABLE SCROLL
+========================================================= */
+
+.transactions-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: #181818;
+}
+
+.transactions-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  background: #181818;
+  font-family: inherit;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.transactions-table th {
+  padding: 10px 12px;
+  border-bottom: 1px solid #292929;
+  background: #151515;
+  color: #555;
+  text-align: left;
+  font-size: 6.5px;
+  font-weight: 400;
+  letter-spacing: 1.4px;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.transactions-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #292929;
+  background: #181818;
+  color: #ccc;
+  font-size: 8px;
+  font-weight: 400;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.transactions-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.transactions-table tbody tr:hover td {
+  background: #1d1d1d;
+}
+
+
+/* =========================================================
+   COLUMN WIDTH
+========================================================= */
+
+.transactions-table th:nth-child(1),
+.transactions-table td:nth-child(1) {
+  width: 105px;
+  min-width: 105px;
+}
+
+.transactions-table th:nth-child(2),
+.transactions-table td:nth-child(2) {
+  width: 135px;
+  min-width: 135px;
+}
+
+.transactions-table th:nth-child(3),
+.transactions-table td:nth-child(3) {
+  width: 125px;
+  min-width: 125px;
+}
+
+.transactions-table th:nth-child(4),
+.transactions-table td:nth-child(4) {
+  width: 175px;
+  min-width: 175px;
+}
+
+.transactions-table th:nth-child(5),
+.transactions-table td:nth-child(5) {
+  width: 90px;
+  min-width: 90px;
+}
+
+.transactions-table th:nth-child(6),
+.transactions-table td:nth-child(6) {
+  width: 120px;
+  min-width: 120px;
+}
+
+.transactions-table th:nth-child(7),
+.transactions-table td:nth-child(7) {
+  width: 60px;
+  min-width: 60px;
+}
+
+.transactions-table th:nth-child(8),
+.transactions-table td:nth-child(8) {
+  width: 120px;
+  min-width: 120px;
+}
+
+.transactions-table th:nth-child(9),
+.transactions-table td:nth-child(9) {
+  width: 65px;
+  min-width: 65px;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.transactions-payment-type {
+  display: inline-block;
+  padding: 4px 7px;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+.transactions-payment-type.down-payment {
+  background: #242424;
+  color: #aaa;
+}
+
+.transactions-payment-type.final {
+  background: #292929;
+  color: #eee;
+}
+
+.transactions-payment {
+  display: inline-block;
+  padding: 4px 7px;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 0.8px;
+}
+
+.transactions-payment.cash {
+  background: #242424;
+  color: #aaa;
+}
+
+.transactions-payment.qris {
+  background: #292929;
+  color: #eee;
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+.transactions-delete {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+.transactions-delete:hover {
+  color: #fff;
+}
+
+
+/* =========================================================
+   EMPTY / LOADING
+========================================================= */
+
+.transactions-empty {
+  padding: 45px 20px !important;
+  background: #181818 !important;
+  color: #555 !important;
+  text-align: center;
+  font-size: 8px !important;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.transactions-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 14px 0;
+  border-top: 1px solid #292929;
+  color: #444;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 0.8px;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.transactions-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.75);
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.transactions-modal {
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #333;
+  background: #181818;
+  color: #eee;
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.transactions-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #292929;
+  background: #181818;
+}
+
+.transactions-modal-header span {
+  color: #666;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.transactions-modal-header h2 {
+  margin: 7px 0 6px;
+  color: #eee;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.transactions-modal-header p {
+  margin: 0;
+  color: #666;
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.transactions-close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #333;
+  background: #111;
+  color: #aaa;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.transactions-close:hover {
+  color: #fff;
+  border-color: #555;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.transactions-form-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  padding: 21px 22px;
+  background: #181818;
+}
+
+.transactions-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.transactions-field label {
+  color: #666;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.transactions-field input,
+.transactions-field select {
+  width: 100%;
+  height: 34px;
+  padding: 8px 10px;
+  border: 1px solid #292929;
+  outline: none;
+  background: #111;
+  color: #eee;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 400;
+  transition: border-color 0.2s ease;
+}
+
+.transactions-field input::placeholder {
+  color: #555;
+}
+
+.transactions-field input:focus,
+.transactions-field select:focus {
+  border-color: #666;
+}
+
+.transactions-field select option {
+  background: #181818;
+  color: #eee;
+}
+
+
+/* =========================================================
+   PAYMENT PREVIEW
+========================================================= */
+
+.transactions-preview {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  border-top: 1px solid #292929;
+  border-bottom: 1px solid #292929;
+  background: #181818;
+}
+
+.transactions-preview > div {
+  padding: 15px 18px;
+  border-right: 1px solid #292929;
+}
+
+.transactions-preview > div:last-child {
+  border-right: 0;
+}
+
+.transactions-preview span {
+  display: block;
+  margin-bottom: 7px;
+  color: #666;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.6px;
+}
+
+.transactions-preview strong {
+  color: #eee;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   FORM ERROR
+========================================================= */
+
+.transactions-form-error {
+  margin: 13px 22px 0;
+  padding: 10px 12px;
+  border: 1px solid #382525;
+  background: #241919;
+  color: #b87878;
+  font-size: 8px;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.transactions-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 15px 22px;
+  border-top: 1px solid #292929;
+  background: #181818;
+}
+
+.transactions-cancel,
+.transactions-save {
+  height: 32px;
+  padding: 0 15px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 400;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.transactions-cancel {
+  border: 1px solid #333;
+  background: transparent;
+  color: #aaa;
+}
+
+.transactions-cancel:hover {
+  border-color: #555;
+  color: #fff;
+}
+
+.transactions-save {
+  border: 1px solid #eee;
+  background: #eee;
+  color: #111;
+}
+
+.transactions-save:hover {
+  background: #fff;
+}
+
+.transactions-cancel:disabled,
+.transactions-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.transactions-page,
+.transactions-page h1,
+.transactions-page h2,
+.transactions-page h3,
+.transactions-page h4,
+.transactions-page p,
+.transactions-page span,
+.transactions-page div,
+.transactions-page button,
+.transactions-page input,
+.transactions-page select,
+.transactions-page textarea,
+.transactions-page option,
+.transactions-page table,
+.transactions-page th,
+.transactions-page td,
+.transactions-page label {
+  font-family:
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+
+/* =========================================================
+   RESPONSIVE — 1200
+========================================================= */
+
+@media (max-width: 1200px) {
+
+  .transactions-main {
+    padding: 38px 35px 25px;
+  }
+
+  .transactions-summary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 900
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .transactions-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .transactions-performance-filter {
+    width: 100%;
+  }
+
+  .transactions-performance-filter select {
+    flex: 1;
+  }
+
+  .transactions-card-header {
+    flex-direction: column;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE — 700
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .transactions-main {
+    width: 100%;
+    padding: 72px 20px 25px;
+  }
+
+  .transactions-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 27px;
+  }
+
+  .transactions-header h1 {
+    font-size: 32px;
+  }
+
+  .transactions-header p {
+    font-size: 10px;
+  }
+
+  .transactions-header-actions {
+    width: 100%;
+  }
+
+  .transactions-header-actions
+  .transactions-pdf-button,
+
+  .transactions-header-actions
+  .transactions-add-button {
+    flex: 1;
+  }
+
+
+  /* =======================================================
+     SECTION
+  ======================================================= */
+
+  .transactions-section-heading {
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .transactions-performance-filter {
+    width: auto;
+    flex-shrink: 0;
+    gap: 5px;
+  }
+
+  .transactions-performance-filter select {
+    flex: none;
+    width: auto;
+    min-width: 88px;
+  }
+
+
+  /* =======================================================
+     SUMMARY
+  ======================================================= */
+
+  .transactions-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-summary > div {
+    padding: 18px 20px;
+  }
+
+
+  /* =======================================================
+     CARD
+  ======================================================= */
+
+  .transactions-card-header {
+    padding: 18px;
+  }
+
+
+  /* =======================================================
+     TABLE
+  ======================================================= */
+
+  .transactions-table {
+    min-width: 1000px;
+  }
+
+
+  /* =======================================================
+     MODAL
+  ======================================================= */
+
+  .transactions-overlay {
+    padding: 15px;
+  }
+
+  .transactions-modal-header {
+    padding: 19px;
+  }
+
+  .transactions-form-grid {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .transactions-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-preview > div {
+    border-right: 0;
+    border-bottom: 1px solid #292929;
+  }
+
+  .transactions-preview > div:last-child {
+    border-bottom: 0;
+  }
+
+  .transactions-modal-footer {
+    padding: 16px 20px;
+  }
+
+  .transactions-form-error {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+
+  /* =======================================================
+     FOOTER
+  ======================================================= */
+
+  .transactions-footer {
+    flex-direction: column;
+    gap: 7px;
+    font-size: 7px;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE — 480
+========================================================= */
+
+@media (max-width: 480px) {
+
+  .transactions-main {
+    padding: 68px 15px 22px;
+  }
+
+  .transactions-header h1 {
+    font-size: 29px;
+  }
+
+  .transactions-performance-filter {
+    gap: 4px;
+  }
+
+  .transactions-performance-filter select {
+    min-width: 76px;
+    padding-left: 8px;
+    padding-right: 22px;
+    font-size: 8px;
+  }
+
+  .transactions-card-header {
+    padding: 17px;
+  }
+
+  .transactions-form-grid {
+    padding: 19px;
+  }
+
+  .transactions-modal-header {
+    padding: 19px;
+  }
+
+  .transactions-table th {
+    font-size: 6px;
+  }
+
+  .transactions-table td {
+    padding: 12px 11px;
+  }
+
+}

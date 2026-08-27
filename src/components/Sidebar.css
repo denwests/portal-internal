@@ -1,0 +1,366 @@
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.dashboard-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 250px;
+  height: 100vh;
+
+  background: #171717;
+  color: #fff;
+
+  padding: 30px 22px;
+
+  display: flex;
+  flex-direction: column;
+
+  z-index: 1100;
+
+  font-family:
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 50px;
+}
+
+.dashboard-brand-mark {
+  width: 38px;
+  height: 38px;
+
+  background: #fff;
+  color: #171717;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.dashboard-brand-name {
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+
+.dashboard-brand-subtitle {
+  margin-top: 3px;
+
+  font-size: 8px;
+  letter-spacing: 2px;
+
+  color: #777;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.dashboard-navigation {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.dashboard-nav-section {
+  margin-bottom: 10px;
+
+  font-size: 8px;
+  letter-spacing: 2px;
+
+  color: #777;
+}
+
+.dashboard-nav-section.second {
+  margin-top: 35px;
+}
+
+
+.dashboard-nav-item {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px 10px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  text-decoration: none;
+
+  color: #999;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.dashboard-nav-item span {
+  font-size: 9px;
+  color: #555;
+}
+
+
+.dashboard-nav-item:hover {
+  background: #242424;
+  color: #fff;
+}
+
+
+.dashboard-nav-item.active {
+  background: #242424;
+  color: #fff;
+}
+
+
+.dashboard-nav-item.active span {
+  color: #fff;
+}
+
+
+/* =========================================================
+   BOTTOM USER
+========================================================= */
+
+.dashboard-sidebar-bottom {
+  margin-top: auto;
+}
+
+
+.dashboard-user {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding-bottom: 20px;
+}
+
+
+.dashboard-avatar {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+
+  background: #ddd;
+  color: #222;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+
+  flex-shrink: 0;
+}
+
+
+.dashboard-user-name {
+  max-width: 150px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 11px;
+}
+
+
+.dashboard-user-role {
+  margin-top: 3px;
+
+  font-size: 9px;
+
+  color: #777;
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.dashboard-logout {
+  width: 100%;
+
+  padding: 10px;
+
+  background: transparent;
+
+  border: 1px solid #333;
+
+  color: #999;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 10px;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.dashboard-logout:hover {
+  color: #fff;
+
+  border-color: #555;
+
+  background: #222;
+}
+
+
+/* =========================================================
+   MOBILE RAIL
+========================================================= */
+
+.dashboard-mobile-rail {
+  display: none;
+}
+
+
+/* =========================================================
+   MOBILE TRIGGER
+========================================================= */
+
+.dashboard-mobile-trigger {
+  display: none;
+
+  position: fixed;
+
+  top: 15px;
+  left: 15px;
+
+  width: 40px;
+  height: 40px;
+
+  border: 1px solid #333;
+
+  background: #171717;
+
+  z-index: 1200;
+
+  cursor: pointer;
+
+  padding: 0;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+.dashboard-mobile-trigger span {
+  display: block;
+
+  width: 16px;
+  height: 1px;
+
+  background: #fff;
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY
+========================================================= */
+
+.dashboard-mobile-overlay {
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.65);
+
+  z-index: 1050;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .dashboard-mobile-trigger {
+    display: flex;
+  }
+
+
+  .dashboard-mobile-overlay {
+    display: block;
+  }
+
+
+  .dashboard-sidebar {
+    width: 270px;
+    height: 100vh;
+
+    transform: translateX(-100%);
+
+    transition:
+      transform 0.25s ease;
+
+    overflow-y: auto;
+  }
+
+
+  .dashboard-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE
+========================================================= */
+
+@media (max-width: 480px) {
+
+  .dashboard-mobile-trigger {
+    top: 12px;
+    left: 12px;
+
+    width: 38px;
+    height: 38px;
+  }
+
+
+  .dashboard-sidebar {
+    width: 260px;
+  }
+
+}

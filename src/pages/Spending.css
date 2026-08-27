@@ -1,0 +1,1390 @@
+/* =========================================================
+   SPENDING PAGE
+   DISESUAIKAN DENGAN TRANSACTIONS
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: #111;
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.spending-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  background: #111;
+  color: #eee;
+  font-family:
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  font-weight: 400;
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.spending-main {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  padding: 42px 52px 28px;
+  background: #111;
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   SECTION HEADING
+   MENGIKUTI HEADER TRANSACTIONS
+========================================================= */
+
+.spending-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 34px;
+}
+
+.spending-section-heading > div:first-child {
+  min-width: 0;
+}
+
+.spending-section-label {
+  margin: 0;
+  color: #666;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 2px;
+}
+
+.spending-section-heading h2 {
+  margin: 7px 0 0;
+  padding: 0;
+  color: #eee;
+  font-size: 38px;
+  line-height: 1.05;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+
+/* =========================================================
+   PERIOD FILTER
+========================================================= */
+
+.spending-performance-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.spending-performance-filter select {
+  appearance: none;
+  min-width: 105px;
+  height: 31px;
+  padding: 7px 27px 7px 10px;
+
+  border: 1px solid #292929;
+  outline: none;
+
+  background-color: #181818;
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #666 50%
+    ),
+    linear-gradient(
+      135deg,
+      #666 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 12px) 11px,
+    calc(100% - 8px) 11px;
+
+  background-size:
+    4px 4px,
+    4px 4px;
+
+  background-repeat: no-repeat;
+
+  color: #aaa;
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 400;
+}
+
+.spending-performance-filter select:hover {
+  border-color: #444;
+  color: #eee;
+}
+
+.spending-performance-filter select:focus {
+  border-color: #555;
+}
+
+.spending-performance-filter select option {
+  background: #181818;
+  color: #eee;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.spending-error {
+  margin-bottom: 16px;
+  padding: 10px 13px;
+
+  border: 1px solid #382525;
+  background: #241919;
+  color: #b87878;
+
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   TWO COLUMNS
+========================================================= */
+
+.spending-columns {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 12px;
+  align-items: stretch;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.spending-card {
+  min-width: 0;
+
+  background: #181818;
+  border: 1px solid #292929;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.spending-card-header {
+  min-height: 74px;
+
+  padding: 17px 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  border-bottom: 1px solid #292929;
+  background: #181818;
+}
+
+.spending-card-title {
+  min-width: 0;
+}
+
+.spending-card-kicker {
+  margin: 0 0 5px;
+
+  color: #666;
+
+  font-size: 7px;
+  line-height: 1;
+  font-weight: 400;
+
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+}
+
+.spending-card-header h2 {
+  margin: 0;
+
+  color: #eee;
+
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.spending-card-header p {
+  margin: 5px 0 0;
+
+  color: #666;
+
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
+
+.spending-section-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.spending-add-button,
+.spending-pdf-button {
+  height: 29px;
+  padding: 7px 10px;
+
+  border: 1px solid #292929;
+
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 400;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.spending-add-button {
+  order: 2;
+
+  background: #eee;
+  color: #111;
+
+  border-color: #eee;
+}
+
+.spending-add-button:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+.spending-pdf-button {
+  order: 1;
+
+  background: #181818;
+  color: #999;
+
+  border-color: #292929;
+}
+
+.spending-pdf-button:hover {
+  background: #1d1d1d;
+  border-color: #444;
+  color: #eee;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.spending-toolbar {
+  min-height: 35px;
+
+  padding: 7px 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  border-bottom: 1px solid #292929;
+  background: #181818;
+}
+
+.spending-count {
+  color: #555;
+
+  font-size: 7px;
+  line-height: 1;
+  font-weight: 400;
+
+  letter-spacing: 1px;
+}
+
+/* =========================================================
+   TABLE NAVIGATION
+========================================================= */
+
+.spending-table-navigation {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.spending-table-navigation button {
+  width: 25px;
+  height: 22px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #292929;
+  background: #151515;
+  color: #777;
+
+  font-family: inherit;
+  font-size: 10px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.spending-table-navigation button:hover {
+  background: #222;
+  color: #fff;
+  border-color: #444;
+}
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+.spending-table-scroll {
+  width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    #3a3a3a
+    #151515;
+}
+
+.spending-table-scroll::-webkit-scrollbar {
+  height: 5px;
+}
+
+.spending-table-scroll::-webkit-scrollbar-track {
+  background: #151515;
+}
+
+.spending-table-scroll::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+}
+
+.spending-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.spending-table {
+  width: 100%;
+  min-width: 650px;
+
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  background: #181818;
+
+  font-family: inherit;
+}
+
+.spending-table th {
+  padding: 10px 8px;
+
+  border-bottom: 1px solid #292929;
+
+  background: #151515;
+  color: #555;
+
+  text-align: left;
+
+  font-size: 6.5px;
+  font-weight: 400;
+
+  letter-spacing: 1.4px;
+
+  white-space: nowrap;
+}
+
+.spending-table td {
+  padding: 11px 8px;
+
+  border-bottom: 1px solid #292929;
+
+  background: #181818;
+  color: #ccc;
+
+  font-size: 8px;
+  font-weight: 400;
+
+  white-space: nowrap;
+  vertical-align: middle;
+
+  overflow: hidden;
+}
+
+.spending-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.spending-table tbody tr:hover td {
+  background: #1d1d1d;
+}
+
+/* =========================================================
+   COLUMN WIDTH
+========================================================= */
+
+.spending-table th:nth-child(1),
+.spending-table td:nth-child(1) {
+  width: 16%;
+}
+
+.spending-table th:nth-child(2),
+.spending-table td:nth-child(2) {
+  width: 20%;
+}
+
+.spending-table th:nth-child(3),
+.spending-table td:nth-child(3) {
+  width: 15%;
+}
+
+.spending-table th:nth-child(4),
+.spending-table td:nth-child(4) {
+  width: 15%;
+}
+
+.spending-table th:nth-child(5),
+.spending-table td:nth-child(5) {
+  width: 18%;
+}
+
+.spending-table th:nth-child(6),
+.spending-table td:nth-child(6) {
+  width: 16%;
+}
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.spending-description {
+  color: #eee;
+
+  font-size: 8px;
+  font-weight: 400;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   MONEY
+========================================================= */
+
+.money-cell {
+  white-space: nowrap;
+  text-align: right;
+  font-weight: 400;
+}
+
+.spending-page .spending-table td.money-in {
+  color: #8fbf98 !important;
+
+  background: rgba(
+    80,
+    130,
+    90,
+    0.035
+  );
+}
+
+.spending-page .spending-table td.money-out {
+  color: #c88787 !important;
+
+  background: rgba(
+    150,
+    70,
+    70,
+    0.035
+  );
+}
+
+/* =========================================================
+   INFORMATION
+========================================================= */
+
+.spending-information {
+  display: block;
+
+  max-width: 100%;
+
+  color: #777;
+
+  line-height: 1.4;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+.spending-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 4px;
+
+  white-space: nowrap;
+}
+
+.spending-actions button {
+  padding: 5px 7px;
+
+  background: transparent;
+
+  border: 1px solid #292929;
+  color: #aaa;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: 400;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.spending-actions button:hover {
+  background: #eee;
+  color: #111;
+  border-color: #eee;
+}
+
+.spending-actions button.danger {
+  color: #b87878;
+  border-color: #402727;
+}
+
+.spending-actions button.danger:hover {
+  background: #2a1717;
+  color: #e5a0a0;
+  border-color: #5a3030;
+}
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.spending-empty {
+  padding: 45px 20px !important;
+
+  text-align: center;
+
+  background: #181818 !important;
+  color: #555 !important;
+
+  font-size: 8px !important;
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.spending-summary {
+  margin-top: auto;
+
+  padding: 14px 16px;
+
+  border-top: 1px solid #292929;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  background: #181818;
+}
+
+.spending-summary > div:first-child {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.spending-summary span {
+  color: #555;
+
+  font-size: 7px;
+  font-weight: 400;
+
+  letter-spacing: 1.6px;
+}
+
+.spending-summary strong {
+  color: #eee;
+
+  font-size: 15px;
+  line-height: 1.1;
+
+  font-weight: 400;
+}
+
+.spending-summary strong.total-expense-value {
+  color: #c88787 !important;
+}
+
+.spending-summary strong.positive {
+  color: #8fbf98 !important;
+}
+
+.spending-summary strong.negative {
+  color: #c88787 !important;
+}
+
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.spending-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(
+    0,
+    0,
+    0,
+    0.75
+  );
+
+  overflow-y: auto;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.spending-form-box {
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  padding: 0;
+
+  border: 1px solid #333;
+
+  background: #181818;
+  color: #eee;
+
+  box-shadow:
+    0 25px 70px
+    rgba(
+      0,
+      0,
+      0,
+      0.45
+    );
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.spending-form-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 20px;
+
+  margin: 0;
+
+  padding: 20px 22px;
+
+  border-bottom: 1px solid #292929;
+
+  background: #181818;
+}
+
+.spending-form-kicker {
+  margin-bottom: 8px;
+
+  color: #666;
+
+  font-size: 7px;
+  font-weight: 400;
+
+  letter-spacing: 2px;
+}
+
+.spending-form-header h2 {
+  margin: 7px 0 6px;
+
+  color: #eee;
+
+  font-size: 22px;
+  line-height: 1.2;
+
+  font-weight: 400;
+}
+
+.spending-form-header p {
+  margin: 0;
+
+  color: #666;
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.spending-close {
+  width: 32px;
+  height: 32px;
+
+  padding: 0;
+
+  border: 1px solid #333;
+
+  background: #111;
+  color: #aaa;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 400;
+
+  line-height: 1;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.spending-close:hover {
+  color: #fff;
+  border-color: #555;
+}
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.spending-form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 15px;
+
+  padding: 21px 22px;
+
+  background: #181818;
+}
+
+.spending-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.spending-field-wide {
+  grid-column: 1 / -1;
+}
+
+.spending-field label {
+  color: #666;
+
+  font-size: 7px;
+  font-weight: 400;
+
+  letter-spacing: 1.8px;
+}
+
+.spending-field input,
+.spending-field select,
+.spending-field textarea {
+  width: 100%;
+
+  padding: 8px 10px;
+
+  border: 1px solid #292929;
+  outline: none;
+
+  background: #111;
+  color: #eee;
+
+  font-family: inherit;
+
+  font-size: 9px;
+  font-weight: 400;
+
+  transition:
+    border-color 0.2s ease;
+}
+
+.spending-field input,
+.spending-field select {
+  height: 34px;
+}
+
+.spending-field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.spending-field input::placeholder,
+.spending-field textarea::placeholder {
+  color: #555;
+}
+
+.spending-field input:focus,
+.spending-field select:focus,
+.spending-field textarea:focus {
+  border-color: #666;
+}
+
+.spending-field select option {
+  background: #181818;
+  color: #eee;
+}
+
+/* =========================================================
+   FORM ERROR
+========================================================= */
+
+.spending-form-error {
+  margin: 13px 22px 0;
+
+  padding: 10px 12px;
+
+  border: 1px solid #382525;
+
+  background: #241919;
+  color: #b87878;
+
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   FORM FOOTER
+========================================================= */
+
+.spending-form-footer {
+  display: flex;
+
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 20px;
+
+  padding: 15px 22px;
+
+  border-top: 1px solid #292929;
+
+  background: #181818;
+}
+
+.spending-cancel,
+.spending-save {
+  height: 32px;
+
+  padding: 0 15px;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 400;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.spending-cancel {
+  border: 1px solid #333;
+
+  background: transparent;
+  color: #aaa;
+}
+
+.spending-cancel:hover {
+  border-color: #555;
+  color: #fff;
+}
+
+.spending-save {
+  border: 1px solid #eee;
+
+  background: #eee;
+  color: #111;
+}
+
+.spending-save:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+.spending-cancel:disabled,
+.spending-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.spending-footer {
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-top: 20px;
+
+  padding: 14px 0;
+
+  border-top: 1px solid #292929;
+
+  color: #444;
+
+  font-size: 7px;
+  font-weight: 400;
+
+  letter-spacing: 0.8px;
+}
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.spending-page,
+.spending-page h1,
+.spending-page h2,
+.spending-page h3,
+.spending-page h4,
+.spending-page p,
+.spending-page span,
+.spending-page div,
+.spending-page button,
+.spending-page input,
+.spending-page select,
+.spending-page textarea,
+.spending-page option,
+.spending-page table,
+.spending-page th,
+.spending-page td,
+.spending-page label {
+  font-family:
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+/* =========================================================
+   DESKTOP — 1400+
+========================================================= */
+
+@media (min-width: 1400px) {
+  .spending-main {
+    padding:
+      42px
+      55px
+      28px;
+  }
+
+  .spending-table {
+    min-width: 0;
+  }
+}
+
+/* =========================================================
+   TABLET / SMALL DESKTOP — 1200
+========================================================= */
+
+@media (max-width: 1200px) {
+  .spending-main {
+    padding:
+      38px
+      35px
+      25px;
+  }
+
+  .spending-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   TABLET — 900
+========================================================= */
+
+@media (max-width: 900px) {
+  .spending-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .spending-performance-filter {
+    width: 100%;
+  }
+
+  .spending-performance-filter select {
+    flex: 1;
+    width: 100%;
+  }
+
+  .spending-card-header {
+    align-items: flex-start;
+  }
+}
+
+/* =========================================================
+   MOBILE — 700
+========================================================= */
+
+@media (max-width: 700px) {
+  .spending-main {
+    width: 100%;
+
+    padding:
+      72px
+      20px
+      25px;
+  }
+
+  .spending-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 18px;
+
+    margin-bottom: 27px;
+  }
+
+  .spending-section-heading h2 {
+    font-size: 32px;
+  }
+
+  .spending-performance-filter {
+    width: 100%;
+    gap: 5px;
+  }
+
+  .spending-performance-filter select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .spending-columns {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .spending-card-header {
+    padding: 18px;
+
+    align-items: center;
+  }
+
+  .spending-card-header h2 {
+    font-size: 15px;
+  }
+
+  .spending-card-header p {
+    font-size: 8px;
+  }
+
+  .spending-section-actions {
+    width: auto;
+
+    flex-direction: row;
+  }
+
+  .spending-add-button,
+  .spending-pdf-button {
+    flex: none;
+    width: auto;
+  }
+
+  .spending-table {
+    min-width: 650px;
+  }
+
+  .spending-table th {
+    padding:
+      9px
+      7px;
+
+    font-size: 6px;
+  }
+
+  .spending-table td {
+    padding:
+      10px
+      7px;
+
+    font-size: 8px;
+  }
+
+  .spending-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spending-field-wide {
+    grid-column: auto;
+  }
+
+  .spending-form-box {
+    max-height: 90vh;
+  }
+
+  .spending-footer {
+    font-size: 7px;
+  }
+}
+
+/* =========================================================
+   MOBILE — 600
+========================================================= */
+
+@media (max-width: 600px) {
+  .spending-main {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .spending-card-header {
+    gap: 12px;
+  }
+
+  .spending-section-actions {
+    gap: 4px;
+  }
+
+  .spending-add-button,
+  .spending-pdf-button {
+    padding:
+      7px
+      8px;
+
+    font-size: 7px;
+  }
+
+  .spending-summary {
+    padding:
+      12px
+      14px;
+  }
+
+  .spending-summary strong {
+    font-size: 14px;
+  }
+}
+
+/* =========================================================
+   MOBILE — 480
+========================================================= */
+
+@media (max-width: 480px) {
+  .spending-main {
+    padding:
+      68px
+      15px
+      22px;
+  }
+
+  .spending-section-heading {
+    margin-bottom: 18px;
+  }
+
+  .spending-section-heading h2 {
+    font-size: 29px;
+  }
+
+  .spending-performance-filter {
+    gap: 4px;
+  }
+
+  .spending-performance-filter select {
+    height: 30px;
+    font-size: 8px;
+  }
+
+  .spending-card-header {
+    padding: 17px;
+  }
+
+  .spending-card-header h2 {
+    font-size: 14px;
+  }
+
+  .spending-card-header p {
+    display: none;
+  }
+
+  .spending-card-kicker {
+    font-size: 6px;
+  }
+
+  .spending-section-actions {
+    gap: 3px;
+  }
+
+  .spending-add-button,
+  .spending-pdf-button {
+    height: 27px;
+
+    padding:
+      6px
+      7px;
+
+    font-size: 7px;
+  }
+
+  .spending-table {
+    min-width: 620px;
+  }
+
+  .spending-table th {
+    padding:
+      8px
+      6px;
+
+    font-size: 5.5px;
+  }
+
+  .spending-table td {
+    padding:
+      9px
+      6px;
+
+    font-size: 7px;
+  }
+
+  .spending-description {
+    font-size: 7px;
+  }
+
+  .spending-actions {
+    gap: 3px;
+  }
+
+  .spending-actions button {
+    padding:
+      4px
+      6px;
+
+    font-size: 6px;
+  }
+
+  .spending-form-box {
+    max-height: 90vh;
+  }
+}
+
+/* =========================================================
+   FINAL COLOR OVERRIDE
+========================================================= */
+
+.spending-page .spending-table td.money-in {
+  color: #8fbf98 !important;
+}
+
+.spending-page .spending-table td.money-out {
+  color: #c88787 !important;
+}
+
+.spending-page .spending-summary strong.positive {
+  color: #8fbf98 !important;
+}
+
+.spending-page .spending-summary strong.negative {
+  color: #c88787 !important;
+}
+
+.spending-page .spending-summary strong.total-expense-value {
+  color: #c88787 !important;
+}

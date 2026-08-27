@@ -1,0 +1,1452 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: #111;
+}
+
+/* =========================================================
+   DASHBOARD PAGE
+========================================================= */
+
+.dashboard-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  background: #111;
+  color: #eee;
+  font-family:
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.dashboard-sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #0b0b0b;
+  padding: 30px 22px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  z-index: 1100;
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 50px;
+}
+
+.dashboard-brand-mark {
+  width: 38px;
+  height: 38px;
+  background: #eee;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.dashboard-brand-name {
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+
+.dashboard-brand-subtitle {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.dashboard-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dashboard-nav-section {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.dashboard-nav-section.second {
+  margin-top: 35px;
+}
+
+.dashboard-nav-item,
+.dashboard-nav-item:link,
+.dashboard-nav-item:visited {
+  text-decoration: none;
+  color: #777;
+  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.dashboard-nav-item span {
+  font-size: 9px;
+  color: #444;
+}
+
+.dashboard-nav-item:hover {
+  background: #181818;
+  color: #fff;
+}
+
+.dashboard-nav-item.active {
+  background: #1d1d1d;
+  color: #fff;
+}
+
+.dashboard-nav-item.active span {
+  color: #fff;
+}
+
+/* =========================================================
+   USER
+========================================================= */
+
+.dashboard-sidebar-bottom {
+  margin-top: auto;
+}
+
+.dashboard-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 20px;
+}
+
+.dashboard-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #333;
+  color: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.dashboard-user-name {
+  font-size: 11px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-user-role {
+  font-size: 9px;
+  color: #666;
+  margin-top: 3px;
+}
+
+.dashboard-logout {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #292929;
+  color: #777;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 10px;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.dashboard-logout:hover {
+  color: white;
+  border-color: #555;
+  background: #151515;
+}
+
+/* =========================================================
+   MOBILE RAIL / BUTTON
+========================================================= */
+
+.dashboard-mobile-rail,
+.dashboard-mobile-trigger,
+.dashboard-mobile-overlay {
+  display: none;
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  padding: 30px 45px;
+  background: #111;
+}
+
+/* =========================================================
+   TOPBAR
+   Hidden — dashboard langsung ke overview
+========================================================= */
+
+.dashboard-topbar {
+  display: none;
+}
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.dashboard-section-heading {
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.dashboard-section-label {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #666;
+}
+
+.dashboard-section-heading h2 {
+  margin: 6px 0 0;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+/* =========================================================
+   PERFORMANCE FILTER
+========================================================= */
+
+.dashboard-performance-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dashboard-performance-filter select {
+  appearance: none;
+  background: #181818;
+  border: 1px solid #292929;
+  color: #aaa;
+  padding: 8px 28px 8px 10px;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+  outline: none;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #666 50%
+    ),
+    linear-gradient(
+      135deg,
+      #666 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 11px) 11px,
+    calc(100% - 7px) 11px;
+
+  background-size:
+    4px 4px,
+    4px 4px;
+
+  background-repeat: no-repeat;
+}
+
+.dashboard-performance-filter select:hover {
+  border-color: #444;
+  color: #fff;
+}
+
+.dashboard-performance-filter select:focus {
+  border-color: #555;
+}
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dashboard-stat {
+  background: #181818;
+  border: 1px solid #292929;
+  padding: 17px 20px;
+  min-width: 0;
+}
+
+.dashboard-stat.featured {
+  background: #202020;
+}
+
+.dashboard-stat-label {
+  font-size: 8px;
+  letter-spacing: 1.7px;
+  color: #777;
+  margin-bottom: 8px;
+}
+
+.dashboard-stat-value {
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-stat-note {
+  margin-top: 7px;
+  font-size: 8px;
+  color: #555;
+}
+
+/* =========================================================
+   CONTENT GRID
+========================================================= */
+
+.dashboard-content-grid {
+  display: grid;
+  grid-template-columns:
+    1fr 1.35fr;
+
+  gap: 10px;
+  align-items: stretch;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.dashboard-card {
+  background: #181818;
+  border: 1px solid #292929;
+  min-width: 0;
+}
+
+.dashboard-card-header {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #292929;
+}
+
+.dashboard-card-kicker {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.dashboard-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.dashboard-card-header > span {
+  font-size: 9px;
+  color: #555;
+}
+
+.dashboard-view-all {
+  color: #888;
+  text-decoration: none;
+  font-size: 9px;
+  transition: color 0.2s ease;
+}
+
+.dashboard-view-all:hover {
+  color: white;
+}
+
+/* =========================================================
+   MONTHLY REVENUE
+========================================================= */
+
+.revenue-card {
+  min-height: 0;
+  height: 100%;
+}
+
+.revenue-chart {
+  height: 360px;
+  padding: 20px 20px 15px;
+  display: flex;
+  gap: 8px;
+}
+
+.revenue-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.revenue-bar-area {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-bottom: 1px solid #292929;
+}
+
+.revenue-bar {
+  width: 55%;
+  min-height: 3px;
+  background: #777;
+  transition:
+    height 0.25s ease,
+    background 0.2s ease;
+}
+
+.revenue-bar:hover {
+  background: #aaa;
+}
+
+.revenue-column:last-child .revenue-bar {
+  background: #eee;
+}
+
+.revenue-column:last-child .revenue-bar:hover {
+  background: #fff;
+}
+
+.revenue-month {
+  height: 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-top: 7px;
+  text-align: center;
+  color: #555;
+  font-size: 7px;
+}
+
+/* =========================================================
+   BOOKING CALENDAR
+========================================================= */
+
+.booking-calendar-card {
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+
+/* =========================================================
+   CALENDAR HEADER
+========================================================= */
+
+.calendar-header {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  border-bottom: 1px solid #292929;
+}
+
+.calendar-header strong {
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.calendar-header button {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #292929;
+  background: #111;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.calendar-header button:hover {
+  background: #252525;
+  color: white;
+  border-color: #444;
+}
+
+/* =========================================================
+   CALENDAR WEEK
+========================================================= */
+
+.calendar-week {
+  display: grid;
+  grid-template-columns:
+    repeat(7, 1fr);
+
+  border-bottom: 1px solid #292929;
+}
+
+.calendar-week div {
+  padding: 7px 4px;
+  text-align: center;
+  font-size: 6px;
+  letter-spacing: 1px;
+  color: #555;
+}
+
+/* =========================================================
+   CALENDAR GRID
+========================================================= */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(7, 1fr);
+
+  grid-auto-rows: 60px;
+  min-height: 0;
+}
+
+/* =========================================================
+   CALENDAR DAY
+========================================================= */
+
+.calendar-day {
+  height: 60px;
+  min-height: 60px;
+  padding: 6px;
+
+  border-right: 1px solid #292929;
+  border-bottom: 1px solid #292929;
+
+  background: #181818;
+  overflow: hidden;
+}
+
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+/* =========================================================
+   CALENDAR DATE
+========================================================= */
+
+.calendar-date {
+  font-size: 8px;
+  color: #777;
+  margin-bottom: 4px;
+}
+
+.calendar-day.today {
+  background: #222;
+}
+
+.calendar-day.today .calendar-date {
+  color: white;
+}
+
+.calendar-day.has-booking {
+  background: #1d1d1d;
+}
+
+/* =========================================================
+   BOOKING
+========================================================= */
+
+.calendar-booking {
+  background: #303030;
+  color: #bbb;
+
+  padding: 3px 4px;
+  margin-bottom: 2px;
+
+  font-size: 6px;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  border-left: 2px solid #777;
+}
+
+/* =========================================================
+   MORE BOOKINGS
+========================================================= */
+
+.calendar-more {
+  color: #666;
+  font-size: 6px;
+  line-height: 1.2;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.dashboard-footer {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 16px;
+  padding: 12px 0;
+
+  border-top: 1px solid #292929;
+
+  color: #444;
+  font-size: 7px;
+  letter-spacing: 1px;
+}
+
+/* =========================================================
+   MOBILE SIDEBAR
+========================================================= */
+
+@media (max-width: 700px) {
+
+  /* -------------------------------------------------------
+     SIDEBAR
+  ------------------------------------------------------- */
+
+  .dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 270px;
+    height: 100vh;
+    min-height: 100vh;
+
+    padding: 30px 22px;
+
+    transform:
+      translateX(-100%);
+
+    transition:
+      transform
+      0.3s
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      );
+
+    box-shadow:
+      18px 0 40px
+      rgba(
+        0,
+        0,
+        0,
+        0.35
+      );
+
+    overflow-y: auto;
+    z-index: 2000;
+  }
+
+  .dashboard-sidebar.mobile-open {
+    transform:
+      translateX(0);
+  }
+
+  /* -------------------------------------------------------
+     BLACK LEFT RAIL
+  ------------------------------------------------------- */
+
+  .dashboard-mobile-rail {
+    display: block;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 4px;
+    height: 100vh;
+
+    background: #070707;
+
+    z-index: 1400;
+    pointer-events: none;
+  }
+
+  /* -------------------------------------------------------
+     BUTTON
+  ------------------------------------------------------- */
+
+  .dashboard-mobile-trigger {
+    position: fixed;
+
+    top: 12px;
+    left: 8px;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border:
+      1px solid #2d2d2d;
+
+    background:
+      #181818;
+
+    cursor: pointer;
+    z-index: 2200;
+
+    transition:
+      left
+      0.3s
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      ),
+      background
+      0.2s ease,
+      border-color
+      0.2s ease;
+  }
+
+  .dashboard-mobile-trigger:hover {
+    background: #222;
+    border-color: #444;
+  }
+
+  /* -------------------------------------------------------
+     HAMBURGER
+  ------------------------------------------------------- */
+
+  .dashboard-mobile-trigger span {
+    position: absolute;
+
+    width: 13px;
+    height: 1px;
+
+    background: #aaa;
+
+    transition:
+      transform
+      0.25s ease,
+      opacity
+      0.2s ease;
+  }
+
+  .dashboard-mobile-trigger span:first-child {
+    transform:
+      translateY(-4px);
+  }
+
+  .dashboard-mobile-trigger span:nth-child(2) {
+    transform:
+      translateY(0);
+  }
+
+  .dashboard-mobile-trigger span:last-child {
+    transform:
+      translateY(4px);
+  }
+
+  /* -------------------------------------------------------
+     OPEN BUTTON
+  ------------------------------------------------------- */
+
+  .dashboard-mobile-trigger.open {
+    left: 220px;
+    background:
+      #181818;
+    border-color:
+      #303030;
+  }
+
+  .dashboard-mobile-trigger.open
+  span:first-child {
+    transform:
+      rotate(45deg);
+  }
+
+  .dashboard-mobile-trigger.open
+  span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .dashboard-mobile-trigger.open
+  span:last-child {
+    transform:
+      rotate(-45deg);
+  }
+
+  /* -------------------------------------------------------
+     OVERLAY
+  ------------------------------------------------------- */
+
+  .dashboard-mobile-overlay {
+    display: block;
+
+    position: fixed;
+    inset: 0;
+
+    background:
+      rgba(
+        0,
+        0,
+        0,
+        0.64
+      );
+
+    backdrop-filter:
+      blur(2px);
+
+    z-index:
+      1900;
+  }
+
+  /* -------------------------------------------------------
+     MAIN
+  ------------------------------------------------------- */
+
+  .dashboard-main {
+    width: 100%;
+
+    padding:
+      56px 14px 18px;
+  }
+
+  /* -------------------------------------------------------
+     SECTION HEADING
+  ------------------------------------------------------- */
+
+  .dashboard-section-heading {
+    margin-bottom: 10px;
+
+    align-items:
+      center;
+
+    flex-direction:
+      row;
+
+    gap: 8px;
+  }
+
+  .dashboard-section-label {
+    font-size: 7px;
+  }
+
+  .dashboard-section-heading h2 {
+    margin-top: 5px;
+    font-size: 17px;
+  }
+
+  /* -------------------------------------------------------
+     FILTER
+  ------------------------------------------------------- */
+
+  .dashboard-performance-filter {
+    width:
+      auto;
+
+    gap: 4px;
+  }
+
+  .dashboard-performance-filter select {
+    padding:
+      7px 25px 7px 8px;
+
+    font-size:
+      8px;
+  }
+
+  /* -------------------------------------------------------
+     STATS
+  ------------------------------------------------------- */
+
+  .dashboard-stats {
+    grid-template-columns:
+      repeat(3, 1fr);
+
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .dashboard-stat {
+    padding:
+      12px 10px;
+  }
+
+  .dashboard-stat-label {
+    font-size: 6px;
+    letter-spacing: 1px;
+
+    margin-bottom:
+      7px;
+  }
+
+  .dashboard-stat-value {
+    font-size:
+      17px;
+
+    letter-spacing:
+      -0.3px;
+  }
+
+  .dashboard-stat-note {
+    margin-top:
+      5px;
+
+    font-size:
+      6px;
+  }
+
+  /* -------------------------------------------------------
+     CONTENT
+  ------------------------------------------------------- */
+
+  .dashboard-content-grid {
+    grid-template-columns:
+      1fr;
+
+    gap:
+      8px;
+  }
+
+  /* -------------------------------------------------------
+     CARD
+  ------------------------------------------------------- */
+
+  .dashboard-card-header {
+    padding:
+      12px 14px;
+  }
+
+  .dashboard-card-kicker {
+    font-size:
+      6px;
+
+    margin-bottom:
+      5px;
+  }
+
+  .dashboard-card-header h3 {
+    font-size:
+      14px;
+  }
+
+  .dashboard-card-header > span {
+    font-size:
+      8px;
+  }
+
+  .dashboard-view-all {
+    font-size:
+      8px;
+  }
+
+  /* -------------------------------------------------------
+     REVENUE
+  ------------------------------------------------------- */
+
+  .revenue-card {
+    min-height:
+      0;
+  }
+
+  .revenue-chart {
+    height:
+      230px;
+
+    padding:
+      14px 12px 10px;
+
+    gap:
+      4px;
+  }
+
+  .revenue-month {
+    height:
+      18px;
+
+    padding-top:
+      5px;
+
+    font-size:
+      6px;
+  }
+
+  /* -------------------------------------------------------
+     CALENDAR
+  ------------------------------------------------------- */
+
+  .booking-calendar-card {
+    min-height:
+      0;
+  }
+
+  .calendar-header {
+    height:
+      38px;
+
+    padding:
+      0 10px;
+  }
+
+  .calendar-header strong {
+    font-size:
+      9px;
+  }
+
+  .calendar-header button {
+    width:
+      23px;
+
+    height:
+      23px;
+
+    font-size:
+      14px;
+  }
+
+  .calendar-week div {
+    padding:
+      6px 2px;
+
+    font-size:
+      5px;
+
+    letter-spacing:
+      0.5px;
+  }
+
+  .calendar-grid {
+    grid-auto-rows:
+      46px;
+
+    min-height:
+      0;
+  }
+
+  .calendar-day {
+    height:
+      46px;
+
+    min-height:
+      46px;
+
+    padding:
+      4px;
+  }
+
+  .calendar-date {
+    font-size:
+      7px;
+
+    margin-bottom:
+      3px;
+  }
+
+  .calendar-booking {
+    font-size:
+      5px;
+
+    padding:
+      2px 3px;
+
+    margin-bottom:
+      2px;
+
+    border-left-width:
+      1px;
+  }
+
+  .calendar-more {
+    font-size:
+      5px;
+  }
+
+  /* -------------------------------------------------------
+     FOOTER
+  ------------------------------------------------------- */
+
+  .dashboard-footer {
+    margin-top:
+      10px;
+
+    padding:
+      9px 0;
+
+    font-size:
+      6px;
+  }
+}
+
+/* =========================================================
+   MOBILE — 480PX
+========================================================= */
+
+@media (max-width: 480px) {
+
+  .dashboard-mobile-trigger {
+    top:
+      10px;
+
+    left:
+      7px;
+
+    width:
+      30px;
+
+    height:
+      30px;
+  }
+
+  .dashboard-mobile-trigger.open {
+    left:
+      208px;
+  }
+
+  .dashboard-sidebar {
+    width:
+      250px;
+  }
+
+  .dashboard-main {
+    padding:
+      52px 10px 15px;
+  }
+
+  /* -------------------------------------------------------
+     SECTION
+  ------------------------------------------------------- */
+
+  .dashboard-section-heading {
+    gap:
+      5px;
+  }
+
+  .dashboard-section-heading h2 {
+    font-size:
+      15px;
+  }
+
+  .dashboard-section-label {
+    font-size:
+      6px;
+  }
+
+  /* -------------------------------------------------------
+     FILTER
+  ------------------------------------------------------- */
+
+  .dashboard-performance-filter {
+    gap:
+      3px;
+  }
+
+  .dashboard-performance-filter select {
+    padding:
+      6px 22px 6px 7px;
+
+    font-size:
+      7px;
+  }
+
+  /* -------------------------------------------------------
+     STATS
+  ------------------------------------------------------- */
+
+  .dashboard-stats {
+    gap:
+      5px;
+
+    margin-bottom:
+      8px;
+  }
+
+  .dashboard-stat {
+    padding:
+      10px 8px;
+  }
+
+  .dashboard-stat-label {
+    font-size:
+      5px;
+
+    letter-spacing:
+      0.8px;
+
+    margin-bottom:
+      6px;
+  }
+
+  .dashboard-stat-value {
+    font-size:
+      15px;
+  }
+
+  .dashboard-stat-note {
+    font-size:
+      5px;
+
+    margin-top:
+      4px;
+  }
+
+  /* -------------------------------------------------------
+     CARD
+  ------------------------------------------------------- */
+
+  .dashboard-card-header {
+    padding:
+      11px 12px;
+  }
+
+  .dashboard-card-kicker {
+    font-size:
+      5px;
+
+    letter-spacing:
+      1.5px;
+  }
+
+  .dashboard-card-header h3 {
+    font-size:
+      13px;
+  }
+
+  /* -------------------------------------------------------
+     REVENUE
+  ------------------------------------------------------- */
+
+  .revenue-chart {
+    height:
+      205px;
+
+    padding:
+      12px 10px 8px;
+
+    gap:
+      3px;
+  }
+
+  .revenue-month {
+    height:
+      16px;
+
+    font-size:
+      5px;
+  }
+
+  /* -------------------------------------------------------
+     CALENDAR
+  ------------------------------------------------------- */
+
+  .calendar-header {
+    height:
+      36px;
+
+    padding:
+      0 8px;
+  }
+
+  .calendar-header strong {
+    font-size:
+      8px;
+  }
+
+  .calendar-header button {
+    width:
+      21px;
+
+    height:
+      21px;
+
+    font-size:
+      13px;
+  }
+
+  .calendar-week div {
+    padding:
+      5px 1px;
+
+    font-size:
+      5px;
+  }
+
+  .calendar-grid {
+    grid-auto-rows:
+      42px;
+  }
+
+  .calendar-day {
+    height:
+      42px;
+
+    min-height:
+      42px;
+
+    padding:
+      3px;
+  }
+
+  .calendar-date {
+    font-size:
+      6px;
+
+    margin-bottom:
+      2px;
+  }
+
+  .calendar-booking {
+    font-size:
+      4.5px;
+
+    padding:
+      2px;
+  }
+
+  .calendar-more {
+    font-size:
+      4.5px;
+  }
+
+  /* -------------------------------------------------------
+     FOOTER
+  ------------------------------------------------------- */
+
+  .dashboard-footer {
+    font-size:
+      5.5px;
+
+    margin-top:
+      8px;
+
+    padding:
+      7px 0;
+  }
+}
+
+/* =========================================================
+   TABLET / SMALL DESKTOP — 1100PX
+========================================================= */
+
+@media (min-width: 701px) and (max-width: 1100px) {
+
+  .dashboard-sidebar {
+    width:
+      220px;
+  }
+
+  .dashboard-main {
+    padding:
+      25px 25px;
+  }
+
+  .dashboard-content-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .revenue-chart {
+    height:
+      300px;
+  }
+
+  .calendar-grid {
+    grid-auto-rows:
+      55px;
+  }
+
+  .calendar-day {
+    height:
+      55px;
+
+    min-height:
+      55px;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET — 800PX
+========================================================= */
+
+@media (min-width: 701px) and (max-width: 800px) {
+
+  .dashboard-stats {
+    grid-template-columns:
+      repeat(3, 1fr);
+  }
+
+  .dashboard-stat {
+    padding:
+      14px 15px;
+  }
+
+  .dashboard-stat-value {
+    font-size:
+      22px;
+  }
+
+  .dashboard-section-heading {
+    align-items:
+      center;
+  }
+}
