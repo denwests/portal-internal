@@ -1955,126 +1955,65 @@ td {
         )}
 
 
-        {/* =================================================
-            CURRENT DATA
-        ================================================= */}
+ {/* =================================================
+    CURRENT DATA
+================================================= */}
 
-        <section className="bookkeeping-overview">
+<section className="bookkeeping-overview">
 
-          <div className="bookkeeping-section-label">
-            CURRENT DATA
-          </div>
+  <div className="bookkeeping-section-label">
+    CURRENT DATA
+  </div>
 
+  <div className="bookkeeping-overview-grid">
 
-          <div className="bookkeeping-overview-grid">
+    <div>
 
-            <div>
+      <span>
+        NET REVENUE
+      </span>
 
-              <span>
-                GROSS REVENUE
-              </span>
+      <strong>
+        {formatRupiah(
+          netRevenue
+        )}
+      </strong>
 
-              <strong>
-                {formatRupiah(
-                  grossRevenue
-                )}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                NET REVENUE
-              </span>
-
-              <strong>
-                {formatRupiah(
-                  netRevenue
-                )}
-              </strong>
-
-            </div>
+    </div>
 
 
-            <div>
+    <div>
 
-              <span>
-                STUDIO EXPENSES
-              </span>
+      <span>
+        TOTAL EXPENSE
+      </span>
 
-              <strong>
-                {formatRupiah(
-                  spendingTotal
-                )}
-              </strong>
+      <strong>
+        {formatRupiah(
+          totalExpense
+        )}
+      </strong>
 
-            </div>
-
-
-            <div>
-
-              <span>
-                TOTAL EXPENSE
-              </span>
-
-              <strong>
-                {formatRupiah(
-                  totalExpense
-                )}
-              </strong>
-
-            </div>
+    </div>
 
 
-            <div>
+    <div>
 
-              <span>
-                NET PROFIT
-              </span>
+      <span>
+        NET PROFIT
+      </span>
 
-              <strong>
-                {formatRupiah(
-                  netProfit
-                )}
-              </strong>
+      <strong>
+        {formatRupiah(
+          netProfit
+        )}
+      </strong>
 
-            </div>
+    </div>
 
+  </div>
 
-            <div>
-
-              <span>
-                QRIS MDR
-              </span>
-
-              <strong>
-                {formatRupiah(
-                  qrisMdrAmount
-                )}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                QRIS REVENUE
-              </span>
-
-              <strong>
-                {formatRupiah(
-                  qrisGrossRevenue
-                )}
-              </strong>
-
-            </div>
-
-          </div>
-
-        </section>
+</section>
 
 
         {/* =================================================
