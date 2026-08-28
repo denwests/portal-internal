@@ -405,7 +405,35 @@ function Sidebar({
             )}
 
 
-            {/* 07 DOCUMENTS */}
+            {/* 07 EMPLOYEE */}
+
+            {employeeRole ===
+              "Founder" && (
+
+              <Link
+                to="/employee"
+                className={`dashboard-nav-item ${
+                  isActive(
+                    "employee"
+                  )
+                }`}
+                onClick={
+                  closeMobileSidebar
+                }
+              >
+
+                <span>
+                  07
+                </span>
+
+                Employee
+
+              </Link>
+
+            )}
+
+
+            {/* 08 DOCUMENTS */}
 
             {employeeRole ===
               "Founder" && (
@@ -423,7 +451,7 @@ function Sidebar({
               >
 
                 <span>
-                  07
+                  08
                 </span>
 
                 Documents

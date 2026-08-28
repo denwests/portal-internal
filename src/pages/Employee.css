@@ -1,825 +1,12 @@
 /* =========================================================
    EMPLOYEE PAGE
-   PLUNO INTERNAL SYSTEM
-   Mengikuti layout Dashboard & Customer
+   PLUNO INTERNAL PORTAL
+   DISESUAIKAN DENGAN CUSTOMER / BOOKING UI
 ========================================================= */
 
-.employee-page {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  background: #f4f3ef;
-  color: #171717;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 400;
+* {
+  box-sizing: border-box;
 }
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-.employee-sidebar {
-  width: 250px;
-  min-height: 100vh;
-  height: 100vh;
-  background: #171717;
-  color: white;
-  padding: 30px 22px;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  overflow: hidden;
-}
-
-/* Brand */
-
-.employee-sidebar .brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 50px;
-  flex-shrink: 0;
-}
-
-.employee-sidebar .brand-mark {
-  width: 38px;
-  height: 38px;
-  background: white;
-  color: #171717;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.employee-sidebar .brand-name {
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 2px;
-}
-
-.employee-sidebar .brand-subtitle {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #999;
-  margin-top: 3px;
-  font-weight: 400;
-}
-
-/* Navigation */
-
-.employee-sidebar .navigation {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.employee-sidebar .nav-section {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #777;
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-.employee-sidebar .nav-section.second {
-  margin-top: 35px;
-}
-
-.employee-sidebar .nav-item {
-  text-decoration: none;
-  color: #999;
-  padding: 12px 10px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 12px;
-  font-weight: 400;
-  transition: 0.2s ease;
-}
-
-.employee-sidebar .nav-item span {
-  font-size: 9px;
-  color: #555;
-  font-weight: 400;
-}
-
-.employee-sidebar .nav-item:hover,
-.employee-sidebar .nav-item.active {
-  background: #242424;
-  color: white;
-}
-
-.employee-sidebar .nav-item.active span {
-  color: white;
-}
-
-/* User */
-
-.employee-sidebar .sidebar-bottom {
-  margin-top: auto;
-  flex-shrink: 0;
-}
-
-.employee-sidebar .user-mini {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 20px;
-}
-
-.employee-sidebar .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #ddd;
-  color: #222;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.employee-sidebar .user-name {
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.employee-sidebar .user-role {
-  font-size: 9px;
-  color: #777;
-  margin-top: 3px;
-  font-weight: 400;
-}
-
-.employee-sidebar .logout {
-  width: 100%;
-  background: transparent;
-  border: 1px solid #333;
-  color: #999;
-  padding: 10px;
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 400;
-  font-family: inherit;
-}
-
-.employee-sidebar .logout:hover {
-  color: white;
-  border-color: #555;
-}
-
-/* =========================================================
-   MAIN
-========================================================= */
-
-.employee-main {
-  flex: 1;
-  min-width: 0;
-  min-height: 100vh;
-  padding: 55px 60px;
-  background: #f4f3ef;
-  color: #171717;
-}
-
-/* =========================================================
-   TOPBAR
-========================================================= */
-
-.employee-topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 45px;
-  gap: 30px;
-}
-
-.employee-eyebrow {
-  font-size: 9px;
-  letter-spacing: 2px;
-  color: #999;
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-.employee-topbar h1 {
-  margin: 0;
-  font-size: 42px;
-  line-height: 1.1;
-  font-weight: 400;
-  letter-spacing: -1px;
-}
-
-.employee-topbar p {
-  margin: 10px 0 0;
-  color: #888;
-  font-size: 12px;
-  font-weight: 400;
-}
-
-/* =========================================================
-   ADD BUTTON
-========================================================= */
-
-.add-employee-button {
-  padding: 12px 18px;
-  background: #171717;
-  color: white;
-  border: 1px solid #171717;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 400;
-  transition: 0.2s ease;
-  white-space: nowrap;
-}
-
-.add-employee-button:hover {
-  background: #333;
-}
-
-/* =========================================================
-   ERROR
-========================================================= */
-
-.employee-error {
-  background: #f7e9e9;
-  color: #9a4a4a;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  font-size: 10px;
-  font-weight: 400;
-}
-
-/* =========================================================
-   STATISTICS
-========================================================= */
-
-.employee-stat-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 28px;
-}
-
-.employee-stat-card {
-  background: white;
-  border: 1px solid #e4e2de;
-  padding: 25px 28px;
-}
-
-.employee-stat-label {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #999;
-  margin-bottom: 12px;
-  font-weight: 500;
-}
-
-.employee-stat-value {
-  font-size: 34px;
-  line-height: 1.1;
-  font-weight: 400;
-  letter-spacing: -0.5px;
-}
-
-.employee-stat-note {
-  margin-top: 12px;
-  font-size: 9px;
-  color: #aaa;
-  font-weight: 400;
-}
-
-/* =========================================================
-   EMPLOYEE LIST
-========================================================= */
-
-.employee-list-section {
-  width: 100%;
-  background: white;
-  border: 1px solid #e4e2de;
-}
-
-.employee-list-header {
-  padding: 25px 28px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 25px;
-  border-bottom: 1px solid #eee;
-}
-
-.employee-list-header h2 {
-  margin: 8px 0 0;
-  font-size: 22px;
-  line-height: 1.2;
-  font-weight: 400;
-  letter-spacing: -0.2px;
-}
-
-.employee-list-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  font-size: 9px;
-  color: #999;
-  font-weight: 400;
-}
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-.employee-search-box {
-  width: 230px;
-  height: 38px;
-  border: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  background: white;
-}
-
-.employee-search-box span {
-  color: #999;
-  font-size: 12px;
-}
-
-.employee-search-box input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 400;
-  color: #171717;
-}
-
-.employee-search-box input::placeholder {
-  color: #aaa;
-}
-
-/* =========================================================
-   TABLE
-========================================================= */
-
-.employee-table-scroll {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.employee-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: inherit;
-}
-
-.employee-table th {
-  text-align: left;
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #999;
-  font-weight: 500;
-  padding: 15px 20px;
-  background: #fafafa;
-  border-bottom: 1px solid #ddd;
-  white-space: nowrap;
-}
-
-.employee-table td {
-  padding: 18px 20px;
-  border-bottom: 1px solid #eee;
-  font-size: 10px;
-  font-weight: 400;
-  color: #171717;
-}
-
-.employee-name {
-  font-size: 11px;
-  font-weight: 500;
-  color: #171717;
-}
-
-/* =========================================================
-   ROLE
-========================================================= */
-
-.employee-role-badge {
-  display: inline-block;
-  padding: 6px 9px;
-  font-size: 9px;
-  font-weight: 400;
-  background: #eee;
-  color: #171717;
-}
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-.employee-status {
-  display: inline-block;
-  padding: 6px 9px;
-  font-size: 9px;
-  font-weight: 400;
-}
-
-.employee-status-active {
-  background: #eee;
-  color: #171717;
-}
-
-.employee-status-inactive {
-  background: #f2f2f2;
-  color: #888;
-}
-
-/* =========================================================
-   ACTIONS
-========================================================= */
-
-.employee-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.employee-actions button {
-  padding: 7px 10px;
-  background: white;
-  border: 1px solid #ddd;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 9px;
-  font-weight: 400;
-  color: #171717;
-  transition: 0.2s ease;
-}
-
-.employee-actions button:hover {
-  background: #171717;
-  color: white;
-}
-
-/* =========================================================
-   EMPTY
-========================================================= */
-
-.empty-employee {
-  padding: 50px 20px;
-  text-align: center;
-  color: #999;
-  font-size: 10px;
-  font-weight: 400;
-}
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.employee-footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 35px;
-  padding: 20px 0;
-  border-top: 1px solid #ddd;
-  color: #aaa;
-  font-size: 8px;
-  letter-spacing: 1px;
-  font-weight: 400;
-}
-
-/* =========================================================
-   OVERLAY
-========================================================= */
-
-.employee-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-  z-index: 1000;
-  overflow-y: auto;
-}
-
-/* =========================================================
-   FORM / MODAL
-========================================================= */
-
-.employee-form-box,
-.employee-detail-box {
-  width: 100%;
-  max-width: 720px;
-  background: white;
-  padding: 30px;
-  color: #171717;
-}
-
-.employee-form-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 30px;
-}
-
-.employee-form-kicker {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #999;
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-.employee-form-header h2 {
-  margin: 0 0 8px;
-  font-size: 25px;
-  line-height: 1.2;
-  font-weight: 400;
-  letter-spacing: -0.3px;
-}
-
-.employee-form-header p {
-  margin: 0;
-  color: #888;
-  font-size: 11px;
-  font-weight: 400;
-}
-
-.employee-form-close {
-  width: 35px;
-  height: 35px;
-  border: 1px solid #ddd;
-  background: white;
-  color: #171717;
-  font-family: inherit;
-  font-size: 20px;
-  font-weight: 400;
-  cursor: pointer;
-}
-
-/* =========================================================
-   FORM
-========================================================= */
-
-.employee-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.employee-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.employee-field label {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #999;
-  font-weight: 500;
-}
-
-.employee-field input,
-.employee-field select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  background: white;
-  color: #171717;
-  outline: none;
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 400;
-}
-
-.employee-field input:focus,
-.employee-field select:focus {
-  border-color: #171717;
-}
-
-/* =========================================================
-   ROLE INFO
-========================================================= */
-
-.employee-role-info {
-  margin-top: 25px;
-  padding: 20px;
-  background: #f8f8f8;
-}
-
-.employee-role-info-title {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #999;
-  margin-bottom: 15px;
-  font-weight: 500;
-}
-
-.employee-role-info-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-}
-
-.employee-role-info-list div {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.employee-role-info-list strong {
-  font-size: 10px;
-  font-weight: 500;
-}
-
-.employee-role-info-list span {
-  font-size: 9px;
-  color: #999;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-/* =========================================================
-   FORM FOOTER
-========================================================= */
-
-.employee-form-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-}
-
-.employee-form-footer-right,
-.employee-detail-footer {
-  display: flex;
-  gap: 10px;
-}
-
-.employee-cancel,
-.employee-save,
-.employee-delete-button {
-  padding: 11px 18px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 9px;
-  font-weight: 400;
-}
-
-.employee-cancel {
-  background: white;
-  color: #171717;
-  border: 1px solid #ddd;
-}
-
-.employee-save {
-  background: #171717;
-  color: white;
-  border: 1px solid #171717;
-}
-
-.employee-delete-button {
-  background: white;
-  color: #a04444;
-  border: 1px solid #ddd;
-}
-
-.employee-save:hover {
-  background: #333;
-}
-
-/* =========================================================
-   DETAIL
-========================================================= */
-
-.employee-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-top: 1px solid #eee;
-}
-
-.employee-detail-item {
-  padding: 20px 0;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.employee-detail-item:nth-child(odd) {
-  margin-right: 20px;
-}
-
-.employee-detail-item span {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #999;
-  font-weight: 500;
-}
-
-.employee-detail-item strong {
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.employee-detail-footer {
-  justify-content: flex-end;
-  margin-top: 25px;
-}
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 1100px) {
-  .employee-sidebar {
-    width: 220px;
-  }
-
-  .employee-main {
-    padding: 45px 35px;
-  }
-
-  .employee-stat-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 900px) {
-  .employee-list-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .employee-list-right {
-    width: 100%;
-  }
-
-  .employee-search-box {
-    flex: 1;
-  }
-}
-
-@media (max-width: 700px) {
-  .employee-page {
-    display: block;
-  }
-
-  .employee-sidebar {
-    display: none;
-  }
-
-  .employee-main {
-    padding: 30px 20px;
-  }
-
-  .employee-topbar {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .employee-topbar h1 {
-    font-size: 34px;
-  }
-
-  .add-employee-button {
-    width: 100%;
-  }
-
-  .employee-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .employee-role-info-list {
-    grid-template-columns: 1fr;
-  }
-
-  .employee-detail-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .employee-detail-item:nth-child(odd) {
-    margin-right: 0;
-  }
-}
-
-/* =========================================================
-   FIX GLOBAL LAYOUT
-========================================================= */
 
 html,
 body,
@@ -831,27 +18,1186 @@ body,
 }
 
 body {
-  background: #f4f3ef;
+  background: #111;
 }
 
+
+/* =========================================================
+   PAGE
+========================================================= */
+
 .employee-page {
-  width: 100%;
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
+  width: 100%;
   display: flex;
-  background: #f4f3ef;
+  background: #111;
+  color: #eee;
+  font-family:
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
 }
+
+
+/* =========================================================
+   MAIN
+========================================================= */
 
 .employee-main {
   flex: 1;
-  width: auto;
   min-width: 0;
-  margin: 0;
-  background: #f4f3ef;
+  min-height: 100vh;
+  padding: 30px 45px;
+  background: #111;
 }
 
-/* Jangan biarkan CSS customer mempengaruhi employee */
-.employee-page * {
-  box-sizing: border-box;
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.employee-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.employee-section-label,
+.employee-eyebrow {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #666;
+}
+
+.employee-section-heading h2 {
+  margin: 6px 0 0;
+  font-size: 17px;
+  line-height: normal;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.employee-error,
+.employee-modal-error {
+  padding: 10px 14px;
+  background: #2b1919;
+  color: #d88;
+  border: 1px solid #3b2424;
+  font-size: 9px;
+}
+
+.employee-error {
+  margin-bottom: 10px;
+}
+
+.employee-modal-error {
+  margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+.employee-stat-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.employee-stat-card {
+  min-width: 0;
+  padding: 16px 18px;
+  background: #181818;
+  border: 1px solid #292929;
+}
+
+.employee-stat-card:nth-child(2) {
+  background: #1b1b1b;
+}
+
+.employee-stat-label {
+  margin-bottom: 8px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #777;
+}
+
+.employee-stat-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 21px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+}
+
+.employee-stat-note {
+  margin-top: 7px;
+  font-size: 8px;
+  color: #555;
+}
+
+
+/* =========================================================
+   EMPLOYEE LIST
+========================================================= */
+
+.employee-list-section {
+  min-width: 0;
+  background: #181818;
+  border: 1px solid #292929;
+}
+
+.employee-list-header {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid #292929;
+}
+
+.employee-list-header h2 {
+  margin: 4px 0 0;
+  font-size: 8px;
+  line-height: normal;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: #666;
+}
+
+.employee-list-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #555;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.employee-search-box {
+  width: 190px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  background: #111;
+  border: 1px solid #333;
+}
+
+.employee-search-box span {
+  color: #777;
+  font-size: 10px;
+}
+
+.employee-search-box input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #eee;
+  font-family: inherit;
+  font-size: 9px;
+}
+
+.employee-search-box input::placeholder {
+  color: #666;
+}
+
+
+/* =========================================================
+   ADD BUTTON
+========================================================= */
+
+.add-employee-button {
+  height: 32px;
+  padding: 0 13px;
+  background: #eee;
+  color: #111;
+  border: 1px solid #eee;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.add-employee-button:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+
+/* =========================================================
+   TABLE SCROLL
+========================================================= */
+
+.employee-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling:
+    touch;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.employee-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.employee-table th {
+  text-align: left;
+  padding: 11px 14px;
+  background: #141414;
+  border-bottom:
+    1px solid #333;
+  color: #777;
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.employee-table td {
+  padding: 12px 14px;
+  border-bottom:
+    1px solid #292929;
+  color: #ccc;
+  font-size: 9px;
+  font-weight: 400;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.employee-table
+tbody
+tr:last-child
+td {
+  border-bottom: none;
+}
+
+.employee-table
+tbody
+tr:hover {
+  background: #1d1d1d;
+}
+
+
+/* =========================================================
+   TABLE WIDTH
+========================================================= */
+
+.employee-table
+th:nth-child(1),
+.employee-table
+td:nth-child(1) {
+  width: 22%;
+}
+
+.employee-table
+th:nth-child(2),
+.employee-table
+td:nth-child(2) {
+  width: 29%;
+}
+
+.employee-table
+th:nth-child(3),
+.employee-table
+td:nth-child(3) {
+  width: 17%;
+}
+
+.employee-table
+th:nth-child(4),
+.employee-table
+td:nth-child(4) {
+  width: 14%;
+}
+
+.employee-table
+th:nth-child(5),
+.employee-table
+td:nth-child(5) {
+  width: 18%;
+}
+
+
+/* =========================================================
+   NAME / EMAIL
+========================================================= */
+
+.employee-name {
+  color: #eee;
+  font-size: 9px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.employee-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   ROLE / STATUS
+========================================================= */
+
+.employee-role-badge,
+.employee-status {
+  display: inline-block;
+  padding: 4px 7px;
+  font-size: 7px;
+  line-height: 1;
+}
+
+.employee-role-badge {
+  background: #222;
+  color: #aaa;
+  border: 1px solid #303030;
+}
+
+.employee-status-active {
+  background: #263026;
+  color: #9fbd9f;
+}
+
+.employee-status-inactive {
+  background: #321f1f;
+  color: #c88;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.employee-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.employee-actions button {
+  padding: 5px 7px;
+  background: transparent;
+  border: 1px solid #333;
+  color: #888;
+  font-family: inherit;
+  font-size: 7px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.employee-actions button:hover {
+  background: #252525;
+  color: #fff;
+  border-color: #555;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-employee {
+  padding:
+    45px 20px
+    !important;
+  text-align:
+    center
+    !important;
+  color:
+    #666
+    !important;
+  font-size:
+    9px
+    !important;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.employee-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 12px 0;
+  border-top:
+    1px solid #292929;
+  color: #444;
+  font-size: 7px;
+  letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.employee-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  background:
+    rgba(
+      0,
+      0,
+      0,
+      0.75
+    );
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   FORM / DETAIL
+========================================================= */
+
+.employee-form-box,
+.employee-detail-box {
+  width: 100%;
+  max-width: 720px;
+  padding: 30px;
+  background: #181818;
+  border: 1px solid #333;
+  color: #eee;
+}
+
+
+/* =========================================================
+   FORM HEADER
+========================================================= */
+
+.employee-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.employee-form-kicker {
+  margin-bottom: 8px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #666;
+}
+
+.employee-form-header h2 {
+  margin: 0 0 7px;
+  font-size: 22px;
+  line-height: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.employee-form-header p {
+  margin: 0;
+  color: #777;
+  font-size: 10px;
+}
+
+.employee-form-close {
+  width: 32px;
+  height: 32px;
+  flex:
+    0 0 32px;
+  border: 1px solid #333;
+  background: #111;
+  color: #aaa;
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.employee-form-close:hover {
+  color: #fff;
+  background: #252525;
+  border-color: #444;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.employee-form-grid {
+  display: grid;
+  grid-template-columns:
+    1fr 1fr;
+  gap: 16px;
+}
+
+.employee-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.employee-field label {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #777;
+  font-weight: 500;
+}
+
+.employee-field input,
+.employee-field select {
+  width: 100%;
+  height: 38px;
+  padding: 0 11px;
+  border:
+    1px solid #333;
+  border-radius: 0;
+  outline: none;
+  background: #111;
+  color: #eee;
+  font-family: inherit;
+  font-size: 9px;
+}
+
+.employee-field
+input::placeholder {
+  color: #666;
+}
+
+.employee-field
+input:focus,
+.employee-field
+select:focus {
+  border-color: #777;
+}
+
+.employee-field
+input:disabled {
+  color: #666;
+  background: #151515;
+  cursor: not-allowed;
+}
+
+.employee-field
+select
+option {
+  background: #181818;
+  color: #eee;
+}
+
+
+/* =========================================================
+   ROLE INFO
+========================================================= */
+
+.employee-role-info {
+  margin-top: 18px;
+  padding: 17px;
+  background: #151515;
+  border:
+    1px solid #292929;
+}
+
+.employee-role-info-title {
+  margin-bottom: 15px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #666;
+}
+
+.employee-role-info-list {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 16px;
+}
+
+.employee-role-info-list div {
+  min-width: 0;
+}
+
+.employee-role-info-list strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #ddd;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.employee-role-info-list span {
+  display: block;
+  color: #666;
+  font-size: 8px;
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   FORM FOOTER
+========================================================= */
+
+.employee-form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+  padding-top: 17px;
+  border-top:
+    1px solid #292929;
+}
+
+.employee-form-footer-right,
+.employee-detail-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.employee-cancel,
+.employee-save,
+.employee-delete-button {
+  height: 35px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+
+/* CANCEL */
+
+.employee-cancel {
+  background: transparent;
+  color: #aaa;
+  border:
+    1px solid #333;
+}
+
+.employee-cancel:hover {
+  color: #fff;
+  border-color: #555;
+}
+
+
+/* SAVE */
+
+.employee-save {
+  background: #eee;
+  color: #111;
+  border:
+    1px solid #eee;
+}
+
+.employee-save:hover {
+  background: #fff;
+}
+
+
+/* DELETE */
+
+.employee-delete-button {
+  background: transparent;
+  color: #a66;
+  border:
+    1px solid #412828;
+}
+
+.employee-delete-button:hover {
+  background: #321f1f;
+  color: #d88;
+  border-color: #5a3030;
+}
+
+
+/* =========================================================
+   DETAIL
+========================================================= */
+
+.employee-detail-grid {
+  display: grid;
+  grid-template-columns:
+    1fr 1fr;
+  border-top:
+    1px solid #292929;
+  border-left:
+    1px solid #292929;
+}
+
+.employee-detail-item {
+  min-height: 85px;
+  padding: 17px;
+  border-right:
+    1px solid #292929;
+  border-bottom:
+    1px solid #292929;
+}
+
+.employee-detail-item span {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #666;
+}
+
+.employee-detail-item strong {
+  display: block;
+  color: #eee;
+  font-size: 11px;
+  font-weight: 400;
+  word-break: break-word;
+}
+
+.employee-detail-footer {
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+
+/* =========================================================
+   TABLET / SMALL DESKTOP
+   1100PX
+========================================================= */
+
+@media
+(min-width: 701px)
+and
+(max-width: 1100px) {
+
+  .employee-main {
+    padding: 25px;
+  }
+
+
+  .employee-stat-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+  }
+
+
+  .employee-table {
+    min-width: 720px;
+  }
+
+
+  .employee-list-header {
+    gap: 12px;
+  }
+
+
+  .employee-list-right {
+    gap: 8px;
+  }
+
+
+  .employee-search-box {
+    width: 170px;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   700PX
+========================================================= */
+
+@media
+(max-width: 700px) {
+
+
+  /* MAIN */
+
+  .employee-main {
+    width: 100%;
+    padding:
+      56px
+      14px
+      18px;
+  }
+
+
+  /* HEADING */
+
+  .employee-section-heading {
+    margin-bottom: 10px;
+  }
+
+  .employee-section-label {
+    font-size: 7px;
+  }
+
+  .employee-section-heading h2 {
+    margin-top: 5px;
+    font-size: 17px;
+  }
+
+
+  /* STATISTICS */
+
+  .employee-stat-grid {
+    grid-template-columns:
+      1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .employee-stat-card {
+    padding:
+      14px 16px;
+  }
+
+  .employee-stat-value {
+    font-size: 19px;
+  }
+
+
+  /* LIST HEADER */
+
+  .employee-list-header {
+    padding:
+      12px 14px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .employee-list-header h2 {
+    font-size: 6px;
+    letter-spacing: 1.5px;
+  }
+
+  .employee-eyebrow {
+    font-size: 6px;
+    letter-spacing: 1.5px;
+  }
+
+  .employee-list-right {
+    gap: 6px;
+  }
+
+  .employee-list-right
+  > span {
+    display: none;
+  }
+
+
+  /* SEARCH */
+
+  .employee-search-box {
+    width: 145px;
+    height: 30px;
+    padding: 0 8px;
+    gap: 6px;
+  }
+
+  .employee-search-box input {
+    font-size: 8px;
+  }
+
+
+  /* ADD */
+
+  .add-employee-button {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 8px;
+  }
+
+
+  /* TABLE */
+
+  .employee-table-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .employee-table {
+    width: 720px;
+    min-width: 720px;
+  }
+
+  .employee-table th {
+    padding: 10px;
+    font-size: 6px;
+    letter-spacing: 1.2px;
+  }
+
+  .employee-table td {
+    padding:
+      11px 10px;
+    font-size: 8px;
+  }
+
+  .employee-name {
+    font-size: 8px;
+  }
+
+  .employee-role-badge,
+  .employee-status {
+    padding: 4px 6px;
+    font-size: 6px;
+  }
+
+  .employee-actions {
+    gap: 3px;
+  }
+
+  .employee-actions button {
+    padding:
+      5px 6px;
+    font-size: 6px;
+  }
+
+
+  /* FOOTER */
+
+  .employee-footer {
+    margin-top: 10px;
+    padding: 9px 0;
+    font-size: 6px;
+  }
+
+
+  /* MODAL */
+
+  .employee-overlay {
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  .employee-form-box,
+  .employee-detail-box {
+    margin:
+      auto 0;
+    padding: 22px;
+  }
+
+  .employee-form-grid,
+  .employee-role-info-list,
+  .employee-detail-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .employee-form-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .employee-form-footer-right {
+    width: 100%;
+  }
+
+  .employee-cancel,
+  .employee-save,
+  .employee-delete-button {
+    flex: 1;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   480PX
+========================================================= */
+
+@media
+(max-width: 480px) {
+
+
+  .employee-main {
+    padding:
+      52px
+      10px
+      15px;
+  }
+
+
+  /* HEADING */
+
+  .employee-section-label {
+    font-size: 6px;
+    letter-spacing: 1.5px;
+  }
+
+  .employee-section-heading h2 {
+    font-size: 15px;
+  }
+
+
+  /* STAT */
+
+  .employee-stat-card {
+    padding:
+      13px 14px;
+  }
+
+  .employee-stat-label {
+    font-size: 7px;
+  }
+
+  .employee-stat-value {
+    font-size: 18px;
+  }
+
+
+  /* LIST */
+
+  .employee-list-header {
+    padding:
+      11px 12px;
+  }
+
+  .employee-list-header h2,
+  .employee-eyebrow {
+    font-size: 5.5px;
+    letter-spacing: 1.2px;
+  }
+
+
+  /* SEARCH */
+
+  .employee-search-box {
+    width: 130px;
+    height: 29px;
+  }
+
+
+  /* ADD */
+
+  .add-employee-button {
+    height: 29px;
+    padding: 0 8px;
+  }
+
+
+  /* TABLE */
+
+  .employee-table {
+    width: 700px;
+    min-width: 700px;
+  }
+
+  .employee-table th {
+    padding:
+      9px 8px;
+    font-size: 5.5px;
+    letter-spacing: 1px;
+  }
+
+  .employee-table td {
+    padding:
+      10px 8px;
+    font-size: 7px;
+  }
+
+  .employee-name {
+    font-size: 7px;
+  }
+
+  .employee-role-badge,
+  .employee-status {
+    padding:
+      4px 5px;
+    font-size: 5.5px;
+  }
+
+  .employee-actions button {
+    padding: 5px;
+    font-size: 5.5px;
+  }
+
+
+  /* FOOTER */
+
+  .employee-footer {
+    margin-top: 8px;
+    padding: 7px 0;
+    font-size: 5.5px;
+  }
+
+
+  /* MODAL */
+
+  .employee-overlay {
+    padding: 10px;
+  }
+
+  .employee-form-box,
+  .employee-detail-box {
+    padding: 18px;
+  }
+
+  .employee-form-header h2 {
+    font-size: 19px;
+  }
+
+  .employee-form-footer-right,
+  .employee-detail-footer {
+    width: 100%;
+  }
+
+  .employee-detail-footer
+  .employee-cancel,
+  .employee-detail-footer
+  .employee-save {
+    flex: 1;
+  }
+
 }

@@ -4,6 +4,116 @@ import Sidebar from "../components/Sidebar";
 import "./Booking.css";
 
 
+/* ==================================================
+   BOOKING PERIOD FILTER
+================================================== */
+
+function getCurrentDateParts() {
+
+  const currentDate =
+    new Date();
+
+  const year =
+    String(
+      currentDate.getFullYear()
+    );
+
+  const month =
+    String(
+      currentDate.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+  const day =
+    String(
+      currentDate.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+  return {
+    year,
+    month,
+    date: `${year}-${month}-${day}`,
+  };
+
+}
+
+
+function getInitialPeriodFilter() {
+
+  const current =
+    getCurrentDateParts();
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const period =
+    params.get(
+      "period"
+    );
+
+  const type =
+    [
+      "date",
+      "month",
+      "year",
+    ].includes(
+      period
+    )
+      ? period
+      : "date";
+
+  const date =
+    params.get(
+      "date"
+    );
+
+  const month =
+    params.get(
+      "month"
+    );
+
+  const year =
+    params.get(
+      "year"
+    );
+
+  return {
+
+    type,
+
+    date:
+      /^\d{4}-\d{2}-\d{2}$/.test(
+        date || ""
+      )
+        ? date
+        : current.date,
+
+    month:
+      /^(0[1-9]|1[0-2])$/.test(
+        month || ""
+      )
+        ? month
+        : current.month,
+
+    year:
+      /^\d{4}$/.test(
+        year || ""
+      )
+        ? year
+        : current.year,
+
+  };
+
+}
+
+
 function Booking() {
 
   const [
@@ -55,6 +165,18 @@ function Booking() {
     currentPage,
     setCurrentPage,
   ] = useState(0);
+
+  const [
+    periodFilter,
+    setPeriodFilter,
+  ] = useState(
+    getInitialPeriodFilter
+  );
+
+  const [
+    shareCopied,
+    setShareCopied,
+  ] = useState(false);
 
 
   const [
@@ -733,11 +855,349 @@ function Booking() {
 
 
   /* ==================================================
+     PERIOD FILTER
+  ================================================== */
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+
+  const bookingYears =
+    bookings
+      .map(
+        (booking) =>
+          booking.booking_date
+            ? booking.booking_date.substring(
+                0,
+                4
+              )
+            : null
+      )
+      .filter(Boolean);
+
+
+  const currentYear =
+    new Date().getFullYear();
+
+
+  const yearOptions =
+    Array.from(
+      new Set([
+        String(
+          currentYear - 2
+        ),
+        String(
+          currentYear - 1
+        ),
+        String(
+          currentYear
+        ),
+        String(
+          currentYear + 1
+        ),
+        String(
+          currentYear + 2
+        ),
+        ...bookingYears,
+      ])
+    ).sort();
+
+
+  const periodBookings =
+    bookings.filter(
+      (booking) => {
+
+        if (
+          !booking.booking_date
+        ) {
+          return false;
+        }
+
+
+        const [
+          year,
+          month,
+        ] =
+          booking.booking_date.split(
+            "-"
+          );
+
+
+        if (
+          periodFilter.type ===
+          "date"
+        ) {
+
+          return (
+            booking.booking_date ===
+            periodFilter.date
+          );
+
+        }
+
+
+        if (
+          periodFilter.type ===
+          "month"
+        ) {
+
+          return (
+            year ===
+              periodFilter.year &&
+            month ===
+              periodFilter.month
+          );
+
+        }
+
+
+        return (
+          year ===
+          periodFilter.year
+        );
+
+      }
+    );
+
+
+  const periodLabel =
+    periodFilter.type ===
+    "date"
+      ? formatDate(
+          periodFilter.date
+        )
+      : periodFilter.type ===
+        "month"
+      ? `${
+          monthNames[
+            Number(
+              periodFilter.month
+            ) - 1
+          ] || "-"
+        } ${periodFilter.year}`
+      : periodFilter.year;
+
+
+  const updatePeriodFilter =
+    (field, value) => {
+
+      setPeriodFilter(
+        (current) => ({
+          ...current,
+          [field]: value,
+        })
+      );
+
+      setShareCopied(
+        false
+      );
+
+    };
+
+
+  /* ==================================================
+     SYNC PERIOD TO URL
+  ================================================== */
+
+  useEffect(() => {
+
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+
+    params.delete(
+      "date"
+    );
+
+    params.delete(
+      "month"
+    );
+
+    params.delete(
+      "year"
+    );
+
+
+    params.set(
+      "period",
+      periodFilter.type
+    );
+
+
+    if (
+      periodFilter.type ===
+      "date"
+    ) {
+
+      params.set(
+        "date",
+        periodFilter.date
+      );
+
+    }
+
+
+    if (
+      periodFilter.type ===
+      "month"
+    ) {
+
+      params.set(
+        "month",
+        periodFilter.month
+      );
+
+      params.set(
+        "year",
+        periodFilter.year
+      );
+
+    }
+
+
+    if (
+      periodFilter.type ===
+      "year"
+    ) {
+
+      params.set(
+        "year",
+        periodFilter.year
+      );
+
+    }
+
+
+    const queryString =
+      params.toString();
+
+    const nextUrl =
+      `${window.location.pathname}${
+        queryString
+          ? `?${queryString}`
+          : ""
+      }${window.location.hash}`;
+
+
+    window.history.replaceState(
+      null,
+      "",
+      nextUrl
+    );
+
+  }, [
+    periodFilter.type,
+    periodFilter.date,
+    periodFilter.month,
+    periodFilter.year,
+  ]);
+
+
+  /* ==================================================
+     SHARE FILTERED BOOKING LINK
+  ================================================== */
+
+  const handleShare =
+    async () => {
+
+      const shareUrl =
+        window.location.href;
+
+
+      try {
+
+        if (
+          navigator.clipboard &&
+          window.isSecureContext
+        ) {
+
+          await navigator.clipboard.writeText(
+            shareUrl
+          );
+
+        } else {
+
+          const textarea =
+            document.createElement(
+              "textarea"
+            );
+
+          textarea.value =
+            shareUrl;
+
+          textarea.style.position =
+            "fixed";
+
+          textarea.style.opacity =
+            "0";
+
+          document.body.appendChild(
+            textarea
+          );
+
+          textarea.focus();
+          textarea.select();
+
+          document.execCommand(
+            "copy"
+          );
+
+          document.body.removeChild(
+            textarea
+          );
+
+        }
+
+
+        setShareCopied(
+          true
+        );
+
+        window.setTimeout(
+          () => {
+            setShareCopied(
+              false
+            );
+          },
+          1800
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Gagal menyalin link booking:",
+          error
+        );
+
+        setErrorMessage(
+          "Gagal menyalin link booking."
+        );
+
+      }
+
+    };
+
+
+  /* ==================================================
      SEARCH
   ================================================== */
 
   const filteredBookings =
-    bookings.filter(
+    periodBookings.filter(
       (booking) => {
 
         const keyword =
@@ -851,7 +1311,13 @@ function Booking() {
 
   useEffect(() => {
     setCurrentPage(0);
-  }, [search]);
+  }, [
+    search,
+    periodFilter.type,
+    periodFilter.date,
+    periodFilter.month,
+    periodFilter.year,
+  ]);
 
 
   return (
@@ -886,14 +1352,210 @@ function Booking() {
           </div>
 
 
-          <button
-            className="booking-add-button"
-            onClick={
-              openAddForm
-            }
-          >
-            Add
-          </button>
+          <div className="booking-header-actions">
+
+
+            <div className="booking-period-filter">
+
+              <select
+                className="booking-period-type"
+                value={
+                  periodFilter.type
+                }
+                onChange={(
+                  event
+                ) =>
+                  updatePeriodFilter(
+                    "type",
+                    event.target.value
+                  )
+                }
+                aria-label="Booking period type"
+              >
+
+                <option value="date">
+                  Date
+                </option>
+
+                <option value="month">
+                  Month
+                </option>
+
+                <option value="year">
+                  Year
+                </option>
+
+              </select>
+
+
+              {periodFilter.type ===
+                "date" && (
+
+                <input
+                  type="date"
+                  className="booking-period-date"
+                  value={
+                    periodFilter.date
+                  }
+                  onChange={(
+                    event
+                  ) =>
+                    updatePeriodFilter(
+                      "date",
+                      event.target.value
+                    )
+                  }
+                  aria-label="Booking date"
+                />
+
+              )}
+
+
+              {periodFilter.type ===
+                "month" && (
+
+                <>
+
+                  <select
+                    value={
+                      periodFilter.month
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updatePeriodFilter(
+                        "month",
+                        event.target.value
+                      )
+                    }
+                    aria-label="Booking month"
+                  >
+
+                    {monthNames.map(
+                      (
+                        month,
+                        index
+                      ) => (
+
+                        <option
+                          key={month}
+                          value={String(
+                            index + 1
+                          ).padStart(
+                            2,
+                            "0"
+                          )}
+                        >
+                          {month}
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+
+                  <select
+                    value={
+                      periodFilter.year
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      updatePeriodFilter(
+                        "year",
+                        event.target.value
+                      )
+                    }
+                    aria-label="Booking year"
+                  >
+
+                    {yearOptions.map(
+                      (year) => (
+
+                        <option
+                          key={year}
+                          value={year}
+                        >
+                          {year}
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+                </>
+
+              )}
+
+
+              {periodFilter.type ===
+                "year" && (
+
+                <select
+                  value={
+                    periodFilter.year
+                  }
+                  onChange={(
+                    event
+                  ) =>
+                    updatePeriodFilter(
+                      "year",
+                      event.target.value
+                    )
+                  }
+                  aria-label="Booking year"
+                >
+
+                  {yearOptions.map(
+                    (year) => (
+
+                      <option
+                        key={year}
+                        value={year}
+                      >
+                        {year}
+                      </option>
+
+                    )
+                  )}
+
+                </select>
+
+              )}
+
+            </div>
+
+
+            <button
+              type="button"
+              className={`booking-share-button ${
+                shareCopied
+                  ? "copied"
+                  : ""
+              }`}
+              onClick={
+                handleShare
+              }
+            >
+              {shareCopied
+                ? "Copied"
+                : "Share"}
+            </button>
+
+
+            <button
+              type="button"
+              className="booking-add-button"
+              onClick={
+                openAddForm
+              }
+            >
+              Add
+            </button>
+
+          </div>
 
         </div>
 
@@ -918,6 +1580,11 @@ function Booking() {
 
 
             <div className="booking-list-tools">
+
+              <div className="booking-active-period">
+                {periodLabel}
+              </div>
+
 
               <div className="booking-count">
                 {filteredBookings.length} BOOKING

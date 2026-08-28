@@ -75,6 +75,117 @@
 
 
 /* =========================================================
+   HEADER ACTIONS / PERIOD FILTER
+========================================================= */
+
+.booking-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  min-width: 0;
+}
+
+.booking-period-filter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.booking-period-filter select,
+.booking-period-date {
+  min-width: 110px;
+  height: 32px;
+  padding: 0 28px 0 10px;
+  outline: none;
+  border: 1px solid #292929;
+  border-radius: 0;
+  background-color: #181818;
+  color: #aaa;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.booking-period-filter select {
+  appearance: none;
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #666 50%
+    ),
+    linear-gradient(
+      135deg,
+      #666 50%,
+      transparent 50%
+    );
+  background-position:
+    calc(100% - 12px) 12px,
+    calc(100% - 8px) 12px;
+  background-size:
+    4px 4px,
+    4px 4px;
+  background-repeat: no-repeat;
+}
+
+.booking-period-type {
+  min-width: 82px !important;
+}
+
+.booking-period-date {
+  min-width: 138px;
+  padding-right: 8px;
+  color-scheme: dark;
+}
+
+.booking-period-filter select:hover,
+.booking-period-date:hover {
+  border-color: #444;
+  color: #eee;
+}
+
+.booking-period-filter select:focus,
+.booking-period-date:focus {
+  border-color: #555;
+}
+
+.booking-period-filter select option {
+  background: #181818;
+  color: #eee;
+}
+
+.booking-share-button {
+  height: 32px;
+  padding: 0 13px;
+  background: #181818;
+  color: #aaa;
+  border: 1px solid #333;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 9px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.booking-share-button:hover {
+  background: #252525;
+  color: #fff;
+  border-color: #555;
+}
+
+.booking-share-button.copied {
+  background: #263026;
+  color: #9fbd9f;
+  border-color: #354235;
+}
+
+
+/* =========================================================
    ERROR
 ========================================================= */
 
@@ -121,6 +232,15 @@
 
 .booking-count {
   color: #555;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.booking-active-period {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #777;
   font-size: 8px;
   white-space: nowrap;
 }
@@ -711,6 +831,15 @@
     min-width: 800px;
   }
 
+  .booking-page-header {
+    align-items: flex-start;
+  }
+
+  .booking-header-actions {
+    flex-wrap: wrap;
+    max-width: 520px;
+  }
+
 }
 
 
@@ -747,7 +876,46 @@
   }
 
   .booking-add-button {
-    padding: 7px 11px;
+    height: 30px;
+    padding: 0 11px;
+    font-size: 8px;
+  }
+
+  .booking-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .booking-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .booking-period-filter {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .booking-period-filter select,
+  .booking-period-date {
+    height: 30px;
+    font-size: 8px;
+  }
+
+  .booking-period-type {
+    min-width: 76px !important;
+  }
+
+  .booking-period-date {
+    min-width: 132px;
+  }
+
+  .booking-share-button {
+    height: 30px;
+    padding: 0 11px;
     font-size: 8px;
   }
 
@@ -781,6 +949,10 @@
   }
 
   .booking-count {
+    display: none;
+  }
+
+  .booking-active-period {
     display: none;
   }
 

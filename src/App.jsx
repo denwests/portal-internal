@@ -12,6 +12,7 @@ import Customer from "./pages/Customer";
 import Spending from "./pages/Spending";
 import Transactions from "./pages/Transactions";
 import Bookkeeping from "./pages/Bookkeeping";
+import Employee from "./pages/Employee";
 
 
 function App() {
@@ -90,6 +91,28 @@ function App() {
         <Route
           path="/bookkeeping"
           element={<Bookkeeping />}
+        />
+
+
+        {/* =================================================
+            EMPLOYEE
+            Founder only
+        ================================================= */}
+
+        <Route
+          path="/employee"
+          element={
+            localStorage.getItem(
+              "employeeRole"
+            ) === "Founder" ? (
+              <Employee />
+            ) : (
+              <Navigate
+                to="/dashboard"
+                replace
+              />
+            )
+          }
         />
 
 
