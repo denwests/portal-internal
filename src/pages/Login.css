@@ -245,3 +245,41 @@ body,
   }
 
 }
+/* =========================================================
+   PHASE 3 — UI CONSISTENCY / 100% ZOOM
+========================================================= */
+
+.login-box {
+  max-width: 380px;
+  gap: 11px;
+}
+
+.login-box input,
+.login-box button {
+  height: 48px;
+}
+
+.login-box input {
+  padding: 0 16px;
+  font-size: 13px;
+}
+
+.login-box button {
+  font-size: 12px;
+}
+
+.login-box .reset-password-link {
+  font-size: 11px;
+}
+
+.login-error,
+.login-success {
+  padding: 12px 14px;
+  font-size: 11px;
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 18px;
+  }
+}

@@ -364,3 +364,63 @@
   }
 
 }
+/* =========================================================
+   PHASE 3 — UI CONSISTENCY / 100% ZOOM
+   Typography scale and navigation readability
+========================================================= */
+
+.dashboard-brand-name {
+  font-size: 16px;
+  letter-spacing: 1.8px;
+}
+
+.dashboard-brand-subtitle {
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.dashboard-nav-section {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+}
+
+.dashboard-nav-item {
+  padding: 13px 11px;
+  gap: 13px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.dashboard-nav-item span {
+  font-size: 10px;
+}
+
+.dashboard-user-name {
+  font-size: 12px;
+}
+
+.dashboard-user-role {
+  font-size: 10px;
+}
+
+.dashboard-logout {
+  min-height: 38px;
+  font-size: 10.5px;
+}
+
+@media (max-width: 700px) {
+  .dashboard-mobile-trigger {
+    width: 42px;
+    height: 42px;
+  }
+
+  .dashboard-sidebar {
+    width: min(290px, 86vw);
+    padding: 28px 20px;
+  }
+
+  .dashboard-nav-item {
+    min-height: 44px;
+    font-size: 13.5px;
+  }
+}

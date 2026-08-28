@@ -823,3 +823,263 @@ body {
     font-size: 19px;
   }
 }
+
+/* =========================================================
+   PHASE 3 — UI CONSISTENCY / 100% ZOOM
+========================================================= */
+
+.employee-main {
+  padding: 36px 42px 28px;
+}
+
+.employee-section-heading {
+  margin-bottom: 20px;
+}
+
+.employee-section-label,
+.employee-eyebrow,
+.employee-form-kicker,
+.employee-stat-label,
+.employee-role-info-title {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+}
+
+.employee-section-heading h2 {
+  margin-top: 7px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.employee-stat-grid {
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.employee-stat-card {
+  padding: 20px;
+}
+
+.employee-stat-value {
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.employee-stat-note,
+.employee-security-copy,
+.employee-field-note {
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.employee-list-header {
+  padding: 18px 20px;
+}
+
+.employee-list-header h2 {
+  font-size: 18px;
+}
+
+.employee-list-right,
+.employee-search-box {
+  font-size: 9.5px;
+}
+
+.employee-search-box input {
+  min-height: 38px;
+  font-size: 10.5px;
+}
+
+.add-employee-button,
+.employee-save,
+.employee-cancel,
+.employee-delete-button,
+.employee-reset-password-button {
+  min-height: 38px;
+  padding-left: 14px;
+  padding-right: 14px;
+  font-size: 10.5px;
+}
+
+.employee-table th {
+  padding: 12px 14px;
+  font-size: 8.5px;
+  letter-spacing: 1.2px;
+}
+
+.employee-table td {
+  padding: 13px 14px;
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.employee-name,
+.employee-username,
+.employee-email {
+  font-size: 11px;
+}
+
+.employee-role-badge,
+.employee-status {
+  padding: 5px 8px;
+  font-size: 9px;
+}
+
+.employee-actions button {
+  font-size: 9.5px;
+}
+
+.employee-table {
+  min-width: 980px;
+}
+
+.employee-footer {
+  font-size: 8.5px;
+}
+
+.employee-form-box,
+.employee-detail-box {
+  max-width: 760px;
+}
+
+.employee-form-header {
+  padding: 21px 24px;
+}
+
+.employee-form-header h2 {
+  font-size: 22px;
+}
+
+.employee-form-header p {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.employee-form-close {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+}
+
+.employee-form-grid,
+.employee-detail-grid {
+  gap: 16px;
+}
+
+.employee-field label,
+.employee-detail-item span {
+  font-size: 9px;
+  letter-spacing: 1.4px;
+}
+
+.employee-field input,
+.employee-field select,
+.employee-field textarea {
+  min-height: 40px;
+  padding: 9px 11px;
+  font-size: 11px;
+}
+
+.employee-detail-item strong {
+  font-size: 12px;
+}
+
+.employee-role-info {
+  padding: 16px 24px;
+}
+
+.employee-form-footer,
+.employee-detail-footer {
+  padding: 16px 24px;
+}
+
+@media (max-width: 900px) {
+  .employee-main {
+    padding: 32px 28px 26px;
+  }
+}
+
+@media (max-width: 700px) {
+  .employee-main {
+    width: 100%;
+    padding: 74px 16px 24px;
+  }
+
+  .employee-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .employee-section-heading h2 {
+    font-size: 20px;
+  }
+
+  .employee-stat-grid,
+  .employee-form-grid,
+  .employee-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-list-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 17px;
+  }
+
+  .employee-list-right {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .employee-search-box {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .employee-table {
+    width: 960px;
+    min-width: 960px;
+  }
+
+  .employee-form-box,
+  .employee-detail-box {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .employee-form-header {
+    padding: 19px;
+  }
+
+  .employee-role-info,
+  .employee-form-footer,
+  .employee-detail-footer {
+    padding: 15px 19px;
+  }
+
+  .employee-form-footer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .employee-form-footer-left,
+  .employee-form-footer-right {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .employee-form-footer-left button,
+  .employee-form-footer-right button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .employee-main {
+    padding: 70px 14px 22px;
+  }
+}

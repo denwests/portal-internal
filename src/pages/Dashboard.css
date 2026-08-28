@@ -1463,3 +1463,170 @@ body {
       center;
   }
 }
+/* =========================================================
+   PHASE 3 — UI CONSISTENCY / 100% ZOOM
+========================================================= */
+
+.dashboard-main {
+  padding: 36px 42px 28px;
+}
+
+.dashboard-section-heading {
+  margin-bottom: 20px;
+}
+
+.dashboard-section-label,
+.dashboard-card-kicker {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+}
+
+.dashboard-section-heading h2 {
+  margin-top: 7px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.dashboard-performance-filter select {
+  min-width: 118px;
+  height: 38px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 10.5px;
+}
+
+.dashboard-stats {
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.dashboard-stat {
+  padding: 20px;
+}
+
+.dashboard-stat-label {
+  font-size: 9px;
+  letter-spacing: 1.6px;
+}
+
+.dashboard-stat-value {
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.dashboard-stat-note {
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.dashboard-content-grid {
+  gap: 12px;
+}
+
+.dashboard-card,
+.revenue-card,
+.booking-calendar-card {
+  border-color: #2d2d2d;
+}
+
+.dashboard-card-header,
+.calendar-header {
+  padding: 18px 20px;
+}
+
+.dashboard-card-header h2,
+.calendar-header h2 {
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.dashboard-view-all,
+.calendar-more {
+  font-size: 9.5px;
+}
+
+.calendar-week,
+.revenue-month {
+  font-size: 9px;
+}
+
+.calendar-day,
+.calendar-date,
+.calendar-booking {
+  font-size: 10.5px;
+}
+
+.dashboard-footer {
+  font-size: 8.5px;
+}
+
+/* Shared sidebar styles are repeated here because Dashboard.css
+   also contains sidebar declarations. */
+.dashboard-brand-name { font-size: 16px; }
+.dashboard-brand-subtitle { font-size: 9px; }
+.dashboard-nav-section { font-size: 9px; }
+.dashboard-nav-item { padding: 13px 11px; font-size: 13px; }
+.dashboard-nav-item span { font-size: 10px; }
+.dashboard-user-name { font-size: 12px; }
+.dashboard-user-role { font-size: 10px; }
+.dashboard-logout { min-height: 38px; font-size: 10.5px; }
+
+@media (max-width: 900px) {
+  .dashboard-main {
+    padding: 32px 28px 26px;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-main {
+    width: 100%;
+    padding: 74px 16px 24px;
+  }
+
+  .dashboard-section-heading {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .dashboard-section-heading h2 {
+    font-size: 20px;
+  }
+
+  .dashboard-section-label,
+  .dashboard-card-kicker {
+    font-size: 8.5px;
+  }
+
+  .dashboard-stats,
+  .dashboard-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-stat {
+    padding: 18px;
+  }
+
+  .dashboard-stat-value {
+    font-size: 23px;
+  }
+
+  .dashboard-performance-filter {
+    width: 100%;
+  }
+
+  .dashboard-performance-filter select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .dashboard-card-header,
+  .calendar-header {
+    padding: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding: 70px 14px 22px;
+  }
+}

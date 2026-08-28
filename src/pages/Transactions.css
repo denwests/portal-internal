@@ -1322,3 +1322,253 @@ body,
     min-width: 1200px;
   }
 }
+
+/* =========================================================
+   PHASE 3 — UI CONSISTENCY / 100% ZOOM
+========================================================= */
+
+.transactions-main {
+  padding: 36px 42px 28px;
+}
+
+.transactions-section-heading,
+.transactions-header {
+  margin-bottom: 20px;
+}
+
+.transactions-section-label,
+.transactions-eyebrow,
+.transactions-auto-label {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+}
+
+.transactions-section-heading h2,
+.transactions-header h1 {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.transactions-performance-filter select {
+  min-width: 112px;
+  height: 38px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 10.5px;
+}
+
+.transactions-pdf-button,
+.transactions-add-button,
+.transactions-save,
+.transactions-cancel {
+  min-height: 38px;
+  padding-left: 14px;
+  padding-right: 14px;
+  font-size: 10.5px;
+}
+
+.transactions-summary {
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.transactions-summary > div {
+  padding: 20px;
+}
+
+.transactions-summary span {
+  font-size: 9px;
+}
+
+.transactions-summary strong {
+  font-size: 23px;
+}
+
+.transactions-card-header {
+  padding: 18px 20px;
+}
+
+.transactions-card-header span {
+  font-size: 9px;
+}
+
+.transactions-card-header h2 {
+  font-size: 18px;
+}
+
+.transactions-table th {
+  padding: 12px 12px;
+  font-size: 8.5px;
+  letter-spacing: 1.15px;
+}
+
+.transactions-table td {
+  padding: 13px 12px;
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.transactions-payment-type,
+.transactions-payment,
+.transactions-booking-status {
+  padding: 5px 8px;
+  font-size: 9px;
+}
+
+.transactions-row-actions {
+  gap: 9px;
+}
+
+.transactions-invoice,
+.transactions-delete {
+  font-size: 9.5px;
+}
+
+.transactions-table-v2 {
+  min-width: 1280px;
+}
+
+.transactions-footer {
+  font-size: 8.5px;
+}
+
+.transactions-modal {
+  max-width: 760px;
+}
+
+.transactions-modal-header {
+  padding: 21px 24px;
+}
+
+.transactions-modal-header span,
+.transactions-field label {
+  font-size: 9px;
+  letter-spacing: 1.4px;
+}
+
+.transactions-modal-header h2 {
+  font-size: 22px;
+}
+
+.transactions-modal-header p {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.transactions-close {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+}
+
+.transactions-form-grid {
+  gap: 16px;
+  padding: 22px 24px;
+}
+
+.transactions-field input,
+.transactions-field select,
+.transactions-field textarea {
+  min-height: 40px;
+  padding: 9px 11px;
+  font-size: 11px;
+}
+
+.transactions-preview span {
+  font-size: 9px;
+}
+
+.transactions-preview strong {
+  font-size: 15px;
+}
+
+.transactions-modal-footer {
+  padding: 16px 24px;
+}
+
+.transactions-mdr-modal {
+  max-width: 380px !important;
+}
+
+.transactions-mdr-input input {
+  height: 40px;
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .transactions-main {
+    padding: 32px 28px 26px;
+  }
+}
+
+@media (max-width: 700px) {
+  .transactions-main {
+    width: 100%;
+    padding: 74px 16px 24px;
+  }
+
+  .transactions-section-heading,
+  .transactions-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .transactions-section-heading h2,
+  .transactions-header h1 {
+    font-size: 20px;
+  }
+
+  .transactions-performance-filter,
+  .transactions-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .transactions-performance-filter select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .transactions-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-card-header {
+    padding: 17px;
+  }
+
+  .transactions-table-v2 {
+    width: 1240px;
+    min-width: 1240px;
+  }
+
+  .transactions-modal,
+  .transactions-mdr-modal {
+    width: 100%;
+    max-width: 100% !important;
+  }
+
+  .transactions-form-grid,
+  .transactions-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-modal-header {
+    padding: 19px;
+  }
+
+  .transactions-form-grid {
+    padding: 19px;
+  }
+
+  .transactions-modal-footer {
+    padding: 15px 19px;
+  }
+}
+
+@media (max-width: 480px) {
+  .transactions-main {
+    padding: 70px 14px 22px;
+  }
+}
