@@ -512,24 +512,6 @@ function Customer() {
       <Sidebar activePage="customer" />
 
       <main className="customer-main">
-        {/* HEADER */}
-
-        <header className="customer-page-header">
-          <div>
-            <div className="customer-eyebrow"></div>
-
-            <h1></h1>
-          </div>
-        </header>
-
-        {/* ERROR */}
-
-        {errorMessage && (
-          <div className="customer-error">
-            {errorMessage}
-          </div>
-        )}
-
         {/* OVERVIEW */}
 
         <div className="customer-section-heading">
@@ -579,6 +561,12 @@ function Customer() {
             </select>
           </div>
         </div>
+
+        {errorMessage && (
+          <div className="customer-error">
+            {errorMessage}
+          </div>
+        )}
 
         {/* STATISTICS */}
 

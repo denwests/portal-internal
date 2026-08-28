@@ -1630,3 +1630,80 @@ body {
     padding: 70px 14px 22px;
   }
 }
+
+
+/* =========================================================
+   PHASE 3 — UNIFIED PAGE HEADER
+========================================================= */
+.dashboard-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 48px;
+  margin-bottom: 20px;
+}
+
+.dashboard-section-heading > div:first-child {
+  min-width: 0;
+}
+
+.dashboard-section-label {
+  margin: 0;
+  color: #666;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.dashboard-section-heading h2 {
+  margin: 7px 0 0;
+  color: #eee;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+.dashboard-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dashboard-status {
+  min-height: 38px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #292929;
+  background: #181818;
+  color: #888;
+  font-size: 9.5px;
+  white-space: nowrap;
+}
+
+.dashboard-status span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #777;
+}
+
+@media (max-width: 700px) {
+  .dashboard-section-heading {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .dashboard-section-heading h2 { font-size: 20px; }
+  .dashboard-section-label { font-size: 8.5px; }
+  .dashboard-heading-actions { width: 100%; justify-content: flex-start; }
+  .dashboard-performance-filter { flex: 1; min-width: 220px; }
+}

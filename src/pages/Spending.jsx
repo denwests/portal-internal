@@ -1569,14 +1569,19 @@ function Spending() {
 
         {/* =================================================
             OVERVIEW
-            PLUNO STUDIO / FINANCE DIHAPUS
         ================================================= */}
 
         <div className="spending-section-heading">
 
           <div>
 
+            <div className="spending-section-label">
+              PLUNO STUDIO / FINANCE
+            </div>
 
+            <h2>
+              Spending Performance
+            </h2>
 
           </div>
 

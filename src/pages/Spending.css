@@ -1450,3 +1450,182 @@ body {
     padding: 70px 14px 22px;
   }
 }
+
+
+/* =========================================================
+   PHASE 3 — UNIFIED PAGE HEADER
+========================================================= */
+.spending-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 48px;
+  margin-bottom: 20px;
+}
+
+.spending-section-heading > div:first-child { min-width: 0; }
+
+.spending-section-label {
+  margin: 0;
+  color: #666;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.spending-section-heading h2 {
+  margin: 7px 0 0;
+  color: #eee;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+.spending-performance-filter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .spending-section-heading {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .spending-section-heading h2 { font-size: 20px; }
+  .spending-section-label { font-size: 8.5px; }
+  .spending-performance-filter { width: 100%; justify-content: flex-start; }
+}
+
+/* =========================================================
+   MOBILE FIX — CARD HEADER ACTIONS
+   Prevent Download PDF / Add from overlapping card titles.
+========================================================= */
+@media (max-width: 700px) {
+  .spending-card-header {
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .spending-card-title {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .spending-section-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+    flex-wrap: nowrap;
+  }
+
+  .spending-add-button,
+  .spending-pdf-button {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 9.5px;
+  }
+}
+
+@media (max-width: 420px) {
+  .spending-card-header {
+    padding: 16px;
+  }
+
+  .spending-section-actions {
+    justify-content: stretch;
+  }
+
+  .spending-pdf-button {
+    flex: 1 1 auto;
+  }
+
+  .spending-add-button {
+    flex: 0 0 auto;
+  }
+}
+
+/* =========================================================
+   DESKTOP TABLE FIT — NO HORIZONTAL SCROLL
+   Keep mobile/tablet horizontal scrolling intact.
+========================================================= */
+
+@media (min-width: 901px) {
+  .spending-table-scroll {
+    overflow-x: hidden;
+  }
+
+  .spending-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .spending-table th {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 8px;
+    letter-spacing: 0.9px;
+  }
+
+  .spending-table td {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 10px;
+  }
+
+  .spending-description,
+  .money-cell {
+    font-size: 10.5px;
+  }
+
+  .spending-information {
+    font-size: 9.5px;
+  }
+
+  .spending-table th:nth-child(1),
+  .spending-table td:nth-child(1) {
+    width: 14%;
+  }
+
+  .spending-table th:nth-child(2),
+  .spending-table td:nth-child(2) {
+    width: 22%;
+  }
+
+  .spending-table th:nth-child(3),
+  .spending-table td:nth-child(3) {
+    width: 14%;
+  }
+
+  .spending-table th:nth-child(4),
+  .spending-table td:nth-child(4) {
+    width: 14%;
+  }
+
+  .spending-table th:nth-child(5),
+  .spending-table td:nth-child(5) {
+    width: 22%;
+  }
+
+  .spending-table th:nth-child(6),
+  .spending-table td:nth-child(6) {
+    width: 14%;
+  }
+}

@@ -197,3 +197,46 @@ body {
     padding: 70px 14px 22px;
   }
 }
+
+
+/* =========================================================
+   PHASE 3 — UNIFIED PAGE HEADER
+========================================================= */
+.documents-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 48px;
+  margin-bottom: 20px;
+}
+
+.documents-eyebrow {
+  margin: 0;
+  color: #666;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.documents-page-header h1 {
+  margin: 7px 0 0;
+  color: #eee;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+@media (max-width: 700px) {
+  .documents-page-header {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .documents-page-header h1 { font-size: 20px; }
+  .documents-eyebrow { font-size: 8.5px; }
+}

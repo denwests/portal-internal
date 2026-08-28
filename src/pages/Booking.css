@@ -1782,3 +1782,57 @@
     padding: 70px 14px 22px;
   }
 }
+
+
+/* =========================================================
+   PHASE 3 — UNIFIED PAGE HEADER
+========================================================= */
+.booking-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 48px;
+  margin-bottom: 20px;
+}
+
+.booking-page-header > div:first-child { min-width: 0; }
+
+.booking-eyebrow {
+  margin: 0;
+  color: #666;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.booking-page-header h1 {
+  margin: 7px 0 0;
+  color: #eee;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+.booking-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .booking-page-header {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .booking-page-header h1 { font-size: 20px; }
+  .booking-eyebrow { font-size: 8.5px; }
+  .booking-header-actions { width: 100%; justify-content: flex-start; }
+}

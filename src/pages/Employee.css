@@ -1083,3 +1083,48 @@ body {
     padding: 70px 14px 22px;
   }
 }
+
+
+/* =========================================================
+   PHASE 3 — UNIFIED PAGE HEADER
+========================================================= */
+.employee-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 48px;
+  margin-bottom: 20px;
+}
+
+.employee-section-heading > div:first-child { min-width: 0; }
+
+.employee-section-label {
+  margin: 0;
+  color: #666;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.employee-section-heading h2 {
+  margin: 7px 0 0;
+  color: #eee;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+@media (max-width: 700px) {
+  .employee-section-heading {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .employee-section-heading h2 { font-size: 20px; }
+  .employee-section-label { font-size: 8.5px; }
+}

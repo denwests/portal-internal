@@ -850,40 +850,6 @@ function Dashboard() {
 
 
         {/* =================================================
-            TOPBAR
-        ================================================= */}
-
-        <header className="dashboard-topbar">
-
-          <div>
-
-            <div className="dashboard-eyebrow">
-              PLUNO STUDIO · INTERNAL PORTAL
-            </div>
-
-            <h1>
-              Dashboard
-            </h1>
-
-            <p>
-              Overview of your studio activity.
-            </p>
-
-          </div>
-
-
-          <div className="dashboard-status">
-
-            <span></span>
-
-            Studio Online
-
-          </div>
-
-        </header>
-
-
-        {/* =================================================
             OVERVIEW
         ================================================= */}
 
@@ -905,7 +871,14 @@ function Dashboard() {
             </div>
 
 
-            <div className="dashboard-performance-filter">
+            <div className="dashboard-heading-actions">
+
+              <div className="dashboard-status">
+                <span></span>
+                Studio Online
+              </div>
+
+              <div className="dashboard-performance-filter">
 
               <select
                 value={
@@ -960,6 +933,8 @@ function Dashboard() {
                 )}
 
               </select>
+
+              </div>
 
             </div>
 

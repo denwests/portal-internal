@@ -1719,3 +1719,185 @@ body {
     padding: 70px 14px 22px;
   }
 }
+
+
+/* =========================================================
+   PHASE 3 — UNIFIED PAGE HEADER
+========================================================= */
+.customer-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 48px;
+  margin-bottom: 20px;
+}
+
+.customer-section-heading > div:first-child { min-width: 0; }
+
+.customer-section-label {
+  margin: 0;
+  color: #666;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 1.8px;
+}
+
+.customer-section-heading h2 {
+  margin: 7px 0 0;
+  color: #eee;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+.customer-performance-filter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .customer-section-heading {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .customer-section-heading h2 { font-size: 20px; }
+  .customer-section-label { font-size: 8.5px; }
+  .customer-performance-filter { width: 100%; justify-content: flex-start; }
+}
+
+/* =========================================================
+   CUSTOMER VIEW MODAL — CLEAN GRID FIX
+   Keeps the detail card visually continuous at 100% zoom.
+========================================================= */
+
+.customer-detail-box {
+  padding: 0;
+  overflow: hidden;
+}
+
+.customer-detail-box .customer-form-header {
+  margin-bottom: 0;
+  padding: 22px 24px 19px;
+  border-bottom: 1px solid #292929;
+}
+
+.customer-detail-box .detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 20px 24px 0;
+  padding: 1px;
+  border: 0;
+  background: #292929;
+}
+
+.customer-detail-box .detail-item {
+  min-width: 0;
+  min-height: 88px;
+  padding: 17px 18px;
+  border: 0;
+  background: #151515;
+}
+
+.customer-detail-box .detail-item.detail-wide {
+  grid-column: 1 / -1;
+}
+
+.customer-detail-box .detail-item span {
+  display: block;
+  margin-bottom: 8px;
+  color: #6d6d6d;
+  font-size: 9px;
+  line-height: 1.25;
+  font-weight: 400;
+  letter-spacing: 1.4px;
+}
+
+.customer-detail-box .detail-item strong {
+  display: block;
+  min-width: 0;
+  color: #eee;
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 400;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+.customer-detail-box .detail-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 0;
+  padding: 18px 24px 22px;
+}
+
+@media (max-width: 700px) {
+  .customer-detail-box {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100vh - 28px);
+    overflow-y: auto;
+  }
+
+  .customer-detail-box .customer-form-header {
+    padding: 19px 18px 17px;
+  }
+
+  .customer-detail-box .customer-form-header > div:first-child {
+    min-width: 0;
+    padding-right: 4px;
+  }
+
+  .customer-detail-box .customer-form-header h2 {
+    overflow-wrap: anywhere;
+  }
+
+  .customer-detail-box .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 1px;
+    margin: 16px 18px 0;
+  }
+
+  .customer-detail-box .detail-item,
+  .customer-detail-box .detail-item.detail-wide {
+    grid-column: auto;
+    min-height: 0;
+    padding: 15px 16px;
+  }
+
+  .customer-detail-box .detail-footer {
+    padding: 16px 18px 19px;
+  }
+}
+
+@media (max-width: 480px) {
+  .customer-overlay {
+    padding: 12px;
+  }
+
+  .customer-detail-box .detail-grid {
+    margin: 14px 14px 0;
+  }
+
+  .customer-detail-box .detail-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding: 14px;
+  }
+
+  .customer-detail-box .detail-footer .customer-cancel,
+  .customer-detail-box .detail-footer .customer-save {
+    width: 100%;
+  }
+}

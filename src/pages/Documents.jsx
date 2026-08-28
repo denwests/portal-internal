@@ -20,7 +20,7 @@ function Documents() {
           <div>
 
             <div className="documents-eyebrow">
-              PLUNO STUDIO / MANAGEMENT
+              PLUNO STUDIO / DOCUMENT MANAGEMENT
             </div>
 
             <h1>
