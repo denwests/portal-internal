@@ -255,7 +255,7 @@ function Dashboard() {
         await supabase
           .from("customers")
           .select(
-            "id, total, date"
+            "id, date"
           )
           .gte(
             "date",
@@ -284,22 +284,13 @@ function Dashboard() {
         [];
 
 
-      /* ===================================================
-         SELECTED MONTH CUSTOMERS
-      =================================================== */
-
       const selectedMonthCustomers =
         customers.filter(
-          (
-            customer
-          ) => {
+          (customer) => {
 
-            if (
-              !customer.date
-            ) {
+            if (!customer.date) {
               return false;
             }
-
 
             return (
               customer.date >=
@@ -318,78 +309,126 @@ function Dashboard() {
 
 
       /* ===================================================
-         REVENUE
+         REVENUE FROM TRANSACTIONS
+         Transactions are the single source of truth.
+         Staff does not request finance data.
       =================================================== */
 
-      const selectedRevenue =
-        selectedMonthCustomers.reduce(
-          (
-            sum,
-            customer
-          ) => {
+      if (
+        employeeRole !==
+        "Staff"
+      ) {
 
-            return (
-              sum +
-              Number(
-                customer.total ||
-                0
-              )
-            );
-
-          },
-          0
-        );
-
-
-      setTotalRevenue(
-        selectedRevenue
-      );
-
-
-      /* ===================================================
-         MONTHLY REVENUE
-      =================================================== */
-
-      const monthly =
-        Array(12).fill(0);
-
-
-      customers.forEach(
-        (
-          customer
-        ) => {
-
-          if (
-            !customer.date
-          ) {
-            return;
-          }
-
-
-          const customerDate =
-            new Date(
-              `${customer.date}T00:00:00`
+        const {
+          data: transactionYearData,
+          error: transactionYearError,
+        } =
+          await supabase
+            .from("transactions")
+            .select(
+              "amount, transaction_date"
+            )
+            .gte(
+              "transaction_date",
+              yearStart
+            )
+            .lt(
+              "transaction_date",
+              yearEnd
             );
 
 
-          const customerMonth =
-            customerDate.getMonth();
+        if (
+          transactionYearError
+        ) {
 
-
-          monthly[
-            customerMonth
-          ] += Number(
-            customer.total ||
-            0
+          console.error(
+            "TRANSACTION ERROR:",
+            transactionYearError
           );
 
         }
-      );
 
 
-      setMonthlyRevenue(
-        monthly
-      );
+        const transactions =
+          transactionYearData ||
+          [];
+
+
+        const selectedRevenue =
+          transactions
+            .filter(
+              (transaction) =>
+                transaction.transaction_date &&
+                transaction.transaction_date >=
+                  selectedMonthStart &&
+                transaction.transaction_date <
+                  selectedMonthEnd
+            )
+            .reduce(
+              (sum, transaction) =>
+                sum +
+                Number(
+                  transaction.amount ||
+                  0
+                ),
+              0
+            );
+
+
+        setTotalRevenue(
+          selectedRevenue
+        );
+
+
+        const monthly =
+          Array(12).fill(0);
+
+
+        transactions.forEach(
+          (transaction) => {
+
+            if (
+              !transaction.transaction_date
+            ) {
+              return;
+            }
+
+            const monthIndex =
+              Number(
+                transaction.transaction_date.slice(
+                  5,
+                  7
+                )
+              ) - 1;
+
+            if (
+              monthIndex >= 0 &&
+              monthIndex < 12
+            ) {
+              monthly[monthIndex] +=
+                Number(
+                  transaction.amount ||
+                  0
+                );
+            }
+
+          }
+        );
+
+
+        setMonthlyRevenue(
+          monthly
+        );
+
+      } else {
+
+        setTotalRevenue(0);
+        setMonthlyRevenue(
+          Array(12).fill(0)
+        );
+
+      }
 
 
       /* ===================================================
@@ -436,8 +475,55 @@ function Dashboard() {
         [];
 
 
+      /*
+       * Dashboard schedule is operational-only:
+       * - canceled bookings are hidden immediately
+       * - booking dates before today are hidden automatically
+       * Historical records remain stored in Supabase.
+       */
+      const todayDate =
+        new Date();
+
+      const todayString =
+        `${todayDate.getFullYear()}-${String(
+          todayDate.getMonth() + 1
+        ).padStart(
+          2,
+          "0"
+        )}-${String(
+          todayDate.getDate()
+        ).padStart(
+          2,
+          "0"
+        )}`;
+
+
+      const activeBookingList =
+        bookingList.filter(
+          (
+            booking
+          ) => {
+
+            if (
+              !booking.booking_date
+            ) {
+              return false;
+            }
+
+
+            return (
+              booking.booking_date >=
+                todayString &&
+              booking.status !==
+                "Canceled"
+            );
+
+          }
+        );
+
+
       setBookings(
-        bookingList
+        activeBookingList
       );
 
 
@@ -450,7 +536,7 @@ function Dashboard() {
 
 
       const selectedMonthBookings =
-        bookingList.filter(
+        activeBookingList.filter(
           (
             booking
           ) => {

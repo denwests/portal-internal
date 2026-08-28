@@ -53,6 +53,10 @@ function formatDate(date) {
 ========================================================= */
 
 function getGrandTotal(customer) {
+  if (customer.status === "Canceled") {
+    return Number(customer.total || 0);
+  }
+
   return (
     Number(customer.packagePrice || 0) +
     Number(customer.addon || 0)
@@ -388,6 +392,10 @@ function Customer() {
       addon: Number(formData.addon || 0),
       addonNote: formData.addonNote,
       status: formData.status,
+      total:
+        modalType === "edit" && selectedCustomer
+          ? Number(selectedCustomer.total || 0)
+          : 0,
     };
 
     /* =====================================================
@@ -594,7 +602,7 @@ function Customer() {
 
           <div className="customer-stat-card revenue">
             <div className="customer-stat-label">
-              GROSS REVENUE
+              TOTAL PACKAGE VALUE
             </div>
 
             <div className="customer-stat-value">
@@ -725,7 +733,9 @@ function Customer() {
                       <td>
                         <span
                           className={`customer-status ${
-                            customer.status === "Selesai"
+                            customer.status === "Canceled"
+                              ? "status-canceled"
+                              : customer.status === "Selesai"
                               ? "status-done"
                               : "status-process"
                           }`}
@@ -887,6 +897,10 @@ function Customer() {
 
                     <option value="Selesai">
                       Selesai
+                    </option>
+
+                    <option value="Canceled">
+                      Canceled
                     </option>
                   </select>
                 </div>
@@ -1161,7 +1175,7 @@ function Customer() {
           </div>
 
           <div>
-            <span>GROSS REVENUE</span>
+            <span>TOTAL PACKAGE VALUE</span>
 
             <strong>
               {formatRupiah(totalRevenue)}

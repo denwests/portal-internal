@@ -456,23 +456,44 @@ function Bookkeeping() {
     grossRevenue -
     qrisGrossRevenue;
 
-  const qrisMdrPercentage =
-    Number(
-      settings.qris_mdr_percentage || 0
-    );
+  /* =======================================================
+     TRANSACTION NET REVENUE
+
+     Transactions is the financial source of truth.
+     MDR is recorded when each payment is created, so
+     Bookkeeping must not recalculate historical MDR using
+     the current QRIS setting.
+  ======================================================= */
 
   const qrisMdrAmount =
-    Math.round(
-      qrisGrossRevenue *
-        (
-          qrisMdrPercentage /
-          100
-        )
+    filteredTransactions.reduce(
+      (total, item) =>
+        total +
+        Number(
+          item.mdr_amount || 0
+        ),
+      0
     );
 
+  const qrisMdrPercentage =
+    qrisGrossRevenue > 0
+      ? (
+          qrisMdrAmount /
+          qrisGrossRevenue
+        ) * 100
+      : 0;
+
   const netRevenue =
-    grossRevenue -
-    qrisMdrAmount;
+    filteredTransactions.reduce(
+      (total, item) =>
+        total +
+        Number(
+          item.net_amount ??
+            item.amount ??
+            0
+        ),
+      0
+    );
 
   const totalExpense =
     spendingTotal +

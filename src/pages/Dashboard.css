@@ -425,6 +425,19 @@ body {
   height: 100%;
 }
 
+.dashboard-revenue-hidden {
+  width: 100%;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
 .revenue-chart {
   height: 360px;
   padding: 20px 20px 15px;

@@ -1148,3 +1148,177 @@ body,
   padding: 7px 11px;
   font-size: 8px;
 }
+/* =========================================================
+   PHASE 2 — BOOKING GENERATED TRANSACTIONS
+========================================================= */
+
+.transactions-auto-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #292929;
+  background: #151515;
+  color: #666;
+  font-size: 7px;
+  letter-spacing: 1.2px;
+  white-space: nowrap;
+}
+
+.transactions-table-v2 {
+  min-width: 1040px;
+}
+
+.transactions-table-v2 th:nth-child(1),
+.transactions-table-v2 td:nth-child(1) { width: 12%; }
+.transactions-table-v2 th:nth-child(2),
+.transactions-table-v2 td:nth-child(2) { width: 15%; }
+.transactions-table-v2 th:nth-child(3),
+.transactions-table-v2 td:nth-child(3) { width: 13%; }
+.transactions-table-v2 th:nth-child(4),
+.transactions-table-v2 td:nth-child(4) { width: 21%; }
+.transactions-table-v2 th:nth-child(5),
+.transactions-table-v2 td:nth-child(5) { width: 10%; }
+.transactions-table-v2 th:nth-child(6),
+.transactions-table-v2 td:nth-child(6) { width: 11%; }
+.transactions-table-v2 th:nth-child(7),
+.transactions-table-v2 td:nth-child(7) { width: 9%; }
+.transactions-table-v2 th:nth-child(8),
+.transactions-table-v2 td:nth-child(8) { width: 11%; }
+
+@media (max-width: 700px) {
+  .transactions-auto-label {
+    display: none;
+  }
+
+  .transactions-table-v2 {
+    width: 1000px;
+    min-width: 1000px;
+  }
+}
+
+
+/* =========================================================
+   TRANSACTION DELETE — SAFE CORRECTION
+========================================================= */
+
+.transactions-delete:disabled {
+  color: #444;
+  cursor: not-allowed;
+}
+
+.transactions-table-v2 {
+  min-width: 1180px;
+}
+
+.transactions-table-v2 th:nth-child(1),
+.transactions-table-v2 td:nth-child(1) { width: 10%; }
+.transactions-table-v2 th:nth-child(2),
+.transactions-table-v2 td:nth-child(2) { width: 13%; }
+.transactions-table-v2 th:nth-child(3),
+.transactions-table-v2 td:nth-child(3) { width: 11%; }
+.transactions-table-v2 th:nth-child(4),
+.transactions-table-v2 td:nth-child(4) { width: 18%; }
+.transactions-table-v2 th:nth-child(5),
+.transactions-table-v2 td:nth-child(5) { width: 8%; }
+.transactions-table-v2 th:nth-child(6),
+.transactions-table-v2 td:nth-child(6) { width: 9%; }
+.transactions-table-v2 th:nth-child(7),
+.transactions-table-v2 td:nth-child(7) { width: 8%; }
+.transactions-table-v2 th:nth-child(8),
+.transactions-table-v2 td:nth-child(8) { width: 9%; }
+.transactions-table-v2 th:nth-child(9),
+.transactions-table-v2 td:nth-child(9) {
+  width: 8%;
+  min-width: 78px;
+}
+.transactions-table-v2 th:nth-child(10),
+.transactions-table-v2 td:nth-child(10) {
+  width: 6%;
+  min-width: 70px;
+}
+
+@media (max-width: 700px) {
+  .transactions-table-v2 {
+    width: 1160px;
+    min-width: 1160px;
+  }
+}
+
+
+/* =========================================================
+   BOOKING STATUS
+========================================================= */
+
+.transactions-booking-status {
+  display: inline-block;
+  padding: 4px 7px;
+  font-size: 7px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.transactions-booking-status.complete {
+  background: #263026;
+  color: #9fbd9f;
+}
+
+.transactions-booking-status.canceled {
+  background: #321f1f;
+  color: #c88;
+}
+
+
+/* =========================================================
+   CLIENT INVOICE ACTION
+========================================================= */
+
+.transactions-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  white-space: nowrap;
+}
+
+.transactions-invoice,
+.transactions-delete {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+.transactions-invoice {
+  color: #aaa;
+}
+
+.transactions-invoice:hover {
+  color: #fff;
+}
+
+.transactions-invoice:disabled,
+.transactions-delete:disabled {
+  color: #444;
+  cursor: not-allowed;
+}
+
+.transactions-table-v2 {
+  min-width: 1220px;
+}
+
+.transactions-table-v2 th:nth-child(10),
+.transactions-table-v2 td:nth-child(10) {
+  width: 10%;
+  min-width: 112px;
+}
+
+@media (max-width: 700px) {
+  .transactions-table-v2 {
+    width: 1200px;
+    min-width: 1200px;
+  }
+}

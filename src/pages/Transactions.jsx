@@ -12,30 +12,14 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 
-/* =========================================================
-   FORMAT RUPIAH
-========================================================= */
-
 function formatRupiah(value) {
-  return `Rp ${Number(
-    value || 0
-  ).toLocaleString("id-ID")}`;
+  return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
 }
-
-
-/* =========================================================
-   FORMAT DATE
-========================================================= */
 
 function formatDate(date) {
   if (!date) return "-";
 
-  const [
-    year,
-    month,
-    day,
-  ] = date.split("-");
-
+  const [year, month, day] = date.split("-");
   const months = [
     "Januari",
     "Februari",
@@ -51,190 +35,55 @@ function formatDate(date) {
     "Desember",
   ];
 
-  return `${day} ${
-    months[Number(month) - 1]
-  } ${year}`;
+  return `${day} ${months[Number(month) - 1]} ${year}`;
 }
 
 
-/* =========================================================
-   TODAY
-========================================================= */
 
-function getTodayString() {
-  const today = new Date();
-
-  return `${today.getFullYear()}-${String(
-    today.getMonth() + 1
-  ).padStart(
-    2,
-    "0"
-  )}-${String(
-    today.getDate()
-  ).padStart(
-    2,
-    "0"
-  )}`;
+function formatTime(time) {
+  if (!time) return "-";
+  return String(time).substring(0, 5);
 }
 
-
-/* =========================================================
-   MDR STORAGE
-========================================================= */
-
-const MDR_STORAGE_KEY =
-  "pluno_qris_mdr_percentage";
-
-const DEFAULT_MDR_PERCENTAGE =
-  0.7;
-
-
-/* =========================================================
-   READ MDR SETTING
-========================================================= */
-
-function getStoredMdrPercentage() {
-  const storedValue =
-    window.localStorage.getItem(
-      MDR_STORAGE_KEY
-    );
-
-  if (
-    storedValue === null ||
-    storedValue === ""
-  ) {
-    return DEFAULT_MDR_PERCENTAGE;
-  }
-
-  const value =
-    Number(
-      storedValue
-    );
-
-  if (
-    Number.isNaN(value) ||
-    value < 0 ||
-    value > 100
-  ) {
-    return DEFAULT_MDR_PERCENTAGE;
-  }
-
-  return value;
+function formatPaymentType(value) {
+  if (value === "Down Payment") return "Down Payment (DP)";
+  if (value === "Full Payment") return "Pembayaran Penuh";
+  if (value === "Final Payment") return "Pelunasan";
+  return value || "Pembayaran";
 }
 
+function makeInvoiceNumber(transaction) {
+  const date = String(transaction?.transaction_date || "").replace(/-/g, "");
+  const id = String(transaction?.id || "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(0, 8)
+    .toUpperCase();
 
-/* =========================================================
-   TRANSACTIONS COMPONENT
-========================================================= */
+  return `INV-${date || "PAYMENT"}-${id || "PLUNO"}`;
+}
+
+function safeFileName(value) {
+  return String(value || "client")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "client";
+}
 
 function Transactions() {
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [deletingTransactionId, setDeletingTransactionId] = useState(null);
+  const [generatingInvoiceId, setGeneratingInvoiceId] = useState(null);
 
-  /* =======================================================
-     STATE
-  ======================================================= */
-
-  const [
-    transactions,
-    setTransactions,
-  ] = useState([]);
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-  const [
-    saving,
-    setSaving,
-  ] = useState(false);
-
-  const [
-    errorMessage,
-    setErrorMessage,
-  ] = useState("");
-
-  const [
-    showAddModal,
-    setShowAddModal,
-  ] = useState(false);
-
-  const [
-    showMdrSettings,
-    setShowMdrSettings,
-  ] = useState(false);
-
-  const [
-    mdrPercentage,
-    setMdrPercentage,
-  ] = useState(
-    getStoredMdrPercentage()
+  const [selectedMonth, setSelectedMonth] = useState(
+    String(new Date().getMonth() + 1).padStart(2, "0")
   );
 
-  const [
-    mdrFormValue,
-    setMdrFormValue,
-  ] = useState(
-    String(
-      getStoredMdrPercentage()
-    )
+  const [selectedYear, setSelectedYear] = useState(
+    String(new Date().getFullYear())
   );
-
-  const [
-    selectedMonth,
-    setSelectedMonth,
-  ] = useState(
-    String(
-      new Date().getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    )
-  );
-
-  const [
-    selectedYear,
-    setSelectedYear,
-  ] = useState(
-    String(
-      new Date().getFullYear()
-    )
-  );
-
-
-  /* =======================================================
-     FORM DATA
-  ======================================================= */
-
-  const [
-    formData,
-    setFormData,
-  ] = useState({
-    transaction_date:
-      getTodayString(),
-
-    customer:
-      "",
-
-    payment_type:
-      "Down Payment",
-
-    description:
-      "",
-
-    amount:
-      "",
-
-    payment_method:
-      "Cash",
-
-    information:
-      "",
-  });
-
-
-  /* =======================================================
-     MONTH NAMES
-  ======================================================= */
 
   const monthNames = [
     "January",
@@ -251,2190 +100,843 @@ function Transactions() {
     "December",
   ];
 
-
-  /* =======================================================
-     YEAR OPTIONS
-  ======================================================= */
-
-  const currentYear =
-    new Date().getFullYear();
-
+  const currentYear = new Date().getFullYear();
   const yearOptions = [];
 
-  for (
-    let year =
-      currentYear - 5;
-    year <=
-      currentYear + 5;
-    year++
-  ) {
-    yearOptions.push(
-      String(year)
-    );
+  for (let year = currentYear - 5; year <= currentYear + 5; year += 1) {
+    yearOptions.push(String(year));
   }
 
 
-  /* =======================================================
-     FETCH TRANSACTIONS
-  ======================================================= */
+  /* =========================================================
+     FETCH
+  ========================================================= */
 
-  const fetchTransactions =
-    async () => {
+  const fetchTransactions = async () => {
+    setLoading(true);
+    setErrorMessage("");
 
-      setLoading(true);
-      setErrorMessage("");
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("*")
+      .order("transaction_date", { ascending: false })
+      .order("created_at", { ascending: false });
 
-      const {
-        data,
-        error,
-      } =
-        await supabase
-          .from("transactions")
-          .select("*")
-          .order(
-            "transaction_date",
-            {
-              ascending:
-                false,
-            }
-          )
-          .order(
-            "created_at",
-            {
-              ascending:
-                false,
-            }
-          );
-
-      if (error) {
-
-        console.error(
-          "TRANSACTION FETCH ERROR:",
-          error
-        );
-
-        setErrorMessage(
-          `Gagal mengambil transaksi: ${error.message}`
-        );
-
-        setTransactions([]);
-
-        setLoading(false);
-
-        return;
-      }
-
-      setTransactions(
-        data || []
-      );
-
+    if (error) {
+      console.error("TRANSACTION FETCH ERROR:", error);
+      setErrorMessage(`Gagal mengambil transaksi: ${error.message}`);
+      setTransactions([]);
       setLoading(false);
-    };
+      return;
+    }
 
+    const transactionList = data || [];
+
+    const bookingIds = Array.from(
+      new Set(
+        transactionList
+          .map((item) => item.booking_id)
+          .filter(Boolean)
+          .map(String)
+      )
+    );
+
+    let bookingStatusMap = {};
+
+    if (bookingIds.length > 0) {
+      const {
+        data: bookingData,
+        error: bookingError,
+      } = await supabase
+        .from("bookings")
+        .select("id, status")
+        .in("id", bookingIds);
+
+      if (bookingError) {
+        console.error(
+          "TRANSACTION BOOKING STATUS ERROR:",
+          bookingError
+        );
+      } else {
+        bookingStatusMap = Object.fromEntries(
+          (bookingData || []).map((booking) => [
+            String(booking.id),
+            booking.status === "Canceled"
+              ? "Canceled"
+              : "Complete",
+          ])
+        );
+      }
+    }
+
+    setTransactions(
+      transactionList.map((item) => ({
+        ...item,
+        booking_status: item.booking_id
+          ? bookingStatusMap[String(item.booking_id)] || "Complete"
+          : "Complete",
+      }))
+    );
+
+    setLoading(false);
+  };
 
   useEffect(() => {
     fetchTransactions();
   }, []);
 
 
-  /* =======================================================
-     MDR SETTINGS
-  ======================================================= */
+  /* =========================================================
+     DELETE TRANSACTION + RECALCULATE BOOKING
+  ========================================================= */
 
-  const openMdrSettings =
-    () => {
+  const handleDeleteTransaction = async (transaction) => {
+    if (!transaction?.id) return;
 
-      setMdrFormValue(
-        String(
-          mdrPercentage
-        )
-      );
+    const confirmed = window.confirm(
+      `Hapus transaksi ${transaction.payment_type || "Payment"} milik ${
+        transaction.customer || "customer"
+      } sebesar ${formatRupiah(transaction.amount)}?\n\nJika transaksi terhubung ke Booking, jumlah pembayaran dan status Booking akan dihitung ulang otomatis.`
+    );
 
-      setErrorMessage("");
+    if (!confirmed) return;
 
-      setShowMdrSettings(
-        true
-      );
-    };
+    setDeletingTransactionId(transaction.id);
+    setErrorMessage("");
 
+    let bookingSnapshot = null;
+    let bookingWasUpdated = false;
 
-  const closeMdrSettings =
-    () => {
+    try {
+      if (transaction.booking_id) {
+        const { data: booking, error: bookingError } = await supabase
+          .from("bookings")
+          .select(
+            "id, package_price, down_payment, paid_amount, remaining_amount, payment_status"
+          )
+          .eq("id", transaction.booking_id)
+          .maybeSingle();
 
-      if (saving) {
-        return;
-      }
+        if (bookingError) {
+          throw bookingError;
+        }
 
-      setShowMdrSettings(
-        false
-      );
+        if (booking) {
+          bookingSnapshot = {
+            down_payment: Number(booking.down_payment || 0),
+            paid_amount: Number(booking.paid_amount || 0),
+            remaining_amount: Number(booking.remaining_amount || 0),
+            payment_status: booking.payment_status || "Unpaid",
+          };
 
-      setErrorMessage("");
-    };
+          const { data: remainingTransactions, error: remainingError } =
+            await supabase
+              .from("transactions")
+              .select("id, amount, payment_type")
+              .eq("booking_id", String(transaction.booking_id))
+              .neq("id", transaction.id);
 
-
-  const handleMdrChange =
-    (event) => {
-
-      const value =
-        event.target.value;
-
-      if (
-        value === ""
-      ) {
-        setMdrFormValue(
-          ""
-        );
-
-        return;
-      }
-
-      const numericValue =
-        Number(
-          value
-        );
-
-      if (
-        Number.isNaN(
-          numericValue
-        )
-      ) {
-        return;
-      }
-
-      if (
-        numericValue < 0 ||
-        numericValue > 100
-      ) {
-        return;
-      }
-
-      setMdrFormValue(
-        value
-      );
-    };
-
-
-  const saveMdrSettings =
-    () => {
-
-      const value =
-        Number(
-          mdrFormValue
-        );
-
-      if (
-        Number.isNaN(
-          value
-        ) ||
-        value < 0 ||
-        value > 100
-      ) {
-
-        setErrorMessage(
-          "QRIS MDR harus berada di antara 0% sampai 100%."
-        );
-
-        return;
-      }
-
-      setMdrPercentage(
-        value
-      );
-
-      window.localStorage.setItem(
-        MDR_STORAGE_KEY,
-        String(
-          value
-        )
-      );
-
-      setErrorMessage("");
-
-      setShowMdrSettings(
-        false
-      );
-    };
-
-
-  /* =======================================================
-     ACTIVE YEAR
-  ======================================================= */
-
-  const activeYear =
-    selectedYear;
-
-
-  /* =======================================================
-     ACTIVE MONTH
-  ======================================================= */
-
-  const activeMonth =
-    selectedMonth;
-
-
-  /* =======================================================
-     FILTER TRANSACTIONS
-  ======================================================= */
-
-  const filteredTransactions =
-    useMemo(() => {
-
-      return transactions.filter(
-        (item) => {
-
-          if (
-            !item.transaction_date
-          ) {
-            return false;
+          if (remainingError) {
+            throw remainingError;
           }
 
-          return (
-            item.transaction_date.slice(
-              0,
-              4
-            ) ===
-              activeYear &&
-            item.transaction_date.slice(
-              5,
-              7
-            ) ===
-              activeMonth
+          const paidAmount = (remainingTransactions || []).reduce(
+            (total, item) => total + Number(item.amount || 0),
+            0
           );
+
+          const downPayment = (remainingTransactions || [])
+            .filter((item) => item.payment_type === "Down Payment")
+            .reduce(
+              (total, item) => total + Number(item.amount || 0),
+              0
+            );
+
+          const packagePrice = Number(booking.package_price || 0);
+          const remainingAmount =
+            packagePrice > 0
+              ? Math.max(packagePrice - paidAmount, 0)
+              : 0;
+
+          let paymentStatus = "Unpaid";
+
+          if (paidAmount > 0) {
+            paymentStatus =
+              packagePrice > 0 && paidAmount >= packagePrice
+                ? "Paid"
+                : "Partial";
+          }
+
+          const { error: bookingUpdateError } = await supabase
+            .from("bookings")
+            .update({
+              down_payment: downPayment,
+              paid_amount: paidAmount,
+              remaining_amount: remainingAmount,
+              payment_status: paymentStatus,
+            })
+            .eq("id", booking.id);
+
+          if (bookingUpdateError) {
+            throw bookingUpdateError;
+          }
+
+          bookingWasUpdated = true;
         }
+      }
+
+      const { error: deleteError } = await supabase
+        .from("transactions")
+        .delete()
+        .eq("id", transaction.id);
+
+      if (deleteError) {
+        if (
+          bookingWasUpdated &&
+          bookingSnapshot &&
+          transaction.booking_id
+        ) {
+          await supabase
+            .from("bookings")
+            .update(bookingSnapshot)
+            .eq("id", transaction.booking_id);
+        }
+
+        throw deleteError;
+      }
+
+      setTransactions((current) =>
+        current.filter((item) => item.id !== transaction.id)
+      );
+    } catch (error) {
+      console.error("TRANSACTION DELETE ERROR:", error);
+      setErrorMessage(
+        `Gagal menghapus transaksi: ${error.message || "Unknown error"}`
+      );
+    } finally {
+      setDeletingTransactionId(null);
+    }
+  };
+
+
+  /* =========================================================
+     FILTER + SUMMARY
+  ========================================================= */
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((item) => {
+      if (!item.transaction_date) return false;
+
+      return (
+        item.transaction_date.slice(0, 4) === selectedYear &&
+        item.transaction_date.slice(5, 7) === selectedMonth
+      );
+    });
+  }, [transactions, selectedMonth, selectedYear]);
+
+  const totalTransaction = filteredTransactions.length;
+
+  const totalGross = filteredTransactions.reduce(
+    (total, item) => total + Number(item.amount || 0),
+    0
+  );
+
+  const totalMdr = filteredTransactions.reduce(
+    (total, item) => total + Number(item.mdr_amount || 0),
+    0
+  );
+
+  const totalNet = filteredTransactions.reduce(
+    (total, item) => total + Number(item.net_amount ?? item.amount ?? 0),
+    0
+  );
+
+
+  /* =========================================================
+     CLIENT PAYMENT INVOICE / RECEIPT
+     - Generated per transaction.
+     - Payment totals are calculated only up to the selected transaction,
+       so a DP receipt keeps its historical remaining balance even if the
+       booking is paid later.
+  ========================================================= */
+
+  const handleDownloadInvoice = async (transaction) => {
+    if (!transaction?.id) return;
+
+    setGeneratingInvoiceId(transaction.id);
+    setErrorMessage("");
+
+    try {
+      let booking = null;
+      let bookingTransactions = [];
+
+      if (transaction.booking_id) {
+        const {
+          data: bookingData,
+          error: bookingError,
+        } = await supabase
+          .from("bookings")
+          .select(
+            "id, customer_name, customer_phone, booking_date, start_time, package, package_price, status, payment_status"
+          )
+          .eq("id", transaction.booking_id)
+          .maybeSingle();
+
+        if (bookingError) {
+          throw bookingError;
+        }
+
+        booking = bookingData || null;
+
+        const {
+          data: paymentData,
+          error: paymentError,
+        } = await supabase
+          .from("transactions")
+          .select(
+            "id, transaction_date, created_at, amount, payment_type, payment_method"
+          )
+          .eq("booking_id", String(transaction.booking_id))
+          .order("transaction_date", { ascending: true })
+          .order("created_at", { ascending: true });
+
+        if (paymentError) {
+          throw paymentError;
+        }
+
+        bookingTransactions = paymentData || [];
+      }
+
+      if (bookingTransactions.length === 0) {
+        bookingTransactions = [transaction];
+      }
+
+      const selectedIndex = bookingTransactions.findIndex(
+        (item) => String(item.id) === String(transaction.id)
       );
 
-    }, [
-      transactions,
-      activeMonth,
-      activeYear,
-    ]);
+      const transactionsUntilSelected =
+        selectedIndex >= 0
+          ? bookingTransactions.slice(0, selectedIndex + 1)
+          : bookingTransactions;
 
+      const totalPaidUntilSelected = transactionsUntilSelected.reduce(
+        (total, item) => total + Number(item.amount || 0),
+        0
+      );
 
-  /* =======================================================
-     SUMMARY
-  ======================================================= */
+      const packagePrice = Number(booking?.package_price || 0);
+      const remainingAmount =
+        packagePrice > 0
+          ? Math.max(packagePrice - totalPaidUntilSelected, 0)
+          : null;
 
-  const totalTransaction =
-    filteredTransactions.length;
+      const bookingCanceled = booking?.status === "Canceled";
+      const isPaid =
+        !bookingCanceled &&
+        packagePrice > 0 &&
+        totalPaidUntilSelected >= packagePrice;
 
+      const paymentStatus = bookingCanceled
+        ? "DIBATALKAN"
+        : isPaid
+        ? "LUNAS"
+        : totalPaidUntilSelected > 0
+        ? "DP / BELUM LUNAS"
+        : "BELUM BAYAR";
 
-  const totalGross =
-    filteredTransactions.reduce(
-      (
-        total,
-        item
-      ) =>
-        total +
-        Number(
-          item.amount ||
-            0
-        ),
-      0
-    );
+      const customerName =
+        booking?.customer_name || transaction.customer || "-";
+      const customerPhone = booking?.customer_phone || "-";
+      const packageName =
+        booking?.package || transaction.description || "-";
+      const invoiceNumber = makeInvoiceNumber(transaction);
 
-
-  const totalMDR =
-    filteredTransactions.reduce(
-      (
-        total,
-        item
-      ) =>
-        total +
-        Number(
-          item.mdr_amount ||
-            0
-        ),
-      0
-    );
-
-
-  const totalNet =
-    filteredTransactions.reduce(
-      (
-        total,
-        item
-      ) =>
-        total +
-        Number(
-          item.net_amount ||
-            0
-        ),
-      0
-    );
-
-
-  /* =======================================================
-     OPEN ADD MODAL
-  ======================================================= */
-
-  const openAddModal =
-    () => {
-
-      setFormData({
-        transaction_date:
-          getTodayString(),
-
-        customer:
-          "",
-
-        payment_type:
-          "Down Payment",
-
-        description:
-          "",
-
-        amount:
-          "",
-
-        payment_method:
-          "Cash",
-
-        information:
-          "",
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
       });
 
-      setErrorMessage("");
-
-      setShowAddModal(
-        true
-      );
-    };
-
-
-  /* =======================================================
-     CLOSE ADD MODAL
-  ======================================================= */
-
-  const closeAddModal =
-    () => {
-
-      if (saving) {
-        return;
-      }
-
-      setShowAddModal(
-        false
-      );
-
-      setErrorMessage("");
-    };
-
-
-  /* =======================================================
-     FORM CHANGE
-  ======================================================= */
-
-  const handleFormChange =
-    (event) => {
-
-      const {
-        name,
-        value,
-      } = event.target;
-
-      setFormData(
-        (current) => ({
-          ...current,
-          [name]:
-            value,
-        })
-      );
-    };
-
-
-  /* =======================================================
-     AMOUNT CHANGE
-  ======================================================= */
-
-  const handleAmountChange =
-    (event) => {
-
-      const numericValue =
-        event.target.value.replace(
-          /\D/g,
-          ""
-        );
-
-      setFormData(
-        (current) => ({
-          ...current,
-
-          amount:
-            numericValue,
-        })
-      );
-    };
-
-
-  /* =======================================================
-     SAVE TRANSACTION
-  ======================================================= */
-
-  const handleSubmit =
-    async (
-      event
-    ) => {
-
-      event.preventDefault();
-
-      setErrorMessage("");
-
-      const amount =
-        Number(
-          formData.amount ||
-            0
-        );
-
-
-      if (
-        !formData.transaction_date ||
-        !formData.customer.trim() ||
-        !formData.description.trim() ||
-        amount <= 0
-      ) {
-
-        setErrorMessage(
-          "Tanggal, customer, deskripsi, dan nominal wajib diisi."
-        );
-
-        return;
-      }
-
-
-      setSaving(
-        true
-      );
-
-
-      /* ===================================================
-         MDR
-      =================================================== */
-
-      const currentMdrPercentage =
-        formData.payment_method ===
-        "QRIS"
-          ? Number(
-              mdrPercentage
-            )
-          : 0;
-
-
-      const mdrAmount =
-        Math.round(
-          amount *
-            (
-              currentMdrPercentage /
-              100
-            )
-        );
-
-
-      const netAmount =
-        amount -
-        mdrAmount;
-
-
-      /* ===================================================
-         INSERT
-      =================================================== */
-
-      const {
-        data,
-        error,
-      } =
-        await supabase
-          .from(
-            "transactions"
-          )
-          .insert([
-            {
-              transaction_date:
-                formData.transaction_date,
-
-              customer:
-                formData.customer.trim(),
-
-              payment_type:
-                formData.payment_type,
-
-              description:
-                formData.description.trim(),
-
-              amount,
-
-              payment_method:
-                formData.payment_method,
-
-              mdr_percentage:
-                currentMdrPercentage,
-
-              mdr_amount:
-                mdrAmount,
-
-              net_amount:
-                netAmount,
-
-              information:
-                formData.information.trim() ||
-                null,
-            },
-          ])
-          .select()
-          .single();
-
-
-      if (error) {
-
-        console.error(
-          "INSERT TRANSACTION ERROR:",
-          error
-        );
-
-        setErrorMessage(
-          `Gagal menyimpan transaksi: ${error.message}`
-        );
-
-        setSaving(
-          false
-        );
-
-        return;
-      }
-
-
-      setTransactions(
-        (current) => [
-          data,
-          ...current,
-        ]
-      );
-
-
-      /* ===================================================
-         SET FILTER KE TRANSAKSI BARU
-      =================================================== */
-
-      if (
-        data.transaction_date
-      ) {
-
-        setSelectedYear(
-          data.transaction_date.slice(
-            0,
-            4
-          )
-        );
-
-        setSelectedMonth(
-          data.transaction_date.slice(
-            5,
-            7
-          )
-        );
-      }
-
-
-      setSaving(
-        false
-      );
-
-      setShowAddModal(
-        false
-      );
-    };
-
-
-  /* =======================================================
-     DELETE
-  ======================================================= */
-
-  const handleDelete =
-    async (
-      item
-    ) => {
-
-      const confirmed =
-        window.confirm(
-          `Hapus transaksi "${item.description}"?`
-        );
-
-      if (!confirmed) {
-        return;
-      }
-
-      setErrorMessage("");
-
-      const {
-        error,
-      } =
-        await supabase
-          .from(
-            "transactions"
-          )
-          .delete()
-          .eq(
-            "id",
-            item.id
-          );
-
-      if (error) {
-
-        console.error(
-          "DELETE TRANSACTION ERROR:",
-          error
-        );
-
-        setErrorMessage(
-          `Gagal menghapus transaksi: ${error.message}`
-        );
-
-        return;
-      }
-
-      setTransactions(
-        (current) =>
-          current.filter(
-            (
-              transaction
-            ) =>
-              transaction.id !==
-              item.id
-          )
-      );
-    };
-
-
-  /* =======================================================
-     DOWNLOAD PDF
-  ======================================================= */
-
-  const handleDownloadPDF =
-    () => {
-
-      if (
-        filteredTransactions.length ===
-        0
-      ) {
-
-        window.alert(
-          `Tidak ada transaksi untuk ${
-            monthNames[
-              Number(
-                activeMonth
-              ) - 1
-            ]
-          } ${activeYear}.`
-        );
-
-        return;
-      }
-
-
-      const doc =
-        new jsPDF({
-          orientation:
-            "landscape",
-
-          unit:
-            "mm",
-
-          format:
-            "a4",
-        });
-
-
-      /* ===================================================
-         DOCUMENT TITLE
-      =================================================== */
-
-      doc.setFont(
-        "helvetica",
-        "normal"
-      );
-
-      doc.setFontSize(
-        8
-      );
-
-      doc.setTextColor(
-        100,
-        100,
-        100
-      );
-
-      doc.text(
-        "PLUNO INTERNAL SYSTEM",
-        14,
-        14
-      );
-
-
-      doc.setFontSize(
-        20
-      );
-
-      doc.setTextColor(
-        30,
-        30,
-        30
-      );
-
-      doc.text(
-        "Transaction Performance",
-        14,
-        24
-      );
-
-
-      doc.setFontSize(
-        9
-      );
-
-      doc.setTextColor(
-        100,
-        100,
-        100
-      );
-
-      doc.text(
-        `Transaction Report · ${
-          monthNames[
-            Number(
-              activeMonth
-            ) - 1
-          ]
-        } ${activeYear}`,
-        14,
-        31
-      );
-
-
-      /* ===================================================
-         SUMMARY
-      =================================================== */
-
-      const summaryY =
-        40;
-
-
-      const summaryItems = [
-        {
-          label:
-            "TRANSACTIONS",
-
-          value:
-            String(
-              totalTransaction
-            ),
+      doc.setFont("helvetica", "normal");
+
+      doc.setFontSize(9);
+      doc.setTextColor(95, 95, 95);
+      doc.text("PLUNO STUDIO", 16, 16);
+
+      doc.setFontSize(20);
+      doc.setTextColor(25, 25, 25);
+      doc.text("INVOICE PEMBAYARAN", 16, 27);
+
+      doc.setFontSize(8);
+      doc.setTextColor(105, 105, 105);
+      doc.text(`No. Invoice: ${invoiceNumber}`, 16, 34);
+      doc.text(`Tanggal Pembayaran: ${formatDate(transaction.transaction_date)}`, 16, 39);
+
+      const statusText = paymentStatus;
+      doc.setFontSize(10);
+      doc.setTextColor(25, 25, 25);
+      doc.text(statusText, 194, 27, { align: "right" });
+
+      doc.setDrawColor(220, 220, 220);
+      doc.line(16, 45, 194, 45);
+
+      autoTable(doc, {
+        startY: 51,
+        theme: "plain",
+        head: [["KLIEN", "BOOKING"]],
+        body: [[
+          `${customerName}\n${customerPhone}`,
+          `${packageName}\nSesi: ${formatDate(booking?.booking_date)} - ${formatTime(
+            booking?.start_time
+          )}`,
+        ]],
+        styles: {
+          font: "helvetica",
+          fontSize: 9,
+          cellPadding: 4,
+          textColor: [40, 40, 40],
+          lineColor: [225, 225, 225],
+          lineWidth: 0.2,
         },
-
-        {
-          label:
-            "GROSS",
-
-          value:
-            formatRupiah(
-              totalGross
-            ),
+        headStyles: {
+          fontSize: 7,
+          textColor: [105, 105, 105],
+          fontStyle: "normal",
+          fillColor: [248, 248, 248],
         },
-
-        {
-          label:
-            "MDR",
-
-          value:
-            formatRupiah(
-              totalMDR
-            ),
+        columnStyles: {
+          0: { cellWidth: 89 },
+          1: { cellWidth: 89 },
         },
+        margin: { left: 16, right: 16 },
+      });
 
-        {
-          label:
-            "NET",
+      const paymentY = (doc.lastAutoTable?.finalY || 78) + 8;
 
-          value:
-            formatRupiah(
-              totalNet
-            ),
+      autoTable(doc, {
+        startY: paymentY,
+        head: [["RINCIAN PEMBAYARAN", "NILAI"]],
+        body: [
+          ["Jenis Pembayaran", formatPaymentType(transaction.payment_type)],
+          ["Metode Pembayaran", transaction.payment_method || "-"],
+          ["Pembayaran Diterima", formatRupiah(transaction.amount)],
+          [
+            "Harga Paket",
+            packagePrice > 0 ? formatRupiah(packagePrice) : "-",
+          ],
+          ["Total Dibayar", formatRupiah(totalPaidUntilSelected)],
+          [
+            "Sisa Pembayaran",
+            bookingCanceled
+              ? "-"
+              : remainingAmount === null
+              ? "-"
+              : formatRupiah(remainingAmount),
+          ],
+          ["Status Pembayaran", paymentStatus],
+        ],
+        styles: {
+          font: "helvetica",
+          fontSize: 9,
+          cellPadding: 3.4,
+          lineColor: [225, 225, 225],
+          lineWidth: 0.2,
+          textColor: [40, 40, 40],
         },
-      ];
+        headStyles: {
+          fillColor: [25, 25, 25],
+          textColor: [240, 240, 240],
+          fontStyle: "normal",
+          fontSize: 8,
+        },
+        columnStyles: {
+          0: { cellWidth: 88, textColor: [100, 100, 100] },
+          1: { cellWidth: 90 },
+        },
+        margin: { left: 16, right: 16 },
+      });
 
+      let noteY = (doc.lastAutoTable?.finalY || paymentY + 55) + 11;
 
-      const summaryWidth =
-        66;
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
 
-      const summaryGap =
-        4;
-
-
-      summaryItems.forEach(
-        (
-          item,
-          index
-        ) => {
-
-          const x =
-            14 +
-            index *
-              (
-                summaryWidth +
-                summaryGap
-              );
-
-
-          doc.setDrawColor(
-            220,
-            220,
-            220
-          );
-
-          doc.setFillColor(
-            248,
-            248,
-            248
-          );
-
-          doc.rect(
-            x,
-            summaryY,
-            summaryWidth,
-            19,
-            "FD"
-          );
-
-
-          doc.setFontSize(
-            7
-          );
-
-          doc.setTextColor(
-            110,
-            110,
-            110
-          );
-
-          doc.text(
-            item.label,
-            x + 5,
-            summaryY + 7
-          );
-
-
-          doc.setFontSize(
-            11
-          );
-
-          doc.setTextColor(
-            30,
-            30,
-            30
-          );
-
-          doc.text(
-            item.value,
-            x + 5,
-            summaryY + 14
-          );
-        }
-      );
-
-
-      /* ===================================================
-         TABLE DATA
-      =================================================== */
-
-      const tableData =
-        filteredTransactions.map(
-          (
-            item
-          ) => [
-
-            formatDate(
-              item.transaction_date
-            ),
-
-            item.customer ||
-              "-",
-
-            item.payment_type ||
-              "Down Payment",
-
-            item.description ||
-              "-",
-
-            item.payment_method ||
-              "-",
-
-            formatRupiah(
-              item.amount
-            ),
-
-            Number(
-              item.mdr_percentage ||
-                0
-            ) > 0
-              ? `${item.mdr_percentage}%`
-              : "-",
-
-            formatRupiah(
-              item.net_amount
-            ),
-          ]
+      if (bookingCanceled) {
+        const lines = doc.splitTextToSize(
+          "Status booking: Dibatalkan. Pembayaran yang sudah diterima tetap tercatat sebagai pembayaran dan tidak dikembalikan.",
+          178
         );
-
-
-      /* ===================================================
-         TABLE
-      =================================================== */
-
-      autoTable(
-        doc,
-        {
-
-          startY:
-            66,
-
-          head: [[
-            "DATE",
-            "CUSTOMER",
-            "PAYMENT TYPE",
-            "DESCRIPTION",
-            "PAYMENT",
-            "GROSS",
-            "MDR",
-            "NET",
-          ]],
-
-          body:
-            tableData,
-
-          theme:
-            "grid",
-
-          styles: {
-
-            font:
-              "helvetica",
-
-            fontSize:
-              7,
-
-            fontStyle:
-              "normal",
-
-            textColor: [
-              50,
-              50,
-              50,
-            ],
-
-            lineColor: [
-              220,
-              220,
-              220,
-            ],
-
-            lineWidth:
-              0.2,
-
-            cellPadding:
-              3,
-
-            valign:
-              "middle",
-          },
-
-          headStyles: {
-
-            fillColor: [
-              30,
-              30,
-              30,
-            ],
-
-            textColor: [
-              240,
-              240,
-              240,
-            ],
-
-            fontSize:
-              6.5,
-
-            fontStyle:
-              "normal",
-
-            lineColor: [
-              30,
-              30,
-              30,
-            ],
-          },
-
-          alternateRowStyles: {
-
-            fillColor: [
-              248,
-              248,
-              248,
-            ],
-          },
-
-          columnStyles: {
-
-            0: {
-              cellWidth:
-                27,
-            },
-
-            1: {
-              cellWidth:
-                38,
-            },
-
-            2: {
-              cellWidth:
-                34,
-            },
-
-            3: {
-              cellWidth:
-                55,
-            },
-
-            4: {
-              cellWidth:
-                25,
-            },
-
-            5: {
-              cellWidth:
-                35,
-
-              halign:
-                "right",
-            },
-
-            6: {
-              cellWidth:
-                20,
-
-              halign:
-                "center",
-            },
-
-            7: {
-              cellWidth:
-                35,
-
-              halign:
-                "right",
-            },
-          },
-
-          margin: {
-            left:
-              14,
-
-            right:
-              14,
-          },
-        }
-      );
-
-
-      /* ===================================================
-         FOOTER
-      =================================================== */
-
-      const pageCount =
-        doc.internal.getNumberOfPages();
-
-
-      for (
-        let page = 1;
-        page <= pageCount;
-        page++
-      ) {
-
-        doc.setPage(
-          page
-        );
-
-
-        const pageHeight =
-          doc.internal
-            .pageSize
-            .height;
-
-
-        doc.setFontSize(
-          6.5
-        );
-
-        doc.setTextColor(
-          130,
-          130,
-          130
-        );
-
-
+        doc.text(lines, 16, noteY);
+        noteY += lines.length * 4 + 3;
+      } else if (isPaid) {
         doc.text(
-          "PLUNO INTERNAL SYSTEM",
-          14,
-          pageHeight - 8
+          "Pembayaran telah diterima lunas. Sisa pembayaran: Rp 0.",
+          16,
+          noteY
         );
-
-
+        noteY += 7;
+      } else if (remainingAmount !== null) {
         doc.text(
-          `Page ${page} / ${pageCount}`,
-          283,
-          pageHeight - 8,
-          {
-            align:
-              "right",
-          }
+          `Pembayaran telah diterima. Sisa pembayaran: ${formatRupiah(
+            remainingAmount
+          )}.`,
+          16,
+          noteY
         );
+        noteY += 7;
       }
 
+      doc.setDrawColor(225, 225, 225);
+      doc.line(16, noteY + 3, 194, noteY + 3);
 
-      /* ===================================================
-         FILE NAME
-      =================================================== */
-
-      const monthName =
-        monthNames[
-          Number(
-            activeMonth
-          ) - 1
-        ];
-
-
-      doc.save(
-        `Transactions-${monthName}-${activeYear}.pdf`
+      doc.setFontSize(7);
+      doc.setTextColor(125, 125, 125);
+      doc.text(
+        "Dokumen ini dibuat dari catatan pembayaran Pluno Studio.",
+        16,
+        noteY + 10
       );
-    };
+
+      const filename = `invoice-${safeFileName(customerName)}-${
+        transaction.transaction_date || "payment"
+      }.pdf`;
+
+      doc.save(filename);
+    } catch (error) {
+      console.error("INVOICE PDF ERROR:", error);
+      setErrorMessage(
+        `Gagal membuat invoice: ${error.message || "Unknown error"}`
+      );
+    } finally {
+      setGeneratingInvoiceId(null);
+    }
+  };
 
 
-  /* =======================================================
-     RENDER
-  ======================================================= */
+  /* =========================================================
+     MONTHLY TRANSACTION PDF
+  ========================================================= */
+
+  const handleDownloadPDF = () => {
+    if (filteredTransactions.length === 0) {
+      window.alert(
+        `Tidak ada transaksi untuk ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}.`
+      );
+      return;
+    }
+
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text("PLUNO INTERNAL SYSTEM", 14, 14);
+
+    doc.setFontSize(20);
+    doc.setTextColor(30, 30, 30);
+    doc.text("Transaction Performance", 14, 24);
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text(
+      `Transaction Report · ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}`,
+      14,
+      31
+    );
+
+    autoTable(doc, {
+      startY: 40,
+      head: [[
+        "Date",
+        "Customer",
+        "Payment Type",
+        "Package / Description",
+        "Method",
+        "Gross",
+        "MDR",
+        "Net",
+        "Status",
+      ]],
+      body: filteredTransactions.map((item) => [
+        formatDate(item.transaction_date),
+        item.customer || "-",
+        item.payment_type || "-",
+        item.description || "-",
+        item.payment_method || "-",
+        formatRupiah(item.amount),
+        Number(item.mdr_amount || 0) > 0
+          ? `${item.mdr_percentage || 0}% · ${formatRupiah(item.mdr_amount)}`
+          : "-",
+        formatRupiah(item.net_amount ?? item.amount),
+        item.booking_status === "Canceled"
+          ? "Canceled"
+          : "Complete",
+      ]),
+      styles: {
+        font: "helvetica",
+        fontSize: 7,
+        cellPadding: 2.5,
+      },
+      headStyles: {
+        fillColor: [25, 25, 25],
+        textColor: [235, 235, 235],
+        fontStyle: "normal",
+      },
+    });
+
+    const finalY = doc.lastAutoTable?.finalY || 40;
+
+    autoTable(doc, {
+      startY: finalY + 6,
+      head: [["Transactions", "Gross Revenue", "MDR", "Net Revenue"]],
+      body: [[
+        String(totalTransaction),
+        formatRupiah(totalGross),
+        formatRupiah(totalMdr),
+        formatRupiah(totalNet),
+      ]],
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [245, 245, 245],
+        textColor: [80, 80, 80],
+        fontStyle: "normal",
+      },
+    });
+
+    doc.save(
+      `transactions-${selectedYear}-${selectedMonth}.pdf`
+    );
+  };
+
 
   return (
-
     <div className="transactions-page">
-
-
-      {/* =================================================
-          SIDEBAR
-      ================================================= */}
-
-      <Sidebar
-        activePage="transactions"
-      />
-
-
-      {/* =================================================
-          MAIN
-      ================================================= */}
+      <Sidebar activePage="transactions" />
 
       <main className="transactions-main">
-
-
-        {/* =================================================
-            OVERVIEW
-        ================================================= */}
-
         <div className="transactions-section-heading">
-
           <div>
-
             <div className="transactions-section-label">
-              PLUNO STUDIO / FINANCIAL
+              PLUNO STUDIO / FINANCE
             </div>
-
-            <h2>
-              Transaction Performance
-            </h2>
-
+            <h2>Transaction Performance</h2>
           </div>
-
 
           <div className="transactions-performance-filter">
-
-            {/* MONTH */}
-
             <select
-              value={
-                activeMonth
-              }
-              onChange={(
-                event
-              ) =>
-                setSelectedMonth(
-                  event.target.value
-                )
-              }
+              value={selectedMonth}
+              onChange={(event) => setSelectedMonth(event.target.value)}
             >
-
-              {monthNames.map(
-                (
-                  month,
-                  index
-                ) => (
-
-                  <option
-                    key={
-                      month
-                    }
-                    value={String(
-                      index + 1
-                    ).padStart(
-                      2,
-                      "0"
-                    )}
-                  >
-                    {
-                      month
-                    }
-                  </option>
-
-                )
-              )}
-
+              {monthNames.map((month, index) => (
+                <option
+                  key={month}
+                  value={String(index + 1).padStart(2, "0")}
+                >
+                  {month}
+                </option>
+              ))}
             </select>
 
-
-            {/* YEAR */}
-
             <select
-              value={
-                activeYear
-              }
-              onChange={(
-                event
-              ) =>
-                setSelectedYear(
-                  event.target.value
-                )
-              }
+              value={selectedYear}
+              onChange={(event) => setSelectedYear(event.target.value)}
             >
-
-              {yearOptions.map(
-                (
-                  year
-                ) => (
-
-                  <option
-                    key={
-                      year
-                    }
-                    value={
-                      year
-                    }
-                  >
-                    {
-                      year
-                    }
-                  </option>
-
-                )
-              )}
-
+              {yearOptions.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
             </select>
-
-
-            {/* =================================================
-                MDR SETTINGS
-            ================================================= */}
-
-            <button
-              type="button"
-              className="transactions-mdr-settings"
-              onClick={
-                openMdrSettings
-              }
-              aria-label="QRIS MDR Settings"
-              title="QRIS MDR Settings"
-              style={{
-                width:
-                  "30px",
-                height:
-                  "30px",
-                padding:
-                  0,
-                border:
-                  "1px solid #333",
-                background:
-                  "#111",
-                color:
-                  "#aaa",
-                cursor:
-                  "pointer",
-                fontFamily:
-                  "inherit",
-                fontSize:
-                  "14px",
-                fontWeight:
-                  400,
-                lineHeight:
-                  1,
-                display:
-                  "flex",
-                alignItems:
-                  "center",
-                justifyContent:
-                  "center",
-                transition:
-                  "color 0.2s ease, border-color 0.2s ease, background 0.2s ease",
-              }}
-            >
-              ⚙
-            </button>
-
           </div>
-
         </div>
-
-
-        {/* =================================================
-            ERROR
-        ================================================= */}
 
         {errorMessage && (
-
           <div className="transactions-error">
-            {
-              errorMessage
-            }
+            {errorMessage}
           </div>
-
         )}
 
-
-        {/* =================================================
-            SUMMARY
-        ================================================= */}
-
         <div className="transactions-summary">
-
           <div>
-
-            <span>
-              TRANSACTIONS
-            </span>
-
-            <strong>
-              {
-                totalTransaction
-              }
-            </strong>
-
+            <span>TRANSACTIONS</span>
+            <strong>{totalTransaction}</strong>
           </div>
 
-
           <div>
-
-            <span>
-              GROSS
-            </span>
-
-            <strong>
-              {formatRupiah(
-                totalGross
-              )}
-            </strong>
-
+            <span>GROSS REVENUE</span>
+            <strong>{formatRupiah(totalGross)}</strong>
           </div>
 
-
           <div>
-
-            <span>
-              MDR
-            </span>
-
-            <strong>
-              {formatRupiah(
-                totalMDR
-              )}
-            </strong>
-
+            <span>MDR</span>
+            <strong>{formatRupiah(totalMdr)}</strong>
           </div>
 
-
           <div>
-
-            <span>
-              NET
-            </span>
-
-            <strong>
-              {formatRupiah(
-                totalNet
-              )}
-            </strong>
-
+            <span>NET REVENUE</span>
+            <strong>{formatRupiah(totalNet)}</strong>
           </div>
-
         </div>
 
-
-        {/* =================================================
-            TRANSACTION LIST
-        ================================================= */}
-
         <section className="transactions-card">
-
           <div className="transactions-card-header">
-
             <div>
-
-              <span>
-                TRANSACTION LIST
-              </span>
-
-              <h2>
-                Customer Transactions
-              </h2>
-
+              <span>TRANSACTION LEDGER</span>
+              <h2>Booking Payments</h2>
             </div>
 
-
             <div className="transactions-header-actions">
+              <span className="transactions-auto-label">
+                AUTO FROM BOOKING
+              </span>
 
               <button
                 type="button"
                 className="transactions-pdf-button"
-                onClick={
-                  handleDownloadPDF
-                }
+                onClick={handleDownloadPDF}
               >
                 Download PDF
               </button>
-
-
-              <button
-                type="button"
-                className="transactions-add-button"
-                onClick={
-                  openAddModal
-                }
-              >
-                Add
-              </button>
-
             </div>
-
           </div>
 
-
           <div className="transactions-table-scroll">
-
-            <table className="transactions-table">
-
+            <table className="transactions-table transactions-table-v2">
               <thead>
-
                 <tr>
-
-                  <th>
-                    DATE
-                  </th>
-
-                  <th>
-                    CUSTOMER
-                  </th>
-
-                  <th>
-                    PAYMENT TYPE
-                  </th>
-
-                  <th>
-                    DESCRIPTION
-                  </th>
-
-                  <th>
-                    PAYMENT
-                  </th>
-
-                  <th>
-                    GROSS
-                  </th>
-
-                  <th>
-                    MDR
-                  </th>
-
-                  <th>
-                    NET
-                  </th>
-
-                  <th>
-                    ACTION
-                  </th>
-
+                  <th>DATE</th>
+                  <th>CUSTOMER</th>
+                  <th>PAYMENT TYPE</th>
+                  <th>PACKAGE / DESCRIPTION</th>
+                  <th>PAYMENT</th>
+                  <th>GROSS</th>
+                  <th>MDR</th>
+                  <th>NET</th>
+                  <th>STATUS</th>
+                  <th>ACTION</th>
                 </tr>
-
               </thead>
 
-
               <tbody>
-
                 {loading ? (
-
                   <tr>
-
-                    <td
-                      colSpan="9"
-                      className="transactions-empty"
-                    >
+                    <td colSpan="10" className="transactions-empty">
                       Loading transactions...
                     </td>
-
                   </tr>
-
                 ) : filteredTransactions.length === 0 ? (
-
                   <tr>
-
-                    <td
-                      colSpan="9"
-                      className="transactions-empty"
-                    >
+                    <td colSpan="10" className="transactions-empty">
                       No transactions found.
                     </td>
-
                   </tr>
-
                 ) : (
-
-                  filteredTransactions.map(
-                    (
-                      item
-                    ) => (
-
-                      <tr
-                        key={
-                          item.id
-                        }
-                      >
-
-                        <td>
-                          {formatDate(
-                            item.transaction_date
-                          )}
-                        </td>
-
-
-                        <td>
-                          {
-                            item.customer
-                          }
-                        </td>
-
-
-                        <td>
-
-                          <span
-                            className={`transactions-payment-type ${
-                              item.payment_type ===
-                              "Final Payment"
-                                ? "final"
-                                : "down-payment"
-                            }`}
-                          >
-
-                            {
-                              item.payment_type ||
-                              "Down Payment"
+                  filteredTransactions.map((item) => (
+                    <tr key={item.id}>
+                      <td>{formatDate(item.transaction_date)}</td>
+                      <td>{item.customer || "-"}</td>
+                      <td>
+                        <span
+                          className={`transactions-payment-type ${
+                            item.payment_type === "Final Payment"
+                              ? "final"
+                              : item.payment_type === "Full Payment"
+                              ? "final"
+                              : "down-payment"
+                          }`}
+                        >
+                          {item.payment_type || "Payment"}
+                        </span>
+                      </td>
+                      <td>{item.description || "-"}</td>
+                      <td>
+                        <span
+                          className={`transactions-payment ${
+                            item.payment_method === "QRIS"
+                              ? "qris"
+                              : "cash"
+                          }`}
+                        >
+                          {item.payment_method || "-"}
+                        </span>
+                      </td>
+                      <td>{formatRupiah(item.amount)}</td>
+                      <td>
+                        {Number(item.mdr_amount || 0) > 0
+                          ? `${item.mdr_percentage || 0}% · ${formatRupiah(item.mdr_amount)}`
+                          : "-"}
+                      </td>
+                      <td>
+                        {formatRupiah(item.net_amount ?? item.amount)}
+                      </td>
+                      <td>
+                        <span
+                          className={`transactions-booking-status ${
+                            item.booking_status === "Canceled"
+                              ? "canceled"
+                              : "complete"
+                          }`}
+                        >
+                          {item.booking_status === "Canceled"
+                            ? "Canceled"
+                            : "Complete"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="transactions-row-actions">
+                          <button
+                            type="button"
+                            className="transactions-invoice"
+                            onClick={() => handleDownloadInvoice(item)}
+                            disabled={
+                              generatingInvoiceId === item.id ||
+                              deletingTransactionId === item.id
                             }
-
-                          </span>
-
-                        </td>
-
-
-                        <td>
-                          {
-                            item.description
-                          }
-                        </td>
-
-
-                        <td>
-
-                          <span
-                            className={`transactions-payment ${
-                              item.payment_method ===
-                              "QRIS"
-                                ? "qris"
-                                : "cash"
-                            }`}
                           >
-
-                            {
-                              item.payment_method
-                            }
-
-                          </span>
-
-                        </td>
-
-
-                        <td>
-
-                          {formatRupiah(
-                            item.amount
-                          )}
-
-                        </td>
-
-
-                        <td>
-
-                          {Number(
-                            item.mdr_percentage ||
-                              0
-                          ) > 0
-                            ? `${item.mdr_percentage}%`
-                            : "-"}
-
-                        </td>
-
-
-                        <td>
-
-                          {formatRupiah(
-                            item.net_amount
-                          )}
-
-                        </td>
-
-
-                        <td>
+                            {generatingInvoiceId === item.id
+                              ? "Generating..."
+                              : "Invoice"}
+                          </button>
 
                           <button
                             type="button"
                             className="transactions-delete"
-                            onClick={() =>
-                              handleDelete(
-                                item
-                              )
+                            onClick={() => handleDeleteTransaction(item)}
+                            disabled={
+                              deletingTransactionId === item.id ||
+                              generatingInvoiceId === item.id
                             }
                           >
-                            Delete
+                            {deletingTransactionId === item.id
+                              ? "Deleting..."
+                              : "Delete"}
                           </button>
-
-                        </td>
-
-                      </tr>
-
-                    )
-                  )
-
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
-
               </tbody>
-
             </table>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            FOOTER
-        ================================================= */}
-
         <footer className="transactions-footer">
-
-          <span>
-            PLUNO INTERNAL SYSTEM
-          </span>
-
-          <span>
-            v1.0 · 2026
-          </span>
-
+          <span>PLUNO INTERNAL SYSTEM</span>
+          <span>v1.0 · 2026</span>
         </footer>
-
       </main>
-
-
-      {/* =================================================
-          ADD TRANSACTION MODAL
-      ================================================= */}
-
-      {showAddModal && (
-
-        <div className="transactions-overlay">
-
-          <div className="transactions-modal">
-
-
-            <div className="transactions-modal-header">
-
-              <div>
-
-                <span>
-                  NEW TRANSACTION
-                </span>
-
-                <h2>
-                  Add Transaction
-                </h2>
-
-                <p>
-                  Record customer payment.
-                </p>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="transactions-close"
-                onClick={
-                  closeAddModal
-                }
-              >
-                ×
-              </button>
-
-            </div>
-
-
-            <form
-              onSubmit={
-                handleSubmit
-              }
-            >
-
-              <div className="transactions-form-grid">
-
-
-                <div className="transactions-field">
-
-                  <label>
-                    TRANSACTION DATE
-                  </label>
-
-                  <input
-                    type="date"
-                    name="transaction_date"
-                    value={
-                      formData.transaction_date
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                    required
-                  />
-
-                </div>
-
-
-                <div className="transactions-field">
-
-                  <label>
-                    CUSTOMER
-                  </label>
-
-                  <input
-                    type="text"
-                    name="customer"
-                    placeholder="Customer name"
-                    value={
-                      formData.customer
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                    required
-                  />
-
-                </div>
-
-
-                <div className="transactions-field">
-
-                  <label>
-                    PAYMENT TYPE
-                  </label>
-
-                  <select
-                    name="payment_type"
-                    value={
-                      formData.payment_type
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                    required
-                  >
-
-                    <option value="Down Payment">
-                      Down Payment
-                    </option>
-
-                    <option value="Final Payment">
-                      Final Payment
-                    </option>
-
-                  </select>
-
-                </div>
-
-
-                <div className="transactions-field">
-
-                  <label>
-                    DESCRIPTION
-                  </label>
-
-                  <input
-                    type="text"
-                    name="description"
-                    placeholder="Package / transaction description"
-                    value={
-                      formData.description
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                    required
-                  />
-
-                </div>
-
-
-                <div className="transactions-field">
-
-                  <label>
-                    AMOUNT
-                  </label>
-
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="Rp 0"
-                    value={
-                      formData.amount
-                        ? Number(
-                            formData.amount
-                          ).toLocaleString(
-                            "id-ID"
-                          )
-                        : ""
-                    }
-                    onChange={
-                      handleAmountChange
-                    }
-                    required
-                  />
-
-                </div>
-
-
-                <div className="transactions-field">
-
-                  <label>
-                    PAYMENT METHOD
-                  </label>
-
-                  <select
-                    name="payment_method"
-                    value={
-                      formData.payment_method
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                  >
-
-                    <option value="Cash">
-                      Cash
-                    </option>
-
-                    <option value="QRIS">
-                      QRIS
-                    </option>
-
-                  </select>
-
-                </div>
-
-
-                <div className="transactions-field">
-
-                  <label>
-                    INFORMATION
-                  </label>
-
-                  <input
-                    type="text"
-                    name="information"
-                    placeholder="Additional information"
-                    value={
-                      formData.information
-                    }
-                    onChange={
-                      handleFormChange
-                    }
-                  />
-
-                </div>
-
-              </div>
-
-
-              <div className="transactions-preview">
-
-                <div>
-
-                  <span>
-                    GROSS
-                  </span>
-
-                  <strong>
-                    {formatRupiah(
-                      formData.amount
-                    )}
-                  </strong>
-
-                </div>
-
-
-                <div>
-
-                  <span>
-                    MDR
-                  </span>
-
-                  <strong>
-
-                    {
-                      formData.payment_method ===
-                      "QRIS"
-                        ? `${mdrPercentage}%`
-                        : "0%"
-                    }
-
-                  </strong>
-
-                </div>
-
-
-                <div>
-
-                  <span>
-                    NET RECEIVED
-                  </span>
-
-                  <strong>
-
-                    {formatRupiah(
-                      Number(
-                        formData.amount ||
-                          0
-                      ) -
-                        Math.round(
-                          Number(
-                            formData.amount ||
-                              0
-                          ) *
-                            (
-                              formData.payment_method ===
-                              "QRIS"
-                                ? mdrPercentage /
-                                  100
-                                : 0
-                            )
-                        )
-                    )}
-
-                  </strong>
-
-                </div>
-
-              </div>
-
-
-              {errorMessage && (
-
-                <div className="transactions-form-error">
-                  {
-                    errorMessage
-                  }
-                </div>
-
-              )}
-
-
-              <div className="transactions-modal-footer">
-
-                <button
-                  type="button"
-                  className="transactions-cancel"
-                  onClick={
-                    closeAddModal
-                  }
-                  disabled={
-                    saving
-                  }
-                >
-                  Cancel
-                </button>
-
-
-                <button
-                  type="submit"
-                  className="transactions-save"
-                  disabled={
-                    saving
-                  }
-                >
-
-                  {saving
-                    ? "Saving..."
-                    : "Save Transaction"}
-
-                </button>
-
-              </div>
-
-            </form>
-
-          </div>
-
-        </div>
-
-      )}
-
-
-      {/* =================================================
-          QRIS MDR SETTINGS MODAL
-      ================================================= */}
-
-      {showMdrSettings && (
-
-        <div className="transactions-overlay">
-
-          <div className="transactions-modal transactions-mdr-modal">
-
-            <div className="transactions-modal-header">
-
-              <div>
-
-                <span>
-                  PAYMENT PROCESSING
-                </span>
-
-                <h2>
-                  QRIS MDR
-                </h2>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="transactions-close"
-                onClick={
-                  closeMdrSettings
-                }
-              >
-                ×
-              </button>
-
-            </div>
-
-
-            <div className="transactions-mdr-settings-body">
-
-              <div className="transactions-field">
-
-                <label>
-                  MDR PERCENTAGE
-                </label>
-
-
-                <div className="transactions-mdr-input">
-
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.01"
-                    value={
-                      mdrFormValue
-                    }
-                    onChange={
-                      handleMdrChange
-                    }
-                    placeholder="0.7"
-                    autoFocus
-                  />
-
-
-                  <span>
-                    %
-                  </span>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            {errorMessage && (
-
-              <div className="transactions-form-error">
-                {
-                  errorMessage
-                }
-              </div>
-
-            )}
-
-
-            <div className="transactions-modal-footer">
-
-              <button
-                type="button"
-                className="transactions-cancel"
-                onClick={
-                  closeMdrSettings
-                }
-              >
-                Cancel
-              </button>
-
-
-              <button
-                type="button"
-                className="transactions-save"
-                onClick={
-                  saveMdrSettings
-                }
-              >
-                Save
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
     </div>
   );
 }
-
 
 export default Transactions;
