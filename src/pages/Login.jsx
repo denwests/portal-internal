@@ -1,215 +1,292 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabase";
+import {
+  useState,
+} from "react";
+
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  supabase,
+} from "../supabase";
+
 import "./Login.css";
 
+
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [resetEmail, setResetEmail] = useState("");
 
-  const [loading, setLoading] = useState(false);
-  const [resetMode, setResetMode] = useState(false);
+  const [username, setUsername] =
+    useState("");
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [password, setPassword] =
+    useState("");
 
-  const navigate = useNavigate();
+  const [resetEmail, setResetEmail] =
+    useState("");
 
-  /* =========================
-     LOGIN
-  ========================= */
+  const [loading, setLoading] =
+    useState(false);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const [resetMode, setResetMode] =
+    useState(false);
 
-    setLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
+  const [errorMessage, setErrorMessage] =
+    useState("");
 
-    /* =========================
-       FIND EMPLOYEE BY USERNAME
-    ========================= */
+  const [successMessage, setSuccessMessage] =
+    useState("");
 
-    const {
-      data: employee,
-      error: employeeError,
-    } = await supabase
-      .from("employees")
-      .select("*")
-      .eq("username", username.trim())
-      .single();
 
-    if (employeeError || !employee) {
-      console.error("EMPLOYEE ERROR:", employeeError);
+  const navigate =
+    useNavigate();
 
-      setErrorMessage(
-        "Username tidak ditemukan."
-      );
+  const location =
+    useLocation();
 
-      setLoading(false);
-      return;
-    }
 
-    /* =========================
-       CHECK STATUS
-    ========================= */
+  /* =================================================
+     SAFE RETURN PATH
+     Digunakan ketika user membuka share link Booking,
+     lalu harus login terlebih dahulu.
+  ================================================= */
 
-    if (employee.status !== "Aktif") {
-      setErrorMessage(
-        "This account is inactive."
-      );
+  const getReturnPath = () => {
 
-      setLoading(false);
-      return;
-    }
+    const from =
+      location.state?.from;
 
-    /* =========================
-       LOGIN SUPABASE AUTH
-    ========================= */
-
-    const {
-      data: authData,
-      error: authError,
-    } = await supabase.auth.signInWithPassword({
-      email: employee.email,
-      password: password,
-    });
-
-    if (authError) {
-      console.error("AUTH ERROR:", authError);
-
-      setErrorMessage(
-        authError.message ||
-        "Login gagal."
-      );
-
-      setLoading(false);
-      return;
-    }
-
-    /* =========================
-       CHECK USER ID
-    ========================= */
 
     if (
-      !authData.user ||
-      authData.user.id !== employee.id
+      typeof from === "string" &&
+      from.startsWith("/") &&
+      !from.startsWith("//")
     ) {
-      console.error(
-        "USER ID MISMATCH:",
+      return from;
+    }
+
+
+    return "/dashboard";
+
+  };
+
+
+  /* =================================================
+     LOGIN
+  ================================================= */
+
+  const handleLogin =
+    async (event) => {
+
+      event.preventDefault();
+
+      setLoading(true);
+      setErrorMessage("");
+      setSuccessMessage("");
+
+
+      const normalizedUsername =
+        username.trim();
+
+
+      /* =================================================
+         FIND EMPLOYEE BY USERNAME
+      ================================================= */
+
+      const {
+        data: employee,
+        error: employeeError,
+      } = await supabase
+        .from("employees")
+        .select(
+          "id, name, email, role, status"
+        )
+        .eq(
+          "username",
+          normalizedUsername
+        )
+        .maybeSingle();
+
+
+      if (
+        employeeError ||
+        !employee
+      ) {
+
+        console.error(
+          "EMPLOYEE ERROR:",
+          employeeError
+        );
+
+        setErrorMessage(
+          "Username atau password salah."
+        );
+
+        setLoading(false);
+
+        return;
+      }
+
+
+      /* =================================================
+         CHECK STATUS
+      ================================================= */
+
+      if (
+        employee.status !==
+        "Aktif"
+      ) {
+
+        setErrorMessage(
+          "This account is inactive."
+        );
+
+        setLoading(false);
+
+        return;
+      }
+
+
+      /* =================================================
+         LOGIN SUPABASE AUTH
+      ================================================= */
+
+      const {
+        data: authData,
+        error: authError,
+      } = await supabase.auth.signInWithPassword({
+        email: employee.email,
+        password,
+      });
+
+
+      if (authError) {
+
+        console.error(
+          "AUTH ERROR:",
+          authError
+        );
+
+        setErrorMessage(
+          "Username atau password salah."
+        );
+
+        setLoading(false);
+
+        return;
+      }
+
+
+      /* =================================================
+         CHECK AUTH USER = EMPLOYEE
+      ================================================= */
+
+      if (
+        !authData.user ||
+        authData.user.id !==
+          employee.id
+      ) {
+
+        console.error(
+          "USER ID MISMATCH:",
+          {
+            authUserId:
+              authData.user?.id,
+            employeeId:
+              employee.id,
+          }
+        );
+
+        await supabase.auth.signOut();
+
+        setErrorMessage(
+          "Account configuration error."
+        );
+
+        setLoading(false);
+
+        return;
+      }
+
+
+      /* =================================================
+         SAVE DISPLAY DATA
+         ProtectedRoute akan memverifikasi ulang data ini
+         langsung dari database ketika halaman dibuka.
+      ================================================= */
+
+      localStorage.setItem(
+        "isLoggedIn",
+        "true"
+      );
+
+      localStorage.setItem(
+        "employeeId",
+        employee.id
+      );
+
+      localStorage.setItem(
+        "employeeName",
+        employee.name || "User"
+      );
+
+      localStorage.setItem(
+        "employeeRole",
+        employee.role
+      );
+
+
+      /* =================================================
+         GO TO ORIGINAL PAGE / DASHBOARD
+      ================================================= */
+
+      navigate(
+        getReturnPath(),
         {
-          authUserId: authData.user?.id,
-          employeeId: employee.id,
+          replace: true,
         }
       );
 
-      await supabase.auth.signOut();
-
-      setErrorMessage(
-        "Account configuration error."
-      );
-
       setLoading(false);
-      return;
-    }
 
-    /* =========================
-       SAVE LOGIN DATA
-    ========================= */
+    };
 
-    localStorage.setItem(
-      "isLoggedIn",
-      "true"
-    );
 
-    localStorage.setItem(
-      "employeeId",
-      employee.id
-    );
+  /* =================================================
+     RESET PASSWORD REQUEST
+  ================================================= */
 
-    localStorage.setItem(
-      "employeeName",
-      employee.name
-    );
+  const handleResetPassword =
+    async (event) => {
 
-    localStorage.setItem(
-      "employeeRole",
-      employee.role
-    );
+      event.preventDefault();
 
-    /* =========================
-       GO TO DASHBOARD
-    ========================= */
+      setLoading(true);
+      setErrorMessage("");
+      setSuccessMessage("");
 
-    navigate("/dashboard");
 
-    setLoading(false);
-  };
+      const email =
+        resetEmail
+          .trim()
+          .toLowerCase();
 
-  /* =========================
-     RESET PASSWORD
-  ========================= */
 
-  const handleResetPassword = async (event) => {
-    event.preventDefault();
+      if (!email) {
 
-    setLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
+        setErrorMessage(
+          "Masukkan email terlebih dahulu."
+        );
 
-    const email = resetEmail.trim();
+        setLoading(false);
 
-    if (!email) {
-      setErrorMessage(
-        "Masukkan email terlebih dahulu."
-      );
+        return;
+      }
 
-      setLoading(false);
-      return;
-    }
 
-    /* =========================
-       CHECK EMPLOYEE
-    ========================= */
-
-    const {
-      data: employee,
-      error: employeeError,
-    } = await supabase
-      .from("employees")
-      .select("email, status")
-      .eq("email", email)
-      .single();
-
-    if (employeeError || !employee) {
-      setErrorMessage(
-        "Email tidak terdaftar."
-      );
-
-      setLoading(false);
-      return;
-    }
-
-    /* =========================
-       CHECK STATUS
-    ========================= */
-
-    if (employee.status !== "Aktif") {
-      setErrorMessage(
-        "This account is inactive."
-      );
-
-      setLoading(false);
-      return;
-    }
-
-    /* =========================
-       SEND RESET EMAIL
-    ========================= */
-
-    const { error } =
-      await supabase.auth.resetPasswordForEmail(
+      const {
+        error,
+      } = await supabase.auth.resetPasswordForEmail(
         email,
         {
           redirectTo:
@@ -217,41 +294,55 @@ function Login() {
         }
       );
 
-    if (error) {
-      console.error(
-        "RESET PASSWORD ERROR:",
-        error
-      );
 
-      setErrorMessage(
-        error.message ||
-        "Gagal mengirim link reset password."
+      if (error) {
+
+        console.error(
+          "RESET PASSWORD ERROR:",
+          error
+        );
+
+        setErrorMessage(
+          error.message ||
+          "Gagal mengirim link reset password."
+        );
+
+        setLoading(false);
+
+        return;
+      }
+
+
+      /* =================================================
+         Pesan dibuat umum agar halaman login tidak
+         membocorkan apakah sebuah email terdaftar.
+      ================================================= */
+
+      setSuccessMessage(
+        "Jika email terdaftar, link reset password akan dikirim ke email tersebut."
       );
 
       setLoading(false);
-      return;
-    }
 
-    setSuccessMessage(
-      "Reset password link has been sent to your email."
-    );
+    };
 
-    setLoading(false);
-  };
 
-  /* =========================
-     SWITCH TO LOGIN
-  ========================= */
+  /* =================================================
+     BACK TO LOGIN
+  ================================================= */
 
   const handleBackToLogin = () => {
-    setResetMode(false);
 
+    setResetMode(false);
     setResetEmail("");
     setErrorMessage("");
     setSuccessMessage("");
+
   };
 
+
   return (
+
     <div className="login-page">
 
       <form
@@ -263,14 +354,18 @@ function Login() {
         }
       >
 
+
         {!resetMode ? (
 
           <>
+
             <input
               type="text"
               placeholder="Username"
               value={username}
-              onChange={(event) =>
+              onChange={(
+                event
+              ) =>
                 setUsername(
                   event.target.value
                 )
@@ -279,11 +374,14 @@ function Login() {
               required
             />
 
+
             <input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(event) =>
+              onChange={(
+                event
+              ) =>
                 setPassword(
                   event.target.value
                 )
@@ -292,17 +390,24 @@ function Login() {
               required
             />
 
+
             {errorMessage && (
+
               <div className="login-error">
                 {errorMessage}
               </div>
+
             )}
 
+
             {successMessage && (
+
               <div className="login-success">
                 {successMessage}
               </div>
+
             )}
+
 
             <button
               type="submit"
@@ -312,6 +417,7 @@ function Login() {
                 ? "Signing in..."
                 : "Sign in"}
             </button>
+
 
             <button
               type="button"
@@ -324,16 +430,20 @@ function Login() {
             >
               Reset Password
             </button>
+
           </>
 
         ) : (
 
           <>
+
             <input
               type="email"
               placeholder="Email"
               value={resetEmail}
-              onChange={(event) =>
+              onChange={(
+                event
+              ) =>
                 setResetEmail(
                   event.target.value
                 )
@@ -342,17 +452,24 @@ function Login() {
               required
             />
 
+
             {errorMessage && (
+
               <div className="login-error">
                 {errorMessage}
               </div>
+
             )}
 
+
             {successMessage && (
+
               <div className="login-success">
                 {successMessage}
               </div>
+
             )}
+
 
             <button
               type="submit"
@@ -363,21 +480,28 @@ function Login() {
                 : "Send Reset Link"}
             </button>
 
+
             <button
               type="button"
               className="reset-password-link"
-              onClick={handleBackToLogin}
+              onClick={
+                handleBackToLogin
+              }
             >
               Back to Sign in
             </button>
+
           </>
 
         )}
 
+
       </form>
 
     </div>
+
   );
 }
+
 
 export default Login;

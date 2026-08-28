@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import Booking from "./pages/Booking";
 import Customer from "./pages/Customer";
@@ -13,6 +14,24 @@ import Spending from "./pages/Spending";
 import Transactions from "./pages/Transactions";
 import Bookkeeping from "./pages/Bookkeeping";
 import Employee from "./pages/Employee";
+import Documents from "./pages/Documents";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+
+const ALL_ROLES = [
+  "Founder",
+  "Administrator",
+  "Staff",
+];
+
+const OPERATIONAL_ROLES = [
+  "Founder",
+  "Administrator",
+];
+
+const FOUNDER_ONLY = [
+  "Founder",
+];
 
 
 function App() {
@@ -25,7 +44,7 @@ function App() {
 
 
         {/* =================================================
-            LOGIN
+            PUBLIC
         ================================================= */}
 
         <Route
@@ -33,64 +52,111 @@ function App() {
           element={<Login />}
         />
 
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
+        />
+
 
         {/* =================================================
             DASHBOARD
+            Founder / Administrator / Staff
         ================================================= */}
 
         <Route
           path="/dashboard"
-          element={<Dashboard />}
+          element={
+            <ProtectedRoute
+              allowedRoles={ALL_ROLES}
+            >
+              <Dashboard />
+            </ProtectedRoute>
+          }
         />
 
 
         {/* =================================================
             BOOKING LIST
+            Founder / Administrator / Staff
         ================================================= */}
 
         <Route
           path="/booking"
-          element={<Booking />}
+          element={
+            <ProtectedRoute
+              allowedRoles={ALL_ROLES}
+            >
+              <Booking />
+            </ProtectedRoute>
+          }
         />
 
 
         {/* =================================================
             CUSTOMER DATA
+            Founder / Administrator
         ================================================= */}
 
         <Route
           path="/customer"
-          element={<Customer />}
+          element={
+            <ProtectedRoute
+              allowedRoles={OPERATIONAL_ROLES}
+            >
+              <Customer />
+            </ProtectedRoute>
+          }
         />
 
 
         {/* =================================================
             SPENDING
+            Founder / Administrator
         ================================================= */}
 
         <Route
           path="/spending"
-          element={<Spending />}
+          element={
+            <ProtectedRoute
+              allowedRoles={OPERATIONAL_ROLES}
+            >
+              <Spending />
+            </ProtectedRoute>
+          }
         />
 
 
         {/* =================================================
             TRANSACTIONS
+            Founder / Administrator
         ================================================= */}
 
         <Route
           path="/transactions"
-          element={<Transactions />}
+          element={
+            <ProtectedRoute
+              allowedRoles={OPERATIONAL_ROLES}
+            >
+              <Transactions />
+            </ProtectedRoute>
+          }
         />
 
 
         {/* =================================================
             BOOKKEEPING
+            Founder / Administrator
         ================================================= */}
 
         <Route
           path="/bookkeeping"
-          element={<Bookkeeping />}
+          element={
+            <ProtectedRoute
+              allowedRoles={OPERATIONAL_ROLES}
+            >
+              <Bookkeeping />
+            </ProtectedRoute>
+          }
         />
 
 
@@ -102,16 +168,43 @@ function App() {
         <Route
           path="/employee"
           element={
-            localStorage.getItem(
-              "employeeRole"
-            ) === "Founder" ? (
+            <ProtectedRoute
+              allowedRoles={FOUNDER_ONLY}
+            >
               <Employee />
-            ) : (
-              <Navigate
-                to="/dashboard"
-                replace
-              />
-            )
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* =================================================
+            DOCUMENTS
+            Founder only
+        ================================================= */}
+
+        <Route
+          path="/documents"
+          element={
+            <ProtectedRoute
+              allowedRoles={FOUNDER_ONLY}
+            >
+              <Documents />
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* =================================================
+            ROOT
+        ================================================= */}
+
+        <Route
+          path="/"
+          element={
+            <Navigate
+              to="/dashboard"
+              replace
+            />
           }
         />
 
@@ -124,7 +217,7 @@ function App() {
           path="*"
           element={
             <Navigate
-              to="/login"
+              to="/dashboard"
               replace
             />
           }
