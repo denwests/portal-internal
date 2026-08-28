@@ -300,6 +300,36 @@ function Spending() {
      DATABASE CATEGORY
   ======================================================= */
 
+  const normalizeDatabaseCategory =
+    (category) => {
+
+      const normalized =
+        String(
+          category || ""
+        )
+          .trim()
+          .toLowerCase();
+
+      if (
+        normalized === "expense" ||
+        normalized === "studio expense" ||
+        normalized === "studio expenses"
+      ) {
+        return "expense";
+      }
+
+      if (
+        normalized === "cash" ||
+        normalized === "cash spending" ||
+        normalized === "cash movement"
+      ) {
+        return "cash";
+      }
+
+      return normalized;
+    };
+
+
   const getDatabaseCategory =
     (category) => {
 
@@ -313,8 +343,9 @@ function Spending() {
   const getDisplayCategory =
     (category) => {
 
-      return category ===
-        "expense"
+      return normalizeDatabaseCategory(
+        category
+      ) === "expense"
         ? "Studio Expenses"
         : "Cash Spending";
     };
@@ -376,6 +407,11 @@ function Spending() {
         (data || []).map(
           (item) => ({
             ...item,
+
+            category:
+              normalizeDatabaseCategory(
+                item.category
+              ),
 
             transaction_date:
               item.transaction_date ||
@@ -486,16 +522,18 @@ function Spending() {
   const studioExpenses =
     filteredSpendings.filter(
       (item) =>
-        item.category ===
-        "expense"
+        normalizeDatabaseCategory(
+          item.category
+        ) === "expense"
     );
 
 
   const cashSpendings =
     filteredSpendings.filter(
       (item) =>
-        item.category ===
-        "cash"
+        normalizeDatabaseCategory(
+          item.category
+        ) === "cash"
     );
 
 
@@ -871,6 +909,22 @@ function Spending() {
         );
 
 
+      /*
+       * Studio Expenses adalah sumber expense untuk Bookkeeping.
+       * Cash Spending hanya cash movement dan tidak dihitung sebagai
+       * expense oleh Bookkeeping.
+       *
+       * Untuk menjaga data konsisten:
+       * - Studio Expenses selalu amount_in = 0
+       * - amount selalu merepresentasikan outgoing amount
+       * - date dan transaction_date dibuat sama untuk kompatibilitas
+       *   dengan data lama.
+       */
+      const safeAmountIn =
+        databaseCategory === "expense"
+          ? 0
+          : amountIn;
+
       const databaseData = {
 
         category:
@@ -889,7 +943,7 @@ function Spending() {
           amountOut,
 
         amount_in:
-          amountIn,
+          safeAmountIn,
 
         amount_out:
           amountOut,
@@ -947,6 +1001,11 @@ function Spending() {
         const normalizedData =
           {
             ...data,
+
+            category:
+              normalizeDatabaseCategory(
+                data.category
+              ),
 
             transaction_date:
               data.transaction_date ||
@@ -1007,6 +1066,11 @@ function Spending() {
         const normalizedData =
           {
             ...data,
+
+            category:
+              normalizeDatabaseCategory(
+                data.category
+              ),
 
             transaction_date:
               data.transaction_date ||

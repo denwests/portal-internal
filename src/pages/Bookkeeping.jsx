@@ -508,9 +508,20 @@ function Bookkeeping() {
       settings.bep_percentage || 0
     );
 
+  /*
+   * BEP / reserve hanya boleh diambil ketika ada profit.
+   * Jika periode rugi, BEP = 0 agar kerugian tidak terlihat
+   * seolah-olah berkurang karena nilai BEP negatif.
+   */
+  const bepBase =
+    Math.max(
+      netProfit,
+      0
+    );
+
   const bepAmount =
     Math.round(
-      netProfit *
+      bepBase *
         (
           bepPercentage /
           100
@@ -520,6 +531,16 @@ function Bookkeeping() {
   const profitAfterBep =
     netProfit -
     bepAmount;
+
+  /*
+   * Distribusi profit juga hanya dilakukan dari profit positif.
+   * Saat profitAfterBep <= 0, semua nominal distribusi = 0.
+   */
+  const distributionBase =
+    Math.max(
+      profitAfterBep,
+      0
+    );
 
   const distributionPercentage =
     settings.distributions.reduce(
@@ -550,7 +571,7 @@ function Bookkeeping() {
 
           amount:
             Math.round(
-              profitAfterBep *
+              distributionBase *
                 (
                   percentage /
                   100
