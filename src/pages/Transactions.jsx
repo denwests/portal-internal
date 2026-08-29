@@ -190,13 +190,153 @@ function Transactions() {
      DELETE TRANSACTION + RECALCULATE BOOKING
   ========================================================= */
 
+  const syncCustomerAfterTransactionChange = async (
+    booking,
+    { paidAmount, paymentStatus }
+  ) => {
+    if (!booking?.id) return;
+
+    const shouldHaveCustomer =
+      (booking.status === "Canceled" && paidAmount > 0) ||
+      (booking.status !== "Canceled" && paymentStatus === "Paid");
+
+    const customerStatus =
+      booking.status === "Canceled" ? "Canceled" : "Selesai";
+
+    const customerTotal =
+      customerStatus === "Canceled"
+        ? paidAmount
+        : Number(booking.package_price || 0);
+
+    if (shouldHaveCustomer) {
+      let customerId = booking.customer_id || null;
+
+      if (customerId) {
+        const { error: customerUpdateError } = await supabase
+          .from("customers")
+          .update({
+            name: booking.customer_name || "",
+            phone: booking.customer_phone || "",
+            package: booking.package || "",
+            date: booking.booking_date || null,
+            price: Number(booking.package_price || 0),
+            total: customerTotal,
+            status: customerStatus,
+          })
+          .eq("id", customerId);
+
+        if (customerUpdateError) {
+          throw customerUpdateError;
+        }
+      } else {
+        const { data: customerData, error: customerCreateError } = await supabase
+          .from("customers")
+          .insert([
+            {
+              name: booking.customer_name || "",
+              phone: booking.customer_phone || "",
+              package: booking.package || "",
+              date: booking.booking_date || null,
+              price: Number(booking.package_price || 0),
+              addon: 0,
+              addon_note: "",
+              total: customerTotal,
+              status: customerStatus,
+            },
+          ])
+          .select()
+          .single();
+
+        if (customerCreateError) {
+          throw customerCreateError;
+        }
+
+        customerId = customerData.id;
+
+        const { error: bookingLinkError } = await supabase
+          .from("bookings")
+          .update({ customer_id: customerId })
+          .eq("id", booking.id);
+
+        if (bookingLinkError) {
+          await supabase
+            .from("customers")
+            .delete()
+            .eq("id", customerId);
+
+          throw bookingLinkError;
+        }
+      }
+
+      const { error: transactionLinkError } = await supabase
+        .from("transactions")
+        .update({ customer_id: String(customerId) })
+        .eq("booking_id", String(booking.id));
+
+      if (transactionLinkError) {
+        throw transactionLinkError;
+      }
+
+      return;
+    }
+
+    if (!booking.customer_id) {
+      return;
+    }
+
+    const customerId = booking.customer_id;
+
+    const { error: transactionUnlinkError } = await supabase
+      .from("transactions")
+      .update({ customer_id: null })
+      .eq("booking_id", String(booking.id));
+
+    if (transactionUnlinkError) {
+      throw transactionUnlinkError;
+    }
+
+    const { error: bookingUnlinkError } = await supabase
+      .from("bookings")
+      .update({ customer_id: null })
+      .eq("id", booking.id);
+
+    if (bookingUnlinkError) {
+      await supabase
+        .from("transactions")
+        .update({ customer_id: String(customerId) })
+        .eq("booking_id", String(booking.id));
+
+      throw bookingUnlinkError;
+    }
+
+    const { error: customerDeleteError } = await supabase
+      .from("customers")
+      .delete()
+      .eq("id", customerId);
+
+    if (customerDeleteError) {
+      await supabase
+        .from("bookings")
+        .update({ customer_id: customerId })
+        .eq("id", booking.id);
+
+      await supabase
+        .from("transactions")
+        .update({ customer_id: String(customerId) })
+        .eq("booking_id", String(booking.id));
+
+      throw customerDeleteError;
+    }
+  };
+
+
   const handleDeleteTransaction = async (transaction) => {
     if (!transaction?.id) return;
 
     const confirmed = window.confirm(
       `Hapus transaksi ${transaction.payment_type || "Payment"} milik ${
         transaction.customer || "customer"
-      } sebesar ${formatRupiah(transaction.amount)}?\n\nJika transaksi terhubung ke Booking, jumlah pembayaran dan status Booking akan dihitung ulang otomatis.`
+      } sebesar ${formatRupiah(transaction.amount)}?\n\nJika transaksi terhubung ke Booking, Booking dan Customer Data akan disinkronkan otomatis.`
     );
 
     if (!confirmed) return;
@@ -206,13 +346,15 @@ function Transactions() {
 
     let bookingSnapshot = null;
     let bookingWasUpdated = false;
+    let recalculatedBooking = null;
+    let recalculatedPaymentState = null;
 
     try {
       if (transaction.booking_id) {
         const { data: booking, error: bookingError } = await supabase
           .from("bookings")
           .select(
-            "id, package_price, down_payment, paid_amount, remaining_amount, payment_status"
+            "id, customer_id, customer_name, customer_phone, booking_date, package, package_price, status, down_payment, paid_amount, remaining_amount, payment_status"
           )
           .eq("id", transaction.booking_id)
           .maybeSingle();
@@ -282,6 +424,17 @@ function Transactions() {
           }
 
           bookingWasUpdated = true;
+          recalculatedBooking = {
+            ...booking,
+            down_payment: downPayment,
+            paid_amount: paidAmount,
+            remaining_amount: remainingAmount,
+            payment_status: paymentStatus,
+          };
+          recalculatedPaymentState = {
+            paidAmount,
+            paymentStatus,
+          };
         }
       }
 
@@ -308,6 +461,26 @@ function Transactions() {
       setTransactions((current) =>
         current.filter((item) => item.id !== transaction.id)
       );
+
+      if (recalculatedBooking && recalculatedPaymentState) {
+        try {
+          await syncCustomerAfterTransactionChange(
+            recalculatedBooking,
+            recalculatedPaymentState
+          );
+        } catch (customerSyncError) {
+          console.error(
+            "TRANSACTION CUSTOMER SYNC ERROR:",
+            customerSyncError
+          );
+
+          setErrorMessage(
+            `Transaksi sudah dihapus dan Booking sudah dihitung ulang, tetapi Customer Data gagal disinkronkan: ${
+              customerSyncError.message || "Unknown error"
+            }`
+          );
+        }
+      }
     } catch (error) {
       console.error("TRANSACTION DELETE ERROR:", error);
       setErrorMessage(

@@ -587,6 +587,92 @@ function Booking() {
   };
 
 
+  const updateCustomerFromBooking = async (
+    booking,
+    customerId,
+    customerStatus = "Selesai"
+  ) => {
+    if (!customerId) return;
+
+    const customerTotal =
+      customerStatus === "Canceled"
+        ? Number(booking.paid_amount || 0)
+        : Number(booking.package_price || 0);
+
+    const { error } = await supabase
+      .from("customers")
+      .update({
+        name: booking.customer_name || "",
+        phone: booking.customer_phone || "",
+        package: booking.package || "",
+        date: booking.booking_date || null,
+        price: Number(booking.package_price || 0),
+        total: customerTotal,
+        status: customerStatus,
+      })
+      .eq("id", customerId);
+
+    if (error) {
+      throw error;
+    }
+  };
+
+
+  const unlinkAndDeleteCustomerFromBooking = async (booking) => {
+    if (!booking?.customer_id) {
+      return booking;
+    }
+
+    const customerId = booking.customer_id;
+
+    const { error: transactionUnlinkError } = await supabase
+      .from("transactions")
+      .update({ customer_id: null })
+      .eq("booking_id", String(booking.id));
+
+    if (transactionUnlinkError) {
+      throw transactionUnlinkError;
+    }
+
+    const { data: unlinkedBooking, error: bookingUnlinkError } = await supabase
+      .from("bookings")
+      .update({ customer_id: null })
+      .eq("id", booking.id)
+      .select()
+      .single();
+
+    if (bookingUnlinkError) {
+      await supabase
+        .from("transactions")
+        .update({ customer_id: String(customerId) })
+        .eq("booking_id", String(booking.id));
+
+      throw bookingUnlinkError;
+    }
+
+    const { error: customerDeleteError } = await supabase
+      .from("customers")
+      .delete()
+      .eq("id", customerId);
+
+    if (customerDeleteError) {
+      await supabase
+        .from("bookings")
+        .update({ customer_id: customerId })
+        .eq("id", booking.id);
+
+      await supabase
+        .from("transactions")
+        .update({ customer_id: String(customerId) })
+        .eq("booking_id", String(booking.id));
+
+      throw customerDeleteError;
+    }
+
+    return unlinkedBooking;
+  };
+
+
   /* =========================================================
      CREATE / EDIT BOOKING
   ========================================================= */
@@ -682,34 +768,32 @@ function Booking() {
       let finalUpdatedBooking = data;
 
       /*
-       * Customer history:
-       * - Paid Complete booking -> stored as Selesai.
-       * - Canceled booking -> stored/updated as Canceled, even if only DP was paid.
-       * The payment itself remains in Transactions because there is no refund.
+       * Customer Data is client history, not a revenue ledger.
+       * Rules:
+       * - Complete + Paid   -> Customer Data = Selesai
+       * - Complete + Partial/Unpaid -> no Customer Data yet
+       * - Canceled + paid > 0 -> Customer Data = Canceled
+       * - Canceled + paid = 0 -> no Customer Data
        */
-      if (form.status === "Canceled") {
-        try {
-          if (data.customer_id) {
-            const { error: customerUpdateError } = await supabase
-              .from("customers")
-              .update({
-                name: data.customer_name || "",
-                phone: data.customer_phone || "",
-                package: data.package || "",
-                date: data.booking_date || null,
-                price: Number(data.package_price || 0),
-                addon: 0,
-                addon_note: "",
-                total: Number(data.paid_amount || 0),
-                status: "Canceled",
-              })
-              .eq("id", data.customer_id);
+      const shouldHaveCustomer =
+        (form.status === "Canceled" && paidAmount > 0) ||
+        (form.status !== "Canceled" && paymentStatus === "Paid");
 
-            if (customerUpdateError) throw customerUpdateError;
+      const targetCustomerStatus =
+        form.status === "Canceled" ? "Canceled" : "Selesai";
+
+      try {
+        if (shouldHaveCustomer) {
+          if (data.customer_id) {
+            await updateCustomerFromBooking(
+              data,
+              data.customer_id,
+              targetCustomerStatus
+            );
           } else {
             const customerData = await createCustomerFromBooking(
               data,
-              "Canceled"
+              targetCustomerStatus
             );
 
             const {
@@ -734,73 +818,30 @@ function Booking() {
 
             finalUpdatedBooking = linkedBooking;
 
-            await supabase
+            const { error: transactionLinkError } = await supabase
               .from("transactions")
               .update({
                 customer_id: String(customerData.id),
               })
               .eq("booking_id", String(data.id));
+
+            if (transactionLinkError) {
+              throw transactionLinkError;
+            }
           }
-        } catch (customerError) {
-          console.error(
-            "CANCELED CUSTOMER SYNC ERROR:",
-            customerError
-          );
-          setErrorMessage(
-            `Booking sudah diubah menjadi Canceled, tetapi Customer Data gagal disinkronkan: ${customerError.message}`
-          );
-          setSaving(false);
-          return;
+        } else if (data.customer_id) {
+          finalUpdatedBooking = await unlinkAndDeleteCustomerFromBooking(data);
         }
-      } else if (
-        paymentStatus === "Paid" &&
-        !data.customer_id
-      ) {
-        try {
-          const customerData = await createCustomerFromBooking(
-            data,
-            "Selesai"
-          );
-
-          const {
-            data: linkedBooking,
-            error: linkError,
-          } = await supabase
-            .from("bookings")
-            .update({
-              customer_id: customerData.id,
-            })
-            .eq("id", data.id)
-            .select()
-            .single();
-
-          if (linkError) {
-            await supabase
-              .from("customers")
-              .delete()
-              .eq("id", customerData.id);
-            throw linkError;
-          }
-
-          finalUpdatedBooking = linkedBooking;
-
-          await supabase
-            .from("transactions")
-            .update({
-              customer_id: String(customerData.id),
-            })
-            .eq("booking_id", String(data.id));
-        } catch (customerError) {
-          console.error(
-            "CUSTOMER AUTO CREATE ERROR:",
-            customerError
-          );
-          setErrorMessage(
-            `Booking diperbarui, tetapi Customer Data gagal dibuat: ${customerError.message}`
-          );
-          setSaving(false);
-          return;
-        }
+      } catch (customerError) {
+        console.error(
+          "BOOKING CUSTOMER SYNC ERROR:",
+          customerError
+        );
+        setErrorMessage(
+          `Booking sudah diperbarui, tetapi Customer Data gagal disinkronkan: ${customerError.message}`
+        );
+        setSaving(false);
+        return;
       }
 
       setBookings((current) =>
@@ -897,7 +938,7 @@ function Booking() {
 
       if (
         paymentStatus === "Paid" ||
-        form.status === "Canceled"
+        (form.status === "Canceled" && paidAmount > 0)
       ) {
         insertedCustomer = await createCustomerFromBooking(
           newBooking,
@@ -1059,6 +1100,12 @@ function Booking() {
         .single();
 
       if (bookingUpdateError) throw bookingUpdateError;
+
+      await updateCustomerFromBooking(
+        updatedBooking,
+        customerId,
+        "Selesai"
+      );
 
       if (transactionData?.id && customerId) {
         await supabase
