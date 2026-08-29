@@ -57,26 +57,42 @@ function getInitialPeriodFilter() {
   const validDate = (value) =>
     /^\d{4}-\d{2}-\d{2}$/.test(value || "");
 
-  const fallbackStart = validDate(requestedSingleDate)
-    ? requestedSingleDate
-    : current.monthStart;
-
-  const fallbackEnd = validDate(requestedSingleDate)
-    ? requestedSingleDate
-    : current.monthEnd;
-
-  const startDate = validDate(requestedStartDate)
+  /*
+   * Default Date filter is EMPTY.
+   * Without a chosen date/range, the list is not restricted by date.
+   */
+  let startDate = validDate(requestedStartDate)
     ? requestedStartDate
-    : fallbackStart;
+    : "";
 
-  const endDate = validDate(requestedEndDate)
+  let endDate = validDate(requestedEndDate)
     ? requestedEndDate
-    : fallbackEnd;
+    : "";
+
+  if (
+    !startDate &&
+    !endDate &&
+    validDate(requestedSingleDate)
+  ) {
+    startDate = requestedSingleDate;
+    endDate = requestedSingleDate;
+  }
+
+  if (
+    startDate &&
+    endDate &&
+    startDate > endDate
+  ) {
+    [startDate, endDate] = [
+      endDate,
+      startDate,
+    ];
+  }
 
   return {
     type,
-    startDate: startDate <= endDate ? startDate : endDate,
-    endDate: startDate <= endDate ? endDate : startDate,
+    startDate,
+    endDate,
     month: /^(0[1-9]|1[0-2])$/.test(requestedMonth || "")
       ? requestedMonth
       : current.month,
@@ -298,10 +314,23 @@ function Booking() {
       const [year, month] = booking.booking_date.split("-");
 
       if (periodFilter.type === "date") {
-        return (
-          booking.booking_date >= periodFilter.startDate &&
-          booking.booking_date <= periodFilter.endDate
-        );
+        if (
+          periodFilter.startDate &&
+          booking.booking_date <
+            periodFilter.startDate
+        ) {
+          return false;
+        }
+
+        if (
+          periodFilter.endDate &&
+          booking.booking_date >
+            periodFilter.endDate
+        ) {
+          return false;
+        }
+
+        return true;
       }
 
       if (periodFilter.type === "month") {
@@ -317,7 +346,22 @@ function Booking() {
 
   const periodLabel =
     periodFilter.type === "date"
-      ? `${formatDate(periodFilter.startDate)} - ${formatDate(periodFilter.endDate)}`
+      ? periodFilter.startDate &&
+        periodFilter.endDate
+        ? `${formatDate(
+            periodFilter.startDate
+          )} - ${formatDate(
+            periodFilter.endDate
+          )}`
+        : periodFilter.startDate
+        ? `From ${formatDate(
+            periodFilter.startDate
+          )}`
+        : periodFilter.endDate
+        ? `Until ${formatDate(
+            periodFilter.endDate
+          )}`
+        : "All Booking"
       : periodFilter.type === "month"
       ? `${monthNames[Number(periodFilter.month) - 1] || "-"} ${periodFilter.year}`
       : periodFilter.year;
@@ -329,11 +373,21 @@ function Booking() {
         [field]: value,
       };
 
-      if (field === "startDate" && value > next.endDate) {
+      if (
+        field === "startDate" &&
+        value &&
+        next.endDate &&
+        value > next.endDate
+      ) {
         next.endDate = value;
       }
 
-      if (field === "endDate" && value < next.startDate) {
+      if (
+        field === "endDate" &&
+        value &&
+        next.startDate &&
+        value < next.startDate
+      ) {
         next.startDate = value;
       }
 
@@ -354,8 +408,13 @@ function Booking() {
     params.set("period", periodFilter.type);
 
     if (periodFilter.type === "date") {
-      params.set("start", periodFilter.startDate);
-      params.set("end", periodFilter.endDate);
+      if (periodFilter.startDate) {
+        params.set("start", periodFilter.startDate);
+      }
+
+      if (periodFilter.endDate) {
+        params.set("end", periodFilter.endDate);
+      }
     }
 
     if (periodFilter.type === "month") {
@@ -1382,7 +1441,10 @@ function Booking() {
                     type="date"
                     className="booking-period-date"
                     value={periodFilter.startDate}
-                    max={periodFilter.endDate}
+                    max={
+                      periodFilter.endDate ||
+                      undefined
+                    }
                     onChange={(event) =>
                       updatePeriodFilter("startDate", event.target.value)
                     }
@@ -1397,7 +1459,10 @@ function Booking() {
                     type="date"
                     className="booking-period-date"
                     value={periodFilter.endDate}
-                    min={periodFilter.startDate}
+                    min={
+                      periodFilter.startDate ||
+                      undefined
+                    }
                     onChange={(event) =>
                       updatePeriodFilter("endDate", event.target.value)
                     }
