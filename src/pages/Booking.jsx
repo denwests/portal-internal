@@ -962,6 +962,7 @@ function Booking() {
           .insert([
             {
               transaction_date: getTodayParts().date,
+              revenue_date: form.bookingDate,
               customer: form.customerName.trim(),
               payment_type:
                 paymentStatus === "Paid"
@@ -1111,6 +1112,7 @@ function Booking() {
         .insert([
           {
             transaction_date: getTodayParts().date,
+            revenue_date: payingBooking.booking_date,
             customer: payingBooking.customer_name || "",
             payment_type: "Final Payment",
             description: `${payingBooking.package || "Package"} · Final Payment`,

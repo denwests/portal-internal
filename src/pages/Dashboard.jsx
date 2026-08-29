@@ -383,7 +383,7 @@ function Dashboard() {
 
       /* ===================================================
          REVENUE FROM TRANSACTIONS
-         Transactions are the single source of truth.
+         revenue_date is the booking/event date used by Bookkeeping.
          Staff does not request finance data.
       =================================================== */
 
@@ -399,14 +399,14 @@ function Dashboard() {
           await supabase
             .from("transactions")
             .select(
-              "amount, transaction_date"
+              "amount, revenue_date"
             )
             .gte(
-              "transaction_date",
+              "revenue_date",
               yearStart
             )
             .lt(
-              "transaction_date",
+              "revenue_date",
               yearEnd
             );
 
@@ -432,10 +432,10 @@ function Dashboard() {
           transactions
             .filter(
               (transaction) =>
-                transaction.transaction_date &&
-                transaction.transaction_date >=
+                transaction.revenue_date &&
+                transaction.revenue_date >=
                   selectedMonthStart &&
-                transaction.transaction_date <
+                transaction.revenue_date <
                   selectedMonthEnd
             )
             .reduce(
@@ -462,14 +462,14 @@ function Dashboard() {
           (transaction) => {
 
             if (
-              !transaction.transaction_date
+              !transaction.revenue_date
             ) {
               return;
             }
 
             const monthIndex =
               Number(
-                transaction.transaction_date.slice(
+                transaction.revenue_date.slice(
                   5,
                   7
                 )

@@ -481,11 +481,14 @@ function Customer() {
       String(existing.payment_method || "Cash") !== method ||
       String(existing.information || "") !== cleanInformation;
 
+    const transactionDate =
+      addOnChanged || !existing?.transaction_date
+        ? new Date().toISOString().slice(0, 10)
+        : existing.transaction_date;
+
     const payload = {
-      transaction_date:
-        addOnChanged || !existing?.transaction_date
-          ? new Date().toISOString().slice(0, 10)
-          : existing.transaction_date,
+      transaction_date: transactionDate,
+      revenue_date: customer.date || transactionDate,
       customer: customer.name || "",
       payment_type: "Add-on",
       description: `${customer.package || "Package"} · Add-on`,

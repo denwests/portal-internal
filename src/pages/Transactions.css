@@ -242,7 +242,7 @@ body,
 .transactions-summary {
   display: grid;
   grid-template-columns:
-    repeat(4, minmax(0, 1fr));
+    repeat(3, minmax(0, 1fr));
   gap: 9px;
   margin-bottom: 18px;
 }
@@ -382,38 +382,38 @@ body,
 
 .transactions-table th:nth-child(2),
 .transactions-table td:nth-child(2) {
-  width: 135px;
-  min-width: 135px;
+  width: 105px;
+  min-width: 105px;
 }
 
 .transactions-table th:nth-child(3),
 .transactions-table td:nth-child(3) {
-  width: 125px;
-  min-width: 125px;
+  width: 115px;
+  min-width: 115px;
 }
 
 .transactions-table th:nth-child(4),
 .transactions-table td:nth-child(4) {
-  width: 175px;
-  min-width: 175px;
+  width: 135px;
+  min-width: 135px;
 }
 
 .transactions-table th:nth-child(5),
 .transactions-table td:nth-child(5) {
-  width: 90px;
-  min-width: 90px;
+  width: 125px;
+  min-width: 125px;
 }
 
 .transactions-table th:nth-child(6),
 .transactions-table td:nth-child(6) {
-  width: 120px;
-  min-width: 120px;
+  width: 175px;
+  min-width: 175px;
 }
 
 .transactions-table th:nth-child(7),
 .transactions-table td:nth-child(7) {
-  width: 60px;
-  min-width: 60px;
+  width: 90px;
+  min-width: 90px;
 }
 
 .transactions-table th:nth-child(8),
@@ -424,8 +424,20 @@ body,
 
 .transactions-table th:nth-child(9),
 .transactions-table td:nth-child(9) {
-  width: 65px;
-  min-width: 65px;
+  width: 80px;
+  min-width: 80px;
+}
+
+.transactions-table th:nth-child(10),
+.transactions-table td:nth-child(10) {
+  width: 120px;
+  min-width: 120px;
+}
+
+.transactions-table th:nth-child(11),
+.transactions-table td:nth-child(11) {
+  width: 75px;
+  min-width: 75px;
 }
 
 
@@ -439,6 +451,16 @@ body,
   font-size: 7px;
   font-weight: 400;
   letter-spacing: 0.3px;
+}
+
+.transactions-revenue-period {
+  display: inline-block;
+  padding: 4px 7px;
+  border: 1px solid #324039;
+  background: #19231e;
+  color: #8eb7a0;
+  font-size: 7px;
+  letter-spacing: 0.4px;
 }
 
 .transactions-payment-type.down-payment {

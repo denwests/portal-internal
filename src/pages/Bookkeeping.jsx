@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import {
+  isRevenueInRange,
+} from "../lib/revenuePeriod";
 import "./Bookkeeping.css";
 
 /* =========================================================
@@ -376,18 +379,12 @@ function Bookkeeping() {
     if (!fromDate || !toDate) return [];
 
     return transactions.filter(
-      (item) => {
-        if (!item.transaction_date) {
-          return false;
-        }
-
-        return (
-          item.transaction_date >=
-            fromDate &&
-          item.transaction_date <=
-            toDate
-        );
-      }
+      (item) =>
+        isRevenueInRange(
+          item,
+          fromDate,
+          toDate
+        )
     );
   }, [
     transactions,
@@ -827,6 +824,9 @@ function Bookkeeping() {
 
           transaction_items:
             filteredTransactions,
+
+          revenue_basis:
+            "booking_event_date",
 
           revenue_summary: {
 
@@ -1480,14 +1480,14 @@ td {
 <div class="section">
 
   <div class="section-title">
-    01 · Revenue
+    01 · Fixed Revenue by Event Date
   </div>
 
   <div class="summary">
 
     <div class="summary-row">
       <span>
-        Gross Revenue
+        Fixed Gross Revenue
       </span>
 
       <strong>
@@ -1499,7 +1499,7 @@ td {
 
     <div class="summary-row">
       <span>
-        QRIS Revenue
+        QRIS Fixed Revenue
       </span>
 
       <strong>
@@ -1511,7 +1511,7 @@ td {
 
     <div class="summary-row">
       <span>
-        Non-QRIS Revenue
+        Non-QRIS Fixed Revenue
       </span>
 
       <strong>
@@ -1524,7 +1524,7 @@ td {
     <div class="summary-row">
 
       <span>
-        QRIS MDR
+        Fixed Revenue MDR
 
         <span class="muted">
           (0% ≤ Rp500.000 · 0.3% &gt; Rp500.000)
@@ -1543,7 +1543,7 @@ td {
     <div class="summary-row total">
 
       <span>
-        Net Revenue
+        Fixed Net Revenue
       </span>
 
       <strong>
@@ -1939,7 +1939,7 @@ td {
             <div>
 
               <span>
-                CURRENT PERIOD
+                REVENUE BY EVENT DATE · EXPENSE BY PAYMENT DATE
               </span>
 
               <strong>
@@ -1988,7 +1988,7 @@ td {
 
 
  {/* =================================================
-    CURRENT DATA
+    CURRENT FIXED REVENUE · BY EVENT DATE
 ================================================= */}
 
 <section className="bookkeeping-overview">
@@ -2002,7 +2002,37 @@ td {
     <div>
 
       <span>
-        NET REVENUE
+        FIXED GROSS REVENUE
+      </span>
+
+      <strong>
+        {formatRupiah(
+          grossRevenue
+        )}
+      </strong>
+
+    </div>
+
+
+    <div>
+
+      <span>
+        FIXED REVENUE MDR
+      </span>
+
+      <strong>
+        {formatRupiah(
+          qrisMdrAmount
+        )}
+      </strong>
+
+    </div>
+
+
+    <div>
+
+      <span>
+        FIXED NET REVENUE
       </span>
 
       <strong>

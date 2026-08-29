@@ -6,6 +6,10 @@ import {
 
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import {
+  getRevenueDate,
+  isRevenueInMonth,
+} from "../lib/revenuePeriod";
 import "./Transactions.css";
 
 import jsPDF from "jspdf";
@@ -36,6 +40,28 @@ function formatDate(date) {
   ];
 
   return `${day} ${months[Number(month) - 1]} ${year}`;
+}
+
+function formatRevenuePeriod(date) {
+  if (!date) return "-";
+
+  const [year, month] = String(date).split("-");
+  const months = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  return `${months[Number(month) - 1] || month} ${year}`;
 }
 
 
@@ -141,7 +167,7 @@ function Transactions() {
       )
     );
 
-    let bookingStatusMap = {};
+    let bookingMap = {};
 
     if (bookingIds.length > 0) {
       const {
@@ -149,7 +175,7 @@ function Transactions() {
         error: bookingError,
       } = await supabase
         .from("bookings")
-        .select("id, status")
+        .select("id, status, booking_date")
         .in("id", bookingIds);
 
       if (bookingError) {
@@ -158,12 +184,16 @@ function Transactions() {
           bookingError
         );
       } else {
-        bookingStatusMap = Object.fromEntries(
+        bookingMap = Object.fromEntries(
           (bookingData || []).map((booking) => [
             String(booking.id),
-            booking.status === "Canceled"
-              ? "Canceled"
-              : "Complete",
+            {
+              status:
+                booking.status === "Canceled"
+                  ? "Canceled"
+                  : "Complete",
+              bookingDate: booking.booking_date || null,
+            },
           ])
         );
       }
@@ -173,8 +203,11 @@ function Transactions() {
       transactionList.map((item) => ({
         ...item,
         booking_status: item.booking_id
-          ? bookingStatusMap[String(item.booking_id)] || "Complete"
+          ? bookingMap[String(item.booking_id)]?.status || "Complete"
           : "Complete",
+        revenue_date:
+          bookingMap[String(item.booking_id)]?.bookingDate ||
+          getRevenueDate(item),
       }))
     );
 
@@ -507,6 +540,12 @@ function Transactions() {
     });
   }, [transactions, selectedMonth, selectedYear]);
 
+  const fixedRevenueTransactions = useMemo(() => {
+    return transactions.filter((item) =>
+      isRevenueInMonth(item, selectedYear, selectedMonth)
+    );
+  }, [transactions, selectedMonth, selectedYear]);
+
   const totalTransaction = filteredTransactions.length;
 
   const totalGross = filteredTransactions.reduce(
@@ -520,6 +559,21 @@ function Transactions() {
   );
 
   const totalNet = filteredTransactions.reduce(
+    (total, item) => total + Number(item.net_amount ?? item.amount ?? 0),
+    0
+  );
+
+  const fixedRevenueGross = fixedRevenueTransactions.reduce(
+    (total, item) => total + Number(item.amount || 0),
+    0
+  );
+
+  const fixedRevenueMdr = fixedRevenueTransactions.reduce(
+    (total, item) => total + Number(item.mdr_amount || 0),
+    0
+  );
+
+  const fixedRevenueNet = fixedRevenueTransactions.reduce(
     (total, item) => total + Number(item.net_amount ?? item.amount ?? 0),
     0
   );
@@ -792,9 +846,12 @@ function Transactions() {
   ========================================================= */
 
   const handleDownloadPDF = () => {
-    if (filteredTransactions.length === 0) {
+    if (
+      filteredTransactions.length === 0 &&
+      fixedRevenueTransactions.length === 0
+    ) {
       window.alert(
-        `Tidak ada transaksi untuk ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}.`
+        `Tidak ada arus uang atau pendapatan fix untuk ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}.`
       );
       return;
     }
@@ -812,66 +869,151 @@ function Transactions() {
 
     doc.setFontSize(20);
     doc.setTextColor(30, 30, 30);
-    doc.text("Transaction Performance", 14, 24);
+    doc.text("Transaction & Revenue Performance", 14, 24);
 
     doc.setFontSize(9);
     doc.setTextColor(100, 100, 100);
     doc.text(
-      `Transaction Report · ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}`,
+      `Cash flow and fixed revenue · ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}`,
       14,
       31
     );
 
-    autoTable(doc, {
-      startY: 40,
-      head: [[
-        "Date",
-        "Customer",
-        "Payment Type",
-        "Package / Description",
-        "Method",
-        "Gross",
-        "MDR",
-        "Net",
-        "Status",
-      ]],
-      body: filteredTransactions.map((item) => [
-        formatDate(item.transaction_date),
-        item.customer || "-",
-        item.payment_type || "-",
-        item.description || "-",
-        item.payment_method || "-",
-        formatRupiah(item.amount),
-        Number(item.mdr_amount || 0) > 0
-          ? `${item.mdr_percentage || 0}% · ${formatRupiah(item.mdr_amount)}`
-          : "-",
-        formatRupiah(item.net_amount ?? item.amount),
-        item.booking_status === "Canceled"
-          ? "Canceled"
-          : "Complete",
-      ]),
-      styles: {
-        font: "helvetica",
-        fontSize: 7,
-        cellPadding: 2.5,
-      },
-      headStyles: {
-        fillColor: [25, 25, 25],
-        textColor: [235, 235, 235],
-        fontStyle: "normal",
-      },
-    });
+    if (filteredTransactions.length > 0) {
+      doc.setFontSize(10);
+      doc.setTextColor(45, 45, 45);
+      doc.text("Cash In — by Payment Date", 14, 39);
 
-    const finalY = doc.lastAutoTable?.finalY || 40;
+      autoTable(doc, {
+        startY: 43,
+        head: [[
+          "Payment Date",
+          "Event Date",
+          "Revenue Period",
+          "Customer",
+          "Payment Type",
+          "Package / Description",
+          "Method",
+          "Gross",
+          "MDR",
+          "Net",
+          "Status",
+        ]],
+        body: filteredTransactions.map((item) => [
+          formatDate(item.transaction_date),
+          formatDate(getRevenueDate(item)),
+          formatRevenuePeriod(getRevenueDate(item)),
+          item.customer || "-",
+          item.payment_type || "-",
+          item.description || "-",
+          item.payment_method || "-",
+          formatRupiah(item.amount),
+          Number(item.mdr_amount || 0) > 0
+            ? `${item.mdr_percentage || 0}% · ${formatRupiah(item.mdr_amount)}`
+            : "-",
+          formatRupiah(item.net_amount ?? item.amount),
+          item.booking_status === "Canceled"
+            ? "Canceled"
+            : "Complete",
+        ]),
+        styles: {
+          font: "helvetica",
+          fontSize: 6.3,
+          cellPadding: 2.2,
+        },
+        headStyles: {
+          fillColor: [25, 25, 25],
+          textColor: [235, 235, 235],
+          fontStyle: "normal",
+        },
+      });
+    }
+
+    const finalY = doc.lastAutoTable?.finalY || 43;
 
     autoTable(doc, {
       startY: finalY + 6,
-      head: [["Transactions", "Gross Revenue", "MDR", "Net Revenue"]],
+      head: [["Payment Transactions", "Cash Received", "Cash MDR", "Net Cash Received"]],
       body: [[
         String(totalTransaction),
         formatRupiah(totalGross),
         formatRupiah(totalMdr),
         formatRupiah(totalNet),
+      ]],
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [245, 245, 245],
+        textColor: [80, 80, 80],
+        fontStyle: "normal",
+      },
+    });
+
+    const fixedStartY = (doc.lastAutoTable?.finalY || finalY) + 10;
+
+    doc.setFontSize(10);
+    doc.setTextColor(45, 45, 45);
+    doc.text("Fixed Revenue — by Event Date", 14, fixedStartY);
+
+    if (fixedRevenueTransactions.length > 0) {
+      autoTable(doc, {
+        startY: fixedStartY + 4,
+        head: [[
+          "Payment Date",
+          "Event Date",
+          "Revenue Period",
+          "Customer",
+          "Payment Type",
+          "Gross",
+          "MDR",
+          "Net",
+        ]],
+        body: fixedRevenueTransactions.map((item) => [
+          formatDate(item.transaction_date),
+          formatDate(getRevenueDate(item)),
+          formatRevenuePeriod(getRevenueDate(item)),
+          item.customer || "-",
+          item.payment_type || "-",
+          formatRupiah(item.amount),
+          formatRupiah(item.mdr_amount || 0),
+          formatRupiah(item.net_amount ?? item.amount),
+        ]),
+        styles: {
+          font: "helvetica",
+          fontSize: 6.8,
+          cellPadding: 2.3,
+        },
+        headStyles: {
+          fillColor: [25, 25, 25],
+          textColor: [235, 235, 235],
+          fontStyle: "normal",
+        },
+      });
+    } else {
+      doc.setFontSize(8);
+      doc.setTextColor(110, 110, 110);
+      doc.text("No fixed revenue for this period.", 14, fixedStartY + 6);
+    }
+
+    autoTable(doc, {
+      startY:
+        fixedRevenueTransactions.length > 0
+          ? (doc.lastAutoTable?.finalY || fixedStartY + 4) + 5
+          : fixedStartY + 10,
+      head: [[
+        "Revenue Transactions",
+        "Fixed Gross Revenue",
+        "Fixed MDR",
+        "Fixed Net Revenue",
+      ]],
+      body: [[
+        String(fixedRevenueTransactions.length),
+        formatRupiah(fixedRevenueGross),
+        formatRupiah(fixedRevenueMdr),
+        formatRupiah(fixedRevenueNet),
       ]],
       styles: {
         font: "helvetica",
@@ -940,23 +1082,33 @@ function Transactions() {
 
         <div className="transactions-summary">
           <div>
-            <span>TRANSACTIONS</span>
+            <span>PAYMENT TRANSACTIONS</span>
             <strong>{totalTransaction}</strong>
           </div>
 
           <div>
-            <span>GROSS REVENUE</span>
+            <span>CASH RECEIVED</span>
             <strong>{formatRupiah(totalGross)}</strong>
           </div>
 
           <div>
-            <span>MDR</span>
+            <span>CASH MDR</span>
             <strong>{formatRupiah(totalMdr)}</strong>
           </div>
 
           <div>
-            <span>NET REVENUE</span>
+            <span>NET CASH RECEIVED</span>
             <strong>{formatRupiah(totalNet)}</strong>
+          </div>
+
+          <div>
+            <span>FIXED GROSS REVENUE</span>
+            <strong>{formatRupiah(fixedRevenueGross)}</strong>
+          </div>
+
+          <div>
+            <span>FIXED NET REVENUE</span>
+            <strong>{formatRupiah(fixedRevenueNet)}</strong>
           </div>
         </div>
 
@@ -976,9 +1128,16 @@ function Transactions() {
                 type="button"
                 className="transactions-pdf-button"
                 onClick={handleDownloadPDF}
-                disabled={loading || filteredTransactions.length === 0}
+                disabled={
+                  loading ||
+                  (
+                    filteredTransactions.length === 0 &&
+                    fixedRevenueTransactions.length === 0
+                  )
+                }
                 title={
-                  filteredTransactions.length === 0
+                  filteredTransactions.length === 0 &&
+                  fixedRevenueTransactions.length === 0
                     ? "Tidak ada data untuk diekspor"
                     : "Download transaction PDF"
                 }
@@ -992,7 +1151,9 @@ function Transactions() {
             <table className="transactions-table transactions-table-v2">
               <thead>
                 <tr>
-                  <th>DATE</th>
+                  <th>PAYMENT DATE</th>
+                  <th>EVENT DATE</th>
+                  <th>FIXED REVENUE</th>
                   <th>CUSTOMER</th>
                   <th>PAYMENT TYPE</th>
                   <th>PACKAGE / DESCRIPTION</th>
@@ -1009,7 +1170,7 @@ function Transactions() {
                 {loading ? (
                   <tr>
                     <td
-                      colSpan="10"
+                      colSpan="12"
                       className="transactions-empty table-empty-cell"
                     >
                       <span className="table-empty-viewport">
@@ -1020,7 +1181,7 @@ function Transactions() {
                 ) : filteredTransactions.length === 0 ? (
                   <tr>
                     <td
-                      colSpan="10"
+                      colSpan="12"
                       className="transactions-empty table-empty-cell"
                     >
                       <span className="table-empty-viewport">
@@ -1032,6 +1193,12 @@ function Transactions() {
                   filteredTransactions.map((item) => (
                     <tr key={item.id}>
                       <td>{formatDate(item.transaction_date)}</td>
+                      <td>{formatDate(getRevenueDate(item))}</td>
+                      <td>
+                        <span className="transactions-revenue-period">
+                          {formatRevenuePeriod(getRevenueDate(item))}
+                        </span>
+                      </td>
                       <td>{item.customer || "-"}</td>
                       <td>
                         <span
