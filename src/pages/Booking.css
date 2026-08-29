@@ -577,10 +577,17 @@
   background: rgba(0, 0, 0, 0.75);
   display: flex;
   justify-content: center;
-  align-items: center;
+  /*
+   * Center the modal when it fits.
+   * If the modal is taller than the viewport, "safe" automatically
+   * falls back to the top so the first field is never clipped.
+   */
+  align-items: safe center;
   padding: 30px;
   z-index: 1000;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 
