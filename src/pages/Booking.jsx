@@ -14,7 +14,6 @@ import "./Booking.css";
 ========================================================= */
 
 const BOOKINGS_PER_PAGE = 10;
-const DEFAULT_MDR = 0.7;
 
 function getTodayParts() {
   const today = new Date();
@@ -132,11 +131,22 @@ function getPaymentStatus(packagePrice, paidAmount) {
   return "Partial";
 }
 
-function calculateMdr(amount, paymentMethod, mdrPercentage) {
+function calculateMdr(amount, paymentMethod) {
   const gross = Number(amount || 0);
-  const percentage = paymentMethod === "QRIS"
-    ? Number(mdrPercentage || 0)
-    : 0;
+
+  /*
+   * Fixed QRIS MDR rule:
+   * - Cash = 0%
+   * - QRIS up to Rp500.000 = 0%
+   * - QRIS above Rp500.000 = 0.3%
+   *
+   * The rule is based on the amount of each payment transaction,
+   * not on the total package price.
+   */
+  const percentage =
+    paymentMethod === "QRIS" && gross > 500000
+      ? 0.3
+      : 0;
 
   const mdrAmount = Math.round(
     gross * (percentage / 100)
@@ -151,10 +161,6 @@ function calculateMdr(amount, paymentMethod, mdrPercentage) {
 
 
 function Booking() {
-  const employeeRole = localStorage.getItem("employeeRole") || "Staff";
-  const canManageSettings =
-    employeeRole === "Founder" || employeeRole === "Administrator";
-
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -165,7 +171,6 @@ function Booking() {
   const [showForm, setShowForm] = useState(false);
   const [showView, setShowView] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
 
   const [editingBooking, setEditingBooking] = useState(null);
   const [viewingBooking, setViewingBooking] = useState(null);
@@ -175,11 +180,6 @@ function Booking() {
     getInitialPeriodFilter
   );
   const [shareCopied, setShareCopied] = useState(false);
-
-  const [mdrPercentage, setMdrPercentage] = useState(DEFAULT_MDR);
-  const [mdrSettingInput, setMdrSettingInput] = useState(
-    String(DEFAULT_MDR)
-  );
 
   const [settlementMethod, setSettlementMethod] = useState("Cash");
 
@@ -252,31 +252,9 @@ function Booking() {
     setLoading(false);
   };
 
-  const fetchBookingSettings = async () => {
-    const { data, error } = await supabase
-      .from("booking_settings")
-      .select("qris_mdr_percentage")
-      .eq("id", 1)
-      .maybeSingle();
-
-    if (error) {
-      console.error("BOOKING SETTINGS FETCH ERROR:", error);
-      return;
-    }
-
-    const value = Number(data?.qris_mdr_percentage);
-
-    if (!Number.isNaN(value) && value >= 0) {
-      setMdrPercentage(value);
-      setMdrSettingInput(String(value));
-    }
-  };
-
   useEffect(() => {
     fetchBookings();
-    fetchBookingSettings();
   }, []);
-
 
   /* =========================================================
      PERIOD FILTER + SHARE LINK
@@ -902,8 +880,7 @@ function Booking() {
       if (paidAmount > 0) {
         const mdr = calculateMdr(
           paidAmount,
-          form.paymentMethod,
-          mdrPercentage
+          form.paymentMethod
         );
 
         const { data: transactionData, error: transactionError } = await supabase
@@ -1046,8 +1023,7 @@ function Booking() {
 
     const mdr = calculateMdr(
       remaining,
-      settlementMethod,
-      mdrPercentage
+      settlementMethod
     );
 
     let transactionData = null;
@@ -1145,56 +1121,6 @@ function Booking() {
       setErrorMessage(`Gagal memproses pelunasan: ${error.message}`);
       setSaving(false);
     }
-  };
-
-
-  /* =========================================================
-     SETTINGS
-  ========================================================= */
-
-  const openSettingsModal = () => {
-    setMdrSettingInput(String(mdrPercentage));
-    setErrorMessage("");
-    setShowSettings(true);
-  };
-
-  const closeSettingsModal = () => {
-    if (saving) return;
-    setShowSettings(false);
-    setErrorMessage("");
-  };
-
-  const saveBookingSettings = async () => {
-    const value = Number(mdrSettingInput);
-
-    if (Number.isNaN(value) || value < 0 || value > 100) {
-      setErrorMessage("QRIS MDR harus berada di antara 0% sampai 100%.");
-      return;
-    }
-
-    setSaving(true);
-
-    const { error } = await supabase
-      .from("booking_settings")
-      .upsert(
-        {
-          id: 1,
-          qris_mdr_percentage: value,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "id" }
-      );
-
-    if (error) {
-      console.error("BOOKING SETTINGS SAVE ERROR:", error);
-      setErrorMessage(`Gagal menyimpan MDR: ${error.message}`);
-      setSaving(false);
-      return;
-    }
-
-    setMdrPercentage(value);
-    setSaving(false);
-    closeSettingsModal();
   };
 
 
@@ -1401,8 +1327,7 @@ function Booking() {
   const addRemaining = Math.max(addPackagePrice - addPayment, 0);
   const addMdr = calculateMdr(
     addPayment,
-    form.paymentMethod,
-    mdrPercentage
+    form.paymentMethod
   );
 
   const settlementRemaining = payingBooking
@@ -1415,8 +1340,7 @@ function Booking() {
 
   const settlementMdr = calculateMdr(
     settlementRemaining,
-    settlementMethod,
-    mdrPercentage
+    settlementMethod
   );
 
 
@@ -1542,18 +1466,6 @@ function Booking() {
               {shareCopied ? "Copied" : "Share"}
             </button>
 
-            {canManageSettings && (
-              <button
-                type="button"
-                className="booking-settings-button"
-                onClick={openSettingsModal}
-                aria-label="Booking settings"
-                title="Booking Settings"
-              >
-                ⚙
-              </button>
-            )}
-
             <button
               type="button"
               className="booking-add-button"
@@ -1564,7 +1476,7 @@ function Booking() {
           </div>
         </div>
 
-        {errorMessage && !showForm && !showPayment && !showSettings && (
+        {errorMessage && !showForm && !showPayment && (
           <div className="booking-error">{errorMessage}</div>
         )}
 
@@ -1949,7 +1861,7 @@ function Booking() {
                     <span>MDR</span>
                     <strong>
                       {form.paymentMethod === "QRIS" && addPayment > 0
-                        ? `${mdrPercentage}% · ${formatCurrency(addMdr.mdrAmount)}`
+                        ? `${addMdr.percentage}% · ${formatCurrency(addMdr.mdrAmount)}`
                         : "Rp 0"}
                     </strong>
                   </div>
@@ -2259,7 +2171,7 @@ function Booking() {
                 <span>MDR</span>
                 <strong>
                   {settlementMethod === "QRIS"
-                    ? `${mdrPercentage}% · ${formatCurrency(settlementMdr.mdrAmount)}`
+                    ? `${settlementMdr.percentage}% · ${formatCurrency(settlementMdr.mdrAmount)}`
                     : "Rp 0"}
                 </strong>
               </div>
@@ -2296,78 +2208,7 @@ function Booking() {
       )}
 
 
-      {/* =====================================================
-          SETTINGS MODAL
-      ===================================================== */}
 
-      {showSettings && (
-        <div
-          className="booking-overlay"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              closeSettingsModal();
-            }
-          }}
-        >
-          <div className="booking-settings-modal">
-            <div className="booking-form-header">
-              <div>
-                <div className="booking-form-kicker">BOOKING SETTINGS</div>
-                <h2>Payment Settings</h2>
-                <p>QRIS fee used for all booking payments.</p>
-              </div>
-
-              <button
-                type="button"
-                className="booking-close"
-                onClick={closeSettingsModal}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="booking-field">
-              <label>QRIS MDR (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                value={mdrSettingInput}
-                onChange={(event) => setMdrSettingInput(event.target.value)}
-              />
-            </div>
-
-            <div className="booking-settings-note">
-              Contoh: 0.7 berarti MDR QRIS sebesar 0.7% dari gross payment.
-              Cash selalu menggunakan MDR 0%.
-            </div>
-
-            {errorMessage && (
-              <div className="booking-form-error">{errorMessage}</div>
-            )}
-
-            <div className="booking-form-footer">
-              <button
-                type="button"
-                className="booking-cancel"
-                onClick={closeSettingsModal}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                className="booking-save"
-                onClick={saveBookingSettings}
-                disabled={saving}
-              >
-                {saving ? "Saving..." : "Save Setting"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -130,7 +130,6 @@ const defaultDistributions = [
 ];
 
 const defaultSettings = {
-  qris_mdr_percentage: 0,
   additional_expenses: [],
   bep_percentage: 20,
   distributions: defaultDistributions,
@@ -144,8 +143,6 @@ function normalizeSettings(rawSettings) {
     : [];
 
   return {
-    qris_mdr_percentage: Number(raw.qris_mdr_percentage || 0),
-
     additional_expenses: additionalExpenses.map((item, index) => ({
       id: item.id || `additional-${index}-${Date.now()}`,
       name: item.name || "",
@@ -460,9 +457,13 @@ function Bookkeeping() {
      TRANSACTION NET REVENUE
 
      Transactions is the financial source of truth.
-     MDR is recorded when each payment is created, so
-     Bookkeeping must not recalculate historical MDR using
-     the current QRIS setting.
+     MDR is recorded when each payment is created.
+     Fixed transaction rule:
+     - QRIS <= Rp500.000: 0%
+     - QRIS > Rp500.000: 0.3%
+     - Cash: 0%
+     Bookkeeping reads the stored transaction values and does
+     not recalculate MDR from a configurable setting.
   ======================================================= */
 
   const qrisMdrAmount =
@@ -795,13 +796,6 @@ function Bookkeeping() {
           )}`;
 
         const settingsData = {
-
-          qris_mdr_percentage:
-            Number(
-              settings
-                .qris_mdr_percentage ||
-                0
-            ),
 
           additional_expenses:
             settings
@@ -1533,11 +1527,7 @@ td {
         QRIS MDR
 
         <span class="muted">
-          (${Number(
-            revenueSummary
-              .qris_mdr_percentage ||
-            0
-          )}%)
+          (0% ≤ Rp500.000 · 0.3% &gt; Rp500.000)
         </span>
 
       </span>
@@ -1859,23 +1849,6 @@ td {
 
 
       <main className="bookkeeping-main">
-
-
-        <div className="bookkeeping-page-header">
-
-          <div>
-
-            <div className="bookkeeping-page-eyebrow">
-              PLUNO STUDIO / FINANCE
-            </div>
-
-            <h1>
-              Bookkeeping Report
-            </h1>
-
-          </div>
-
-        </div>
 
 
         {/* =================================================
@@ -2481,62 +2454,6 @@ td {
                       )
 
                   )}
-
-                </div>
-
-              </div>
-
-
-              {/* =================================================
-                  PAYMENT PROCESSING
-              ================================================= */}
-
-              <div className="bookkeeping-settings-section">
-
-                <div className="bookkeeping-settings-title">
-
-                  <span>
-                    PAYMENT PROCESSING
-                  </span>
-
-                  <h3>
-                    QRIS MDR
-                  </h3>
-
-                </div>
-
-
-                <div className="bookkeeping-field">
-
-                  <label>
-                    QRIS MDR PERCENTAGE
-                  </label>
-
-
-                  <div className="bookkeeping-input-suffix">
-
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.01"
-                      name="qris_mdr_percentage"
-                      value={
-                        settings
-                          .qris_mdr_percentage
-                      }
-                      onChange={
-                        handlePercentageSettingChange
-                      }
-                      placeholder="0"
-                    />
-
-
-                    <span>
-                      %
-                    </span>
-
-                  </div>
 
                 </div>
 
