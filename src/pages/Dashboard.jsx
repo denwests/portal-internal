@@ -185,6 +185,18 @@ function Dashboard() {
   );
 
 
+  const [
+    selectedScheduleDay,
+    setSelectedScheduleDay,
+  ] = useState(null);
+
+
+  const [
+    selectedScheduleBooking,
+    setSelectedScheduleBooking,
+  ] = useState(null);
+
+
   /* =======================================================
      MONTH NAMES
   ======================================================= */
@@ -1089,6 +1101,34 @@ function Dashboard() {
   };
 
 
+  const selectedScheduleBookings =
+    selectedScheduleDay
+      ? getBookingsForDay(selectedScheduleDay)
+      : [];
+
+
+  const formatScheduleDate = (day) => {
+
+    if (!day) {
+      return "-";
+    }
+
+    return new Date(
+      calendarYear,
+      calendarMonth,
+      day
+    ).toLocaleDateString(
+      "id-ID",
+      {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }
+    );
+
+  };
+
+
   /* =======================================================
      CALENDAR NAVIGATION
   ======================================================= */
@@ -1810,7 +1850,26 @@ function Dashboard() {
                           dayBookings.length
                             ? "has-booking"
                             : ""
+                        } ${
+                          day
+                            ? "calendar-day-clickable"
+                            : ""
                         }`}
+                        role={day ? "button" : undefined}
+                        tabIndex={day ? 0 : undefined}
+                        onClick={() => {
+                          if (!day) return;
+                          setSelectedScheduleDay(day);
+                          setSelectedScheduleBooking(null);
+                        }}
+                        onKeyDown={(event) => {
+                          if (!day) return;
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setSelectedScheduleDay(day);
+                            setSelectedScheduleBooking(null);
+                          }
+                        }}
                       >
 
                         {day && (
@@ -1901,6 +1960,130 @@ function Dashboard() {
           </div>
 
         </section>
+
+
+        {/* =================================================
+            BOOKING SCHEDULE DAY MODAL
+        ================================================= */}
+
+        {selectedScheduleDay && (
+
+          <div
+            className="dashboard-schedule-overlay"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                setSelectedScheduleDay(null);
+                setSelectedScheduleBooking(null);
+              }
+            }}
+          >
+
+            <div className="dashboard-schedule-modal">
+
+              <div className="dashboard-schedule-modal-header">
+
+                <div>
+                  <div className="dashboard-card-kicker">
+                    BOOKING SCHEDULE
+                  </div>
+                  <h3>{formatScheduleDate(selectedScheduleDay)}</h3>
+                </div>
+
+                <button
+                  type="button"
+                  className="dashboard-schedule-close"
+                  onClick={() => {
+                    setSelectedScheduleDay(null);
+                    setSelectedScheduleBooking(null);
+                  }}
+                  aria-label="Close booking schedule"
+                >
+                  ×
+                </button>
+
+              </div>
+
+              {!selectedScheduleBooking ? (
+
+                <div className="dashboard-schedule-list">
+
+                  {selectedScheduleBookings.length === 0 ? (
+                    <div className="dashboard-schedule-empty">
+                      No booking on this date.
+                    </div>
+                  ) : (
+                    selectedScheduleBookings.map((booking, index) => (
+                      <div
+                        className="dashboard-schedule-row"
+                        key={booking.id || index}
+                      >
+                        <div className="dashboard-schedule-copy">
+                          <strong>{booking.customer_name || "Unnamed Customer"}</strong>
+                          <span>{booking.package || "Booking"}</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setSelectedScheduleBooking(booking)}
+                        >
+                          View
+                        </button>
+                      </div>
+                    ))
+                  )}
+
+                </div>
+
+              ) : (
+
+                <div className="dashboard-schedule-detail">
+
+                  <div className="dashboard-schedule-detail-grid">
+                    <div>
+                      <span>CUSTOMER</span>
+                      <strong>{selectedScheduleBooking.customer_name || "-"}</strong>
+                    </div>
+                    <div>
+                      <span>PACKAGE</span>
+                      <strong>{selectedScheduleBooking.package || "-"}</strong>
+                    </div>
+                    <div>
+                      <span>TIME</span>
+                      <strong>
+                        {selectedScheduleBooking.start_time
+                          ? selectedScheduleBooking.start_time.substring(0, 5)
+                          : "-"}
+                      </strong>
+                    </div>
+                    <div>
+                      <span>STATUS</span>
+                      <strong>{selectedScheduleBooking.status || "-"}</strong>
+                    </div>
+                  </div>
+
+                  <div className="dashboard-schedule-notes">
+                    <span>DESCRIPTION</span>
+                    <p>{selectedScheduleBooking.notes || "No description."}</p>
+                  </div>
+
+                  <div className="dashboard-schedule-detail-footer">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedScheduleBooking(null)}
+                    >
+                      Back
+                    </button>
+                  </div>
+
+                </div>
+
+              )}
+
+            </div>
+
+          </div>
+
+        )}
 
 
         {/* =================================================

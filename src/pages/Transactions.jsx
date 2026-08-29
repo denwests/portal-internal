@@ -976,6 +976,12 @@ function Transactions() {
                 type="button"
                 className="transactions-pdf-button"
                 onClick={handleDownloadPDF}
+                disabled={loading || filteredTransactions.length === 0}
+                title={
+                  filteredTransactions.length === 0
+                    ? "Tidak ada data untuk diekspor"
+                    : "Download transaction PDF"
+                }
               >
                 Download PDF
               </button>
@@ -1002,14 +1008,24 @@ function Transactions() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="10" className="transactions-empty">
-                      Loading transactions...
+                    <td
+                      colSpan="10"
+                      className="transactions-empty table-empty-cell"
+                    >
+                      <span className="table-empty-viewport">
+                        Loading transactions...
+                      </span>
                     </td>
                   </tr>
                 ) : filteredTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan="10" className="transactions-empty">
-                      No transactions found.
+                    <td
+                      colSpan="10"
+                      className="transactions-empty table-empty-cell"
+                    >
+                      <span className="table-empty-viewport">
+                        No transactions found.
+                      </span>
                     </td>
                   </tr>
                 ) : (

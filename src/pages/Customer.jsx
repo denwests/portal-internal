@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
 import "./Customer.css";
@@ -19,6 +21,22 @@ function formatRupiah(value) {
   }
 
   return `Rp ${number.toLocaleString("id-ID")}`;
+}
+
+function calculateMdr(amount, paymentMethod) {
+  const gross = Number(amount || 0);
+  const percentage = paymentMethod === "QRIS" && gross > 500000 ? 0.3 : 0;
+  const mdrAmount = Math.round(gross * (percentage / 100));
+
+  return {
+    percentage,
+    mdrAmount,
+    netAmount: gross - mdrAmount,
+  };
+}
+
+function maskMoney() {
+  return "••••••";
 }
 
 /* =========================================================
@@ -106,6 +124,13 @@ function convertToDatabase(customer) {
 ========================================================= */
 
 function Customer() {
+  const employeeRole =
+    localStorage.getItem("employeeRole") || "Staff";
+
+  const isStaff = employeeRole === "Staff";
+  const canManageCustomer =
+    employeeRole === "Founder" || employeeRole === "Administrator";
+
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -130,6 +155,7 @@ function Customer() {
     packagePrice: "",
     addon: "",
     addonNote: "",
+    addonPaymentMethod: "Cash",
     status: "Proses",
   });
 
@@ -172,11 +198,7 @@ function Customer() {
     setErrorMessage("");
 
     const { data, error } = await supabase
-      .from("customers")
-      .select("*")
-      .order("date", {
-        ascending: false,
-      });
+      .rpc("get_customer_list_for_current_user");
 
     if (error) {
       console.error("CUSTOMER FETCH ERROR:", error);
@@ -202,46 +224,19 @@ function Customer() {
      YEAR
   ========================================================= */
 
-  const customerYears = [
-    ...new Set(
-      customers
-        .filter((customer) => customer.date)
-        .map((customer) => customer.date.slice(0, 4))
-    ),
-  ].sort().reverse();
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from(
+    { length: 11 },
+    (_, index) => String(currentYear - 5 + index)
+  );
 
-  const activeYear = customerYears.includes(selectedYear)
-    ? selectedYear
-    : customerYears[0] || selectedYear;
+  const activeYear = selectedYear;
 
   /* =========================================================
      MONTH
   ========================================================= */
 
-  const customerMonths = [
-    ...new Set(
-      customers
-        .filter(
-          (customer) =>
-            customer.date &&
-            customer.date.slice(0, 4) === activeYear
-        )
-        .map((customer) => customer.date.slice(5, 7))
-    ),
-  ].sort();
-
-  useEffect(() => {
-    if (
-      customerMonths.length > 0 &&
-      !customerMonths.includes(selectedMonth)
-    ) {
-      setSelectedMonth(customerMonths[0]);
-    }
-  }, [activeYear, customerMonths.join(",")]);
-
-  const activeMonth = customerMonths.includes(selectedMonth)
-    ? selectedMonth
-    : customerMonths[0] || selectedMonth;
+  const activeMonth = selectedMonth;
 
   /* =========================================================
      FILTER
@@ -274,7 +269,63 @@ function Customer() {
   ========================================================= */
 
   const handleDownloadPDF = () => {
-    window.print();
+    if (filteredCustomers.length === 0) {
+      setErrorMessage(
+        `Tidak ada customer untuk ${
+          monthNamesIndonesia[Number(activeMonth) - 1]
+        } ${activeYear}.`
+      );
+      return;
+    }
+
+    setErrorMessage("");
+
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text("PLUNO INTERNAL SYSTEM", 14, 14);
+
+    doc.setFontSize(20);
+    doc.setTextColor(30, 30, 30);
+    doc.text("Customer List", 14, 24);
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text(
+      `${monthNamesIndonesia[Number(activeMonth) - 1]} ${activeYear}`,
+      14,
+      31
+    );
+
+    autoTable(doc, {
+      startY: 40,
+      head: [["Customer", "Package", "Date", "Total", "Status"]],
+      body: filteredCustomers.map((customer) => [
+        customer.name || "-",
+        customer.package || "-",
+        formatDate(customer.date),
+        formatRupiah(getGrandTotal(customer)),
+        customer.status || "-",
+      ]),
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [25, 25, 25],
+        textColor: [235, 235, 235],
+        fontStyle: "normal",
+      },
+    });
+
+    doc.save(`customers-${activeYear}-${activeMonth}.pdf`);
   };
 
   /* =========================================================
@@ -282,6 +333,8 @@ function Customer() {
   ========================================================= */
 
   const openAddForm = () => {
+    if (!canManageCustomer) return;
+
     setFormData({
       name: "",
       phone: "",
@@ -290,6 +343,7 @@ function Customer() {
       packagePrice: "",
       addon: "",
       addonNote: "",
+      addonPaymentMethod: "Cash",
       status: "Proses",
     });
 
@@ -302,7 +356,22 @@ function Customer() {
      EDIT
   ========================================================= */
 
-  const openEditForm = (customer) => {
+  const openEditForm = async (customer) => {
+    if (!canManageCustomer) return;
+
+    let addonPaymentMethod = "Cash";
+
+    const { data: addonTransaction } = await supabase
+      .from("transactions")
+      .select("payment_method")
+      .eq("source_type", "customer_addon")
+      .eq("source_key", String(customer.id))
+      .maybeSingle();
+
+    if (addonTransaction?.payment_method) {
+      addonPaymentMethod = addonTransaction.payment_method;
+    }
+
     setFormData({
       name: customer.name,
       phone: customer.phone,
@@ -311,6 +380,7 @@ function Customer() {
       packagePrice: customer.packagePrice,
       addon: customer.addon,
       addonNote: customer.addonNote,
+      addonPaymentMethod,
       status: customer.status,
     });
 
@@ -366,11 +436,98 @@ function Customer() {
   };
 
   /* =========================================================
+     ADD-ON → TRANSACTIONS
+     Satu customer hanya memiliki satu transaksi add-on aktif.
+  ========================================================= */
+
+  const syncAddonTransaction = async (
+    customer,
+    addonAmount,
+    paymentMethod,
+    addonNote
+  ) => {
+    if (!customer?.id) return;
+
+    const sourceKey = String(customer.id);
+
+    const { data: existing, error: lookupError } = await supabase
+      .from("transactions")
+      .select("id, transaction_date, amount, payment_method, information")
+      .eq("source_type", "customer_addon")
+      .eq("source_key", sourceKey)
+      .maybeSingle();
+
+    if (lookupError) throw lookupError;
+
+    if (Number(addonAmount || 0) <= 0) {
+      if (existing?.id) {
+        const { error: deleteError } = await supabase
+          .from("transactions")
+          .delete()
+          .eq("id", existing.id);
+        if (deleteError) throw deleteError;
+      }
+      return;
+    }
+
+    const method = paymentMethod === "QRIS" ? "QRIS" : "Cash";
+    const mdr = calculateMdr(addonAmount, method);
+    const cleanInformation =
+      addonNote?.trim() || "Auto generated from Customer Data add-on";
+
+    const addOnChanged =
+      !existing ||
+      Number(existing.amount || 0) !== Number(addonAmount || 0) ||
+      String(existing.payment_method || "Cash") !== method ||
+      String(existing.information || "") !== cleanInformation;
+
+    const payload = {
+      transaction_date:
+        addOnChanged || !existing?.transaction_date
+          ? new Date().toISOString().slice(0, 10)
+          : existing.transaction_date,
+      customer: customer.name || "",
+      payment_type: "Add-on",
+      description: `${customer.package || "Package"} · Add-on`,
+      amount: Number(addonAmount || 0),
+      payment_method: method,
+      mdr_percentage: mdr.percentage,
+      mdr_amount: mdr.mdrAmount,
+      net_amount: mdr.netAmount,
+      information: cleanInformation,
+      booking_id: null,
+      customer_id: sourceKey,
+      source_type: "customer_addon",
+      source_key: sourceKey,
+    };
+
+    if (existing?.id) {
+      const { error: updateError } = await supabase
+        .from("transactions")
+        .update(payload)
+        .eq("id", existing.id);
+      if (updateError) throw updateError;
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from("transactions")
+      .insert([payload]);
+    if (insertError) throw insertError;
+  };
+
+  /* =========================================================
      SUBMIT
   ========================================================= */
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!canManageCustomer) {
+      setErrorMessage("Staff hanya memiliki akses View pada Customer Data.");
+      return;
+    }
+
     setErrorMessage("");
 
     const { data: sessionData, error: sessionError } =
@@ -421,6 +578,27 @@ function Customer() {
 
       const updatedCustomer = convertFromDatabase(data);
 
+      try {
+        await syncAddonTransaction(
+          updatedCustomer,
+          Number(formData.addon || 0),
+          formData.addonPaymentMethod,
+          formData.addonNote
+        );
+      } catch (transactionError) {
+        console.error("ADD-ON TRANSACTION SYNC ERROR:", transactionError);
+
+        await supabase
+          .from("customers")
+          .update(convertToDatabase(selectedCustomer))
+          .eq("id", selectedCustomer.id);
+
+        setErrorMessage(
+          `Customer tidak disimpan karena transaksi add-on gagal: ${transactionError.message}`
+        );
+        return;
+      }
+
       setCustomers((current) =>
         current.map((customer) =>
           customer.id === selectedCustomer.id
@@ -459,6 +637,27 @@ function Customer() {
 
     const newCustomer = convertFromDatabase(data);
 
+    try {
+      await syncAddonTransaction(
+        newCustomer,
+        Number(formData.addon || 0),
+        formData.addonPaymentMethod,
+        formData.addonNote
+      );
+    } catch (transactionError) {
+      console.error("ADD-ON TRANSACTION CREATE ERROR:", transactionError);
+
+      await supabase
+        .from("customers")
+        .delete()
+        .eq("id", newCustomer.id);
+
+      setErrorMessage(
+        `Customer dibatalkan karena transaksi add-on gagal: ${transactionError.message}`
+      );
+      return;
+    }
+
     setCustomers((current) => [...current, newCustomer]);
 
     if (newCustomer.date) {
@@ -474,6 +673,8 @@ function Customer() {
   ========================================================= */
 
   const deleteCustomer = async (customer) => {
+    if (!canManageCustomer) return;
+
     const confirmed = window.confirm(
       `Hapus customer "${customer.name}"?`
     );
@@ -481,6 +682,19 @@ function Customer() {
     if (!confirmed) return;
 
     setErrorMessage("");
+
+    const { error: addonDeleteError } = await supabase
+      .from("transactions")
+      .delete()
+      .eq("source_type", "customer_addon")
+      .eq("source_key", String(customer.id));
+
+    if (addonDeleteError) {
+      setErrorMessage(
+        `Gagal menghapus transaksi add-on: ${addonDeleteError.message}`
+      );
+      return;
+    }
 
     const { error } = await supabase
       .from("customers")
@@ -529,17 +743,16 @@ function Customer() {
               onChange={(event) =>
                 setSelectedMonth(event.target.value)
               }
-              disabled={customerMonths.length === 0}
             >
-              {customerMonths.length === 0 ? (
-                <option value="">No Data</option>
-              ) : (
-                customerMonths.map((month) => (
-                  <option key={month} value={month}>
-                    {monthNames[Number(month) - 1]}
+              {monthNames.map((month, index) => {
+                const value = String(index + 1).padStart(2, "0");
+
+                return (
+                  <option key={month} value={value}>
+                    {month}
                   </option>
-                ))
-              )}
+                );
+              })}
             </select>
 
             <select
@@ -547,17 +760,12 @@ function Customer() {
               onChange={(event) =>
                 setSelectedYear(event.target.value)
               }
-              disabled={customerYears.length === 0}
             >
-              {customerYears.length === 0 ? (
-                <option value="">No Data</option>
-              ) : (
-                customerYears.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))
-              )}
+              {yearOptions.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -596,7 +804,7 @@ function Customer() {
             <div className="customer-stat-value">
               {loading
                 ? "..."
-                : formatRupiah(totalRevenue)}
+                : isStaff ? maskMoney() : formatRupiah(totalRevenue)}
             </div>
 
             <div className="customer-stat-note">
@@ -635,23 +843,31 @@ function Customer() {
                 />
               </div>
 
-              <div className="customer-header-actions">
-                <button
-                  type="button"
-                  className="customer-pdf-button"
-                  onClick={handleDownloadPDF}
-                >
-                  Download PDF
-                </button>
+              {canManageCustomer && (
+                <div className="customer-header-actions">
+                  <button
+                    type="button"
+                    className="customer-pdf-button"
+                    onClick={handleDownloadPDF}
+                    disabled={loading || filteredCustomers.length === 0}
+                    title={
+                      filteredCustomers.length === 0
+                        ? "Tidak ada data untuk diekspor"
+                        : "Download customer PDF"
+                    }
+                  >
+                    Download PDF
+                  </button>
 
-                <button
-                  type="button"
-                  className="add-customer-button"
-                  onClick={openAddForm}
-                >
-                  Add
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    className="add-customer-button"
+                    onClick={openAddForm}
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -673,22 +889,26 @@ function Customer() {
                   <tr>
                     <td
                       colSpan="6"
-                      className="empty-customer"
+                      className="empty-customer table-empty-cell"
                     >
-                      Loading customer...
+                      <span className="table-empty-viewport">
+                        Loading customer...
+                      </span>
                     </td>
                   </tr>
                 ) : filteredCustomers.length === 0 ? (
                   <tr>
                     <td
                       colSpan="6"
-                      className="empty-customer"
+                      className="empty-customer table-empty-cell"
                     >
-                      Tidak ada customer pada{" "}
-                      {monthNamesIndonesia[
-                        Number(activeMonth) - 1
-                      ] || "-"}{" "}
-                      {activeYear}.
+                      <span className="table-empty-viewport">
+                        Tidak ada customer pada{" "}
+                        {monthNamesIndonesia[
+                          Number(activeMonth) - 1
+                        ] || "-"}{" "}
+                        {activeYear}.
+                      </span>
                     </td>
                   </tr>
                 ) : (
@@ -713,9 +933,9 @@ function Customer() {
                       </td>
 
                       <td className="customer-total">
-                        {formatRupiah(
-                          getGrandTotal(customer)
-                        )}
+                        {isStaff
+                          ? maskMoney()
+                          : formatRupiah(getGrandTotal(customer))}
                       </td>
 
                       <td>
@@ -743,14 +963,16 @@ function Customer() {
                             View
                           </button>
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              openEditForm(customer)
-                            }
-                          >
-                            Edit
-                          </button>
+                          {canManageCustomer && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openEditForm(customer)
+                              }
+                            >
+                              Edit
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -923,6 +1145,19 @@ function Customer() {
                     </div>
 
                     <div className="customer-field">
+                      <label>ADD-ON PAYMENT METHOD</label>
+
+                      <select
+                        name="addonPaymentMethod"
+                        value={formData.addonPaymentMethod}
+                        onChange={handleChange}
+                      >
+                        <option value="Cash">Cash</option>
+                        <option value="QRIS">QRIS</option>
+                      </select>
+                    </div>
+
+                    <div className="customer-field">
                       <label>
                         ADD-ON INFORMATION
                       </label>
@@ -1055,9 +1290,9 @@ function Customer() {
                 <span>PACKAGE PRICE</span>
 
                 <strong>
-                  {formatRupiah(
-                    selectedCustomer.packagePrice
-                  )}
+                  {isStaff
+                    ? maskMoney()
+                    : formatRupiah(selectedCustomer.packagePrice)}
                 </strong>
               </div>
 
@@ -1065,9 +1300,9 @@ function Customer() {
                 <span>ADD-ON</span>
 
                 <strong>
-                  {formatRupiah(
-                    selectedCustomer.addon
-                  )}
+                  {isStaff
+                    ? maskMoney()
+                    : formatRupiah(selectedCustomer.addon)}
                 </strong>
               </div>
 
@@ -1083,11 +1318,9 @@ function Customer() {
                 <span>GRAND TOTAL</span>
 
                 <strong>
-                  {formatRupiah(
-                    getGrandTotal(
-                      selectedCustomer
-                    )
-                  )}
+                  {isStaff
+                    ? maskMoney()
+                    : formatRupiah(getGrandTotal(selectedCustomer))}
                 </strong>
               </div>
 
@@ -1109,15 +1342,17 @@ function Customer() {
                 Close
               </button>
 
-              <button
-                type="button"
-                className="customer-save"
-                onClick={() =>
-                  openEditForm(selectedCustomer)
-                }
-              >
-                Edit Customer
-              </button>
+              {canManageCustomer && (
+                <button
+                  type="button"
+                  className="customer-save"
+                  onClick={() =>
+                    openEditForm(selectedCustomer)
+                  }
+                >
+                  Edit Customer
+                </button>
+              )}
             </div>
           </div>
         </div>

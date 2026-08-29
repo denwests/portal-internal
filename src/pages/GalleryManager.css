@@ -481,3 +481,112 @@ body {
     overflow-y: auto;
   }
 }
+
+/* =========================================================
+   TARGETED E2E — GALLERY RETENTION + COMPACT MOBILE
+========================================================= */
+.gallery-manager-eyebrow {
+  font-size: 9px;
+  line-height: 1.2;
+  letter-spacing: 1.8px;
+}
+
+.gallery-table th {
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.gallery-table td,
+.gallery-client-name {
+  font-size: 12px;
+}
+
+.gallery-slug,
+.table-ellipsis {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gallery-retention-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 700px) {
+  .gallery-manager-main {
+    width: 100%;
+    min-width: 0;
+    padding: 70px 14px 20px;
+  }
+
+  .gallery-list-card,
+  .gallery-table-scroll {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .gallery-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .gallery-table-e2e {
+    width: 780px;
+    min-width: 780px;
+    table-layout: fixed;
+  }
+
+  .gallery-table-e2e th,
+  .gallery-table-e2e td {
+    padding: 10px 8px;
+  }
+
+  .gallery-table-e2e th { font-size: 8.5px; }
+  .gallery-table-e2e td,
+  .gallery-client-name { font-size: 10.5px; }
+
+  .gallery-table-e2e th:nth-child(4),
+  .gallery-table-e2e td:nth-child(4) {
+    display: none;
+  }
+
+  .gallery-row-actions {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .gallery-row-actions button {
+    min-width: 0;
+    min-height: 29px;
+    padding: 0 5px;
+    font-size: 8px;
+  }
+
+  .gallery-retention-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-manager-header-actions {
+    flex-direction: row;
+  }
+
+  .gallery-manager-header-actions button {
+    width: auto;
+    min-width: 0;
+    padding: 0 10px;
+    font-size: 9px;
+  }
+
+  .gallery-retention-grid {
+    grid-template-columns: 1fr;
+  }
+}

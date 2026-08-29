@@ -1629,3 +1629,122 @@ body {
     width: 14%;
   }
 }
+
+/* =========================================================
+   TARGETED E2E — COMPACT SPENDING CONTENT
+   Keep title on the left and Download PDF / Add on the right.
+========================================================= */
+.spending-card-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.spending-card-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.spending-section-actions {
+  width: auto;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+.spending-table th { font-size: 10px; }
+.spending-table td { font-size: 11.5px; }
+.spending-description,
+.money-cell { font-size: 12px; }
+.spending-information {
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spending-summary {
+  min-height: 0;
+  padding: 8px 12px;
+  justify-content: flex-end;
+}
+
+.spending-summary > div,
+.spending-summary > div:first-child {
+  width: auto;
+  min-width: 190px;
+  max-width: 260px;
+  padding: 11px 14px;
+  gap: 4px;
+}
+
+.spending-summary span { font-size: 8px; }
+.spending-summary strong { font-size: 18px; }
+
+@media (max-width: 700px) {
+  .spending-card-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .spending-card-title {
+    width: auto;
+    flex: 1 1 auto;
+  }
+
+  .spending-card-header h2 {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .spending-card-kicker { font-size: 7.5px; }
+
+  .spending-section-actions {
+    width: auto;
+    flex: 0 0 auto;
+    gap: 5px;
+  }
+
+  .spending-add-button,
+  .spending-pdf-button {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 32px;
+    height: 32px;
+    padding: 0 8px;
+    font-size: 8.5px;
+  }
+
+  .spending-table {
+    min-width: 720px;
+  }
+
+  .spending-table th,
+  .spending-table td {
+    padding: 10px 8px;
+  }
+
+  .spending-summary {
+    padding: 7px 10px;
+  }
+
+  .spending-summary > div,
+  .spending-summary > div:first-child {
+    min-width: 150px;
+    max-width: 190px;
+    padding: 9px 11px;
+  }
+
+  .spending-summary strong { font-size: 16px; }
+}
+
+.spending-pdf-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}

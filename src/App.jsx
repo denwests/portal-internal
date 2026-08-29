@@ -145,7 +145,7 @@ function App() {
 
         {/* =================================================
             CUSTOMER
-            Founder / Administrator
+            Founder / Administrator / Staff (Staff read-only masked)
         ================================================= */}
 
         <Route
@@ -154,7 +154,7 @@ function App() {
 
             <ProtectedRoute
               allowedRoles={
-                OPERATIONAL_ROLES
+                ALL_ROLES
               }
             >
 
@@ -168,7 +168,7 @@ function App() {
 
         {/* =================================================
             CLIENT GALLERY MANAGER
-            Founder / Administrator
+            Founder / Administrator / Staff
         ================================================= */}
 
         <Route
@@ -177,7 +177,7 @@ function App() {
 
             <ProtectedRoute
               allowedRoles={
-                OPERATIONAL_ROLES
+                ALL_ROLES
               }
             >
 

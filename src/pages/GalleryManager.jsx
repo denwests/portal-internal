@@ -42,6 +42,17 @@ function formatDate(value) {
   });
 }
 
+function isExpired(value) {
+  if (!value) return false;
+  return new Date(value).getTime() <= Date.now();
+}
+
+function addDays(days) {
+  return new Date(
+    Date.now() + Math.max(1, Number(days || 1)) * 24 * 60 * 60 * 1000
+  );
+}
+
 function safeFolderName(value) {
   return String(value || "")
     .replace(/[\\/:*?"<>|]/g, "-")
@@ -54,19 +65,15 @@ function createPreviewBlob(file) {
     try {
       const bitmap = await createImageBitmap(file);
       const maxDimension = 1200;
-
       const scale = Math.min(
         1,
         maxDimension / Math.max(bitmap.width, bitmap.height)
       );
-
       const width = Math.max(1, Math.round(bitmap.width * scale));
       const height = Math.max(1, Math.round(bitmap.height * scale));
-
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
-
       const context = canvas.getContext("2d");
 
       if (!context) {
@@ -93,7 +100,9 @@ function createPreviewBlob(file) {
     } catch (error) {
       reject(
         new Error(
-          `Gagal membuat preview ${file.name}: ${error.message || "format gambar tidak didukung"}`
+          `Gagal membuat preview ${file.name}: ${
+            error.message || "format gambar tidak didukung"
+          }`
         )
       );
     }
@@ -119,7 +128,8 @@ function GalleryManager() {
   const [form, setForm] = useState({
     clientName: "",
     sessionName: "",
-    expiresInDays: "30",
+    linkDays: "7",
+    storageDays: "30",
   });
 
   const fetchGalleries = async () => {
@@ -138,6 +148,10 @@ function GalleryManager() {
           drive_folder_id,
           drive_folder_url,
           expires_at,
+          link_expires_at,
+          storage_expires_at,
+          link_days,
+          storage_days,
           created_at,
           gallery_photos (
             id,
@@ -152,7 +166,7 @@ function GalleryManager() {
       console.error(error);
       setGalleries([]);
       setErrorMessage(
-        "Gagal mengambil gallery. Pastikan GALLERY_DATABASE.sql sudah dijalankan."
+        "Gagal mengambil gallery. Jalankan E2E_DATABASE_PATCH.sql terlebih dahulu."
       );
       setLoading(false);
       return;
@@ -174,9 +188,15 @@ function GalleryManager() {
           (sum, photo) => sum + Number(photo.size_bytes || 0),
           0
         );
+        const linkExpiresAt = gallery.link_expires_at || gallery.expires_at;
+        const storageExpired = isExpired(gallery.storage_expires_at);
+        const linkExpired = isExpired(linkExpiresAt);
 
         return {
           ...gallery,
+          linkExpiresAt,
+          storageExpired,
+          linkExpired,
           photoCount: photos.length,
           sizeBytes: size,
         };
@@ -206,17 +226,77 @@ function GalleryManager() {
   );
 
   const totalActive = normalizedGalleries.filter(
-    (gallery) => gallery.status === "active"
+    (gallery) =>
+      gallery.status === "active" &&
+      !gallery.linkExpired &&
+      !gallery.storageExpired
   ).length;
+
+  const removeGalleryStorage = async (gallery, token) => {
+    if (gallery.drive_folder_id) {
+      await deleteDriveItem(gallery.drive_folder_id, token);
+    }
+
+    const previewPaths = (gallery.gallery_photos || [])
+      .map((photo) => photo.preview_path)
+      .filter(Boolean);
+
+    if (previewPaths.length > 0) {
+      const { error: previewDeleteError } = await supabase.storage
+        .from("gallery-previews")
+        .remove(previewPaths);
+
+      if (previewDeleteError) {
+        throw previewDeleteError;
+      }
+    }
+
+    const { error: deleteError } = await supabase
+      .from("galleries")
+      .delete()
+      .eq("id", gallery.id);
+
+    if (deleteError) throw deleteError;
+  };
+
+  const cleanupExpiredGalleries = async (token) => {
+    const expired = normalizedGalleries.filter(
+      (gallery) => gallery.storageExpired
+    );
+
+    if (expired.length === 0) return 0;
+
+    let deleted = 0;
+
+    for (const gallery of expired) {
+      try {
+        await removeGalleryStorage(gallery, token);
+        deleted += 1;
+      } catch (error) {
+        console.error("EXPIRED GALLERY CLEANUP ERROR:", gallery.id, error);
+      }
+    }
+
+    if (deleted > 0) {
+      await fetchGalleries();
+    }
+
+    return deleted;
+  };
 
   const connectGoogleDrive = async () => {
     setErrorMessage("");
     setSuccessMessage("");
 
     try {
-      await requestDriveAccess();
+      const token = await requestDriveAccess();
       setDriveConnected(true);
-      setSuccessMessage("Google Drive terhubung untuk sesi ini.");
+      const cleaned = await cleanupExpiredGalleries(token);
+      setSuccessMessage(
+        cleaned > 0
+          ? `Google Drive terhubung. ${cleaned} gallery dengan storage expired dibersihkan.`
+          : "Google Drive terhubung untuk sesi ini."
+      );
     } catch (error) {
       console.error(error);
       setDriveConnected(false);
@@ -234,11 +314,20 @@ function GalleryManager() {
       return;
     }
 
+    const linkDays = Math.max(1, Number(form.linkDays || 7));
+    const storageDays = Math.max(1, Number(form.storageDays || 30));
+
+    if (storageDays < linkDays) {
+      setErrorMessage(
+        "Masa storage harus sama atau lebih lama daripada masa aktif link."
+      );
+      return;
+    }
+
     setSaving(true);
 
-    const days = Math.max(1, Number(form.expiresInDays || 30));
-    const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
-
+    const linkExpiresAt = addDays(linkDays);
+    const storageExpiresAt = addDays(storageDays);
     const { data: authData } = await supabase.auth.getUser();
 
     const { error } = await supabase.from("galleries").insert({
@@ -246,7 +335,11 @@ function GalleryManager() {
       session_name: form.sessionName.trim() || null,
       slug: makeRandomSlug(),
       status: "active",
-      expires_at: expiresAt.toISOString(),
+      expires_at: linkExpiresAt.toISOString(),
+      link_expires_at: linkExpiresAt.toISOString(),
+      storage_expires_at: storageExpiresAt.toISOString(),
+      link_days: linkDays,
+      storage_days: storageDays,
       created_by: authData?.user?.id || null,
     });
 
@@ -260,7 +353,8 @@ function GalleryManager() {
     setForm({
       clientName: "",
       sessionName: "",
-      expiresInDays: "30",
+      linkDays: "7",
+      storageDays: "30",
     });
     setShowCreate(false);
     setSaving(false);
@@ -284,6 +378,11 @@ function GalleryManager() {
   };
 
   const choosePhotos = (gallery) => {
+    if (gallery.storageExpired) {
+      setErrorMessage("Storage gallery ini sudah expired.");
+      return;
+    }
+
     setSelectedGalleryForUpload(gallery);
     fileInputRef.current?.click();
   };
@@ -301,7 +400,9 @@ function GalleryManager() {
     const today = new Date().toISOString().slice(0, 10);
     const folder = await createGalleryFolder(
       safeFolderName(
-        `PLUNO - ${gallery.client_name} - ${gallery.session_name || "Gallery"} - ${today}`
+        `PLUNO - ${gallery.client_name} - ${
+          gallery.session_name || "Gallery"
+        } - ${today}`
       ),
       token
     );
@@ -316,7 +417,9 @@ function GalleryManager() {
 
     if (error) {
       await deleteDriveItem(folder.id, token).catch(() => {});
-      throw new Error(`Folder sudah dibuat tetapi gagal disimpan: ${error.message}`);
+      throw new Error(
+        `Folder sudah dibuat tetapi gagal disimpan: ${error.message}`
+      );
     }
 
     return folder;
@@ -345,13 +448,13 @@ function GalleryManager() {
     try {
       const token = await requestDriveAccess();
       setDriveConnected(true);
+      await cleanupExpiredGalleries(token);
 
       const folder = await ensureDriveFolder(gallery, token);
       const existingPhotoCount = Number(gallery.photoCount || 0);
 
       for (let index = 0; index < files.length; index += 1) {
         const file = files[index];
-
         setUploadLabel(`${index + 1}/${files.length} · ${file.name}`);
 
         let uploadedFile = null;
@@ -371,7 +474,6 @@ function GalleryManager() {
           });
 
           const previewBlob = await createPreviewBlob(file);
-
           previewPath = `${gallery.id}/${crypto.randomUUID()}.webp`;
 
           const { error: previewError } = await supabase.storage
@@ -400,9 +502,7 @@ function GalleryManager() {
               sort_order: existingPhotoCount + index,
             });
 
-          if (photoError) {
-            throw new Error(photoError.message);
-          }
+          if (photoError) throw photoError;
         } catch (error) {
           if (previewPath) {
             await supabase.storage
@@ -420,7 +520,9 @@ function GalleryManager() {
       }
 
       setUploadProgress(100);
-      setSuccessMessage(`${files.length} foto berhasil diupload ke Google Drive.`);
+      setSuccessMessage(
+        `${files.length} foto berhasil diupload. Original di Drive, preview di Supabase.`
+      );
       await fetchGalleries();
     } catch (error) {
       console.error(error);
@@ -433,11 +535,25 @@ function GalleryManager() {
   };
 
   const toggleGalleryStatus = async (gallery) => {
+    if (gallery.storageExpired) {
+      setErrorMessage(
+        "Storage gallery sudah expired. Link tidak dapat diaktifkan kembali."
+      );
+      return;
+    }
+
     const nextStatus = gallery.status === "active" ? "disabled" : "active";
+    const updates = { status: nextStatus };
+
+    if (nextStatus === "active" && gallery.linkExpired) {
+      const nextExpiry = addDays(gallery.link_days || 7).toISOString();
+      updates.link_expires_at = nextExpiry;
+      updates.expires_at = nextExpiry;
+    }
 
     const { error } = await supabase
       .from("galleries")
-      .update({ status: nextStatus })
+      .update(updates)
       .eq("id", gallery.id);
 
     if (error) {
@@ -446,14 +562,16 @@ function GalleryManager() {
     }
 
     setSuccessMessage(
-      nextStatus === "active" ? "Gallery diaktifkan." : "Gallery dinonaktifkan."
+      nextStatus === "active"
+        ? "Guest link diaktifkan kembali."
+        : "Guest link dinonaktifkan. Storage tetap disimpan sampai masa storage habis."
     );
     await fetchGalleries();
   };
 
   const deleteGallery = async (gallery) => {
     const confirmed = window.confirm(
-      `Hapus gallery ${gallery.client_name}?\n\nFoto di folder Google Drive juga akan dihapus.`
+      `Hapus gallery ${gallery.client_name}?\n\nFolder Google Drive dan preview juga akan dihapus.`
     );
 
     if (!confirmed) return;
@@ -463,38 +581,9 @@ function GalleryManager() {
     setSuccessMessage("");
 
     try {
-      if (gallery.drive_folder_id) {
-        const token = await requestDriveAccess();
-        setDriveConnected(true);
-        await deleteDriveItem(gallery.drive_folder_id, token);
-      }
-
-      const previewPaths = (gallery.gallery_photos || [])
-        .map((photo) => photo.preview_path)
-        .filter(Boolean);
-
-      const { error } = await supabase
-        .from("galleries")
-        .delete()
-        .eq("id", gallery.id);
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (previewPaths.length > 0) {
-        const { error: previewDeleteError } = await supabase.storage
-          .from("gallery-previews")
-          .remove(previewPaths);
-
-        if (previewDeleteError) {
-          console.warn(
-            "GALLERY PREVIEW CLEANUP ERROR:",
-            previewDeleteError
-          );
-        }
-      }
-
+      const token = await requestDriveAccess();
+      setDriveConnected(true);
+      await removeGalleryStorage(gallery, token);
       setSuccessMessage("Gallery, foto Drive, dan preview berhasil dihapus.");
       await fetchGalleries();
     } catch (error) {
@@ -524,7 +613,9 @@ function GalleryManager() {
           <div className="gallery-manager-header-actions">
             <button
               type="button"
-              className={`gallery-drive-button ${driveConnected ? "connected" : ""}`}
+              className={`gallery-drive-button ${
+                driveConnected ? "connected" : ""
+              }`}
               onClick={connectGoogleDrive}
             >
               {driveConnected ? "Drive Connected" : "Connect Google Drive"}
@@ -555,7 +646,7 @@ function GalleryManager() {
             <strong>{loading ? "..." : normalizedGalleries.length}</strong>
           </div>
           <div className="gallery-stat-card">
-            <span>ACTIVE</span>
+            <span>ACTIVE LINK</span>
             <strong>{loading ? "..." : totalActive}</strong>
           </div>
           <div className="gallery-stat-card">
@@ -587,14 +678,15 @@ function GalleryManager() {
           </div>
 
           <div className="gallery-table-scroll">
-            <table className="gallery-table">
+            <table className="gallery-table gallery-table-e2e">
               <thead>
                 <tr>
                   <th>CLIENT</th>
                   <th>SESSION</th>
                   <th>PHOTOS</th>
                   <th>SIZE</th>
-                  <th>EXPIRES</th>
+                  <th>LINK</th>
+                  <th>STORAGE</th>
                   <th>STATUS</th>
                   <th>ACTION</th>
                 </tr>
@@ -603,97 +695,152 @@ function GalleryManager() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="gallery-empty">
-                      Loading gallery...
+                    <td
+                      colSpan="8"
+                      className="gallery-empty table-empty-cell"
+                    >
+                      <span className="table-empty-viewport">
+                        Loading gallery...
+                      </span>
                     </td>
                   </tr>
                 ) : filteredGalleries.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="gallery-empty">
-                      Belum ada gallery.
+                    <td
+                      colSpan="8"
+                      className="gallery-empty table-empty-cell"
+                    >
+                      <span className="table-empty-viewport">
+                        Belum ada gallery.
+                      </span>
                     </td>
                   </tr>
                 ) : (
-                  filteredGalleries.map((gallery) => (
-                    <tr key={gallery.id}>
-                      <td>
-                        <div className="gallery-client-name">
-                          {gallery.client_name}
-                        </div>
-                        <div className="gallery-slug">{gallery.slug}</div>
-                      </td>
-                      <td>{gallery.session_name || "-"}</td>
-                      <td>{gallery.photoCount}</td>
-                      <td>{formatBytes(gallery.sizeBytes)}</td>
-                      <td>{formatDate(gallery.expires_at)}</td>
-                      <td>
-                        <span className={`gallery-status ${gallery.status}`}>
-                          {gallery.status === "active" ? "Active" : "Disabled"}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="gallery-row-actions">
-                          <button
-                            type="button"
-                            onClick={() => choosePhotos(gallery)}
-                            disabled={uploadingGalleryId === gallery.id}
+                  filteredGalleries.map((gallery) => {
+                    const linkActive =
+                      gallery.status === "active" &&
+                      !gallery.linkExpired &&
+                      !gallery.storageExpired;
+
+                    return (
+                      <tr key={gallery.id}>
+                        <td data-label="Client">
+                          <div className="gallery-client-name">
+                            {gallery.client_name}
+                          </div>
+                          <div className="gallery-slug">{gallery.slug}</div>
+                        </td>
+                        <td data-label="Session">
+                          <span className="table-ellipsis">
+                            {gallery.session_name || "-"}
+                          </span>
+                        </td>
+                        <td data-label="Photos">{gallery.photoCount}</td>
+                        <td data-label="Size">{formatBytes(gallery.sizeBytes)}</td>
+                        <td data-label="Link">
+                          {formatDate(gallery.linkExpiresAt)}
+                        </td>
+                        <td data-label="Storage">
+                          {formatDate(gallery.storage_expires_at)}
+                        </td>
+                        <td data-label="Status">
+                          <span
+                            className={`gallery-status ${
+                              gallery.storageExpired
+                                ? "disabled"
+                                : linkActive
+                                ? "active"
+                                : "disabled"
+                            }`}
                           >
-                            {uploadingGalleryId === gallery.id
-                              ? `${uploadProgress}%`
-                              : "Upload"}
-                          </button>
-                          <button type="button" onClick={() => copyGuestLink(gallery)}>
-                            Copy Link
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              window.open(getGuestUrl(gallery), "_blank", "noopener,noreferrer")
-                            }
-                          >
-                            Preview
-                          </button>
-                          {gallery.drive_folder_url && (
+                            {gallery.storageExpired
+                              ? "Storage Expired"
+                              : linkActive
+                              ? "Active"
+                              : gallery.linkExpired
+                              ? "Link Expired"
+                              : "Disabled"}
+                          </span>
+                        </td>
+                        <td data-label="Action">
+                          <div className="gallery-row-actions">
+                            <button
+                              type="button"
+                              onClick={() => choosePhotos(gallery)}
+                              disabled={
+                                gallery.storageExpired ||
+                                uploadingGalleryId === gallery.id
+                              }
+                            >
+                              {uploadingGalleryId === gallery.id
+                                ? `${uploadProgress}%`
+                                : "Upload"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => copyGuestLink(gallery)}
+                              disabled={gallery.storageExpired}
+                            >
+                              Copy Link
+                            </button>
                             <button
                               type="button"
                               onClick={() =>
                                 window.open(
-                                  gallery.drive_folder_url,
+                                  getGuestUrl(gallery),
                                   "_blank",
                                   "noopener,noreferrer"
                                 )
                               }
+                              disabled={gallery.storageExpired}
                             >
-                              Drive
+                              Preview
                             </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => toggleGalleryStatus(gallery)}
-                          >
-                            {gallery.status === "active" ? "Disable" : "Enable"}
-                          </button>
-                          <button
-                            type="button"
-                            className="danger"
-                            onClick={() => deleteGallery(gallery)}
-                            disabled={saving}
-                          >
-                            Delete
-                          </button>
-                        </div>
-
-                        {uploadingGalleryId === gallery.id && (
-                          <div className="gallery-upload-status">
-                            <div className="gallery-upload-track">
-                              <div style={{ width: `${uploadProgress}%` }}></div>
-                            </div>
-                            <span>{uploadLabel}</span>
+                            {gallery.drive_folder_url && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  window.open(
+                                    gallery.drive_folder_url,
+                                    "_blank",
+                                    "noopener,noreferrer"
+                                  )
+                                }
+                              >
+                                Drive
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => toggleGalleryStatus(gallery)}
+                              disabled={gallery.storageExpired}
+                            >
+                              {gallery.status === "active" && !gallery.linkExpired
+                                ? "Disable"
+                                : "Enable"}
+                            </button>
+                            <button
+                              type="button"
+                              className="danger"
+                              onClick={() => deleteGallery(gallery)}
+                              disabled={saving}
+                            >
+                              Delete
+                            </button>
                           </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))
+
+                          {uploadingGalleryId === gallery.id && (
+                            <div className="gallery-upload-status">
+                              <div className="gallery-upload-track">
+                                <div style={{ width: `${uploadProgress}%` }} />
+                              </div>
+                              <span>{uploadLabel}</span>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -714,7 +861,9 @@ function GalleryManager() {
             <div className="gallery-modal">
               <div className="gallery-modal-header">
                 <div>
-                  <div className="gallery-manager-eyebrow">NEW CLIENT DELIVERY</div>
+                  <div className="gallery-manager-eyebrow">
+                    NEW CLIENT DELIVERY
+                  </div>
                   <h2>Create Gallery</h2>
                 </div>
                 <button
@@ -758,28 +907,47 @@ function GalleryManager() {
                   />
                 </label>
 
-                <label>
-                  GUEST LINK ACTIVE FOR
-                  <select
-                    value={form.expiresInDays}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        expiresInDays: event.target.value,
-                      }))
-                    }
-                  >
-                    <option value="7">7 days</option>
-                    <option value="14">14 days</option>
-                    <option value="30">30 days</option>
-                    <option value="60">60 days</option>
-                    <option value="90">90 days</option>
-                  </select>
-                </label>
+                <div className="gallery-retention-grid">
+                  <label>
+                    GUEST LINK ACTIVE
+                    <select
+                      value={form.linkDays}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          linkDays: event.target.value,
+                        }))
+                      }
+                    >
+                      <option value="7">7 days</option>
+                      <option value="14">14 days</option>
+                      <option value="30">30 days</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    STORAGE ACTIVE
+                    <select
+                      value={form.storageDays}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          storageDays: event.target.value,
+                        }))
+                      }
+                    >
+                      <option value="30">30 days</option>
+                      <option value="60">60 days</option>
+                      <option value="90">90 days</option>
+                    </select>
+                  </label>
+                </div>
 
                 <div className="gallery-modal-note">
-                  Foto tetap berada di Google Drive. Expiry hanya menutup guest link dan
-                  tidak otomatis menghapus foto.
+                  Link dapat dinonaktifkan lalu diaktifkan kembali selama storage
+                  belum expired. Saat storage expired, guest link otomatis tidak
+                  dapat dibuka. File expired dibersihkan otomatis saat portal
+                  kembali terhubung ke Google Drive.
                 </div>
 
                 <div className="gallery-modal-actions">

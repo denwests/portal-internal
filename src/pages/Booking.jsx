@@ -177,6 +177,13 @@ function calculateMdr(amount, paymentMethod) {
 
 
 function Booking() {
+  const employeeRole =
+    localStorage.getItem("employeeRole") || "Staff";
+
+  const canManageBooking =
+    employeeRole === "Founder" ||
+    employeeRole === "Administrator";
+
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -528,6 +535,7 @@ function Booking() {
   };
 
   const openAddForm = () => {
+    if (!canManageBooking) return;
     resetForm();
     setErrorMessage("");
     setShowView(false);
@@ -535,6 +543,7 @@ function Booking() {
   };
 
   const openEditForm = (booking) => {
+    if (!canManageBooking) return;
     setEditingBooking(booking);
 
     setForm({
@@ -716,6 +725,12 @@ function Booking() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!canManageBooking) {
+      setErrorMessage("Staff hanya memiliki akses View pada Booking List.");
+      return;
+    }
+
     setErrorMessage("");
 
     const packagePrice = parseMoney(form.packagePrice);
@@ -1040,6 +1055,8 @@ function Booking() {
   ========================================================= */
 
   const openPaymentModal = (booking) => {
+    if (!canManageBooking) return;
+
     const packagePrice = Number(booking.package_price || 0);
 
     if (packagePrice <= 0) {
@@ -1064,7 +1081,7 @@ function Booking() {
   };
 
   const handleConfirmPayment = async () => {
-    if (!payingBooking) return;
+    if (!canManageBooking || !payingBooking) return;
 
     const packagePrice = Number(payingBooking.package_price || 0);
     const alreadyPaid = Number(
@@ -1188,7 +1205,7 @@ function Booking() {
   ========================================================= */
 
   const handleDeleteBooking = async (booking) => {
-    if (!booking?.id) return;
+    if (!canManageBooking || !booking?.id) return;
 
     setErrorMessage("");
 
@@ -1531,13 +1548,15 @@ function Booking() {
               {shareCopied ? "Copied" : "Share"}
             </button>
 
-            <button
-              type="button"
-              className="booking-add-button"
-              onClick={openAddForm}
-            >
-              Add
-            </button>
+            {canManageBooking && (
+              <button
+                type="button"
+                className="booking-add-button"
+                onClick={openAddForm}
+              >
+                Add
+              </button>
+            )}
           </div>
         </div>
 
@@ -1590,14 +1609,24 @@ function Booking() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="8" className="booking-empty">
-                      Loading booking...
+                    <td
+                      colSpan="8"
+                      className="booking-empty table-empty-cell"
+                    >
+                      <span className="table-empty-viewport">
+                        Loading booking...
+                      </span>
                     </td>
                   </tr>
                 ) : visibleBookings.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="booking-empty">
-                      No booking found.
+                    <td
+                      colSpan="8"
+                      className="booking-empty table-empty-cell"
+                    >
+                      <span className="table-empty-viewport">
+                        No booking found.
+                      </span>
                     </td>
                   </tr>
                 ) : (
@@ -1666,31 +1695,35 @@ function Booking() {
                               View
                             </button>
 
-                            <button
-                              type="button"
-                              className="edit"
-                              onClick={() => openEditForm(booking)}
-                            >
-                              Edit
-                            </button>
+                            {canManageBooking && (
+                              <>
+                                <button
+                                  type="button"
+                                  className="edit"
+                                  onClick={() => openEditForm(booking)}
+                                >
+                                  Edit
+                                </button>
 
-                            {remainingAmount > 0 && booking.status !== "Canceled" && (
-                              <button
-                                type="button"
-                                className="paid"
-                                onClick={() => openPaymentModal(booking)}
-                              >
-                                Paid
-                              </button>
+                                {remainingAmount > 0 && booking.status !== "Canceled" && (
+                                  <button
+                                    type="button"
+                                    className="paid"
+                                    onClick={() => openPaymentModal(booking)}
+                                  >
+                                    Paid
+                                  </button>
+                                )}
+
+                                <button
+                                  type="button"
+                                  className="delete"
+                                  onClick={() => handleDeleteBooking(booking)}
+                                >
+                                  Delete
+                                </button>
+                              </>
                             )}
-
-                            <button
-                              type="button"
-                              className="delete"
-                              onClick={() => handleDeleteBooking(booking)}
-                            >
-                              Delete
-                            </button>
                           </div>
                         </td>
                       </tr>
@@ -2130,31 +2163,35 @@ function Booking() {
                 Close
               </button>
 
-              {Math.max(
-                Number(viewingBooking.package_price || 0) -
-                  Number(
-                    viewingBooking.paid_amount ||
-                    viewingBooking.down_payment ||
+              {canManageBooking && (
+                <>
+                  {Math.max(
+                    Number(viewingBooking.package_price || 0) -
+                      Number(
+                        viewingBooking.paid_amount ||
+                        viewingBooking.down_payment ||
+                        0
+                      ),
                     0
-                  ),
-                0
-              ) > 0 && viewingBooking.status !== "Canceled" && (
-                <button
-                  type="button"
-                  className="booking-paid-primary"
-                  onClick={() => openPaymentModal(viewingBooking)}
-                >
-                  Paid
-                </button>
-              )}
+                  ) > 0 && viewingBooking.status !== "Canceled" && (
+                    <button
+                      type="button"
+                      className="booking-paid-primary"
+                      onClick={() => openPaymentModal(viewingBooking)}
+                    >
+                      Paid
+                    </button>
+                  )}
 
-              <button
-                type="button"
-                className="booking-save"
-                onClick={() => openEditForm(viewingBooking)}
-              >
-                Edit Booking
-              </button>
+                  <button
+                    type="button"
+                    className="booking-save"
+                    onClick={() => openEditForm(viewingBooking)}
+                  >
+                    Edit Booking
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

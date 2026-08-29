@@ -54,7 +54,7 @@ function Sidebar({ activePage }) {
       <aside
         className={`dashboard-sidebar ${sidebarOpen ? "mobile-open" : ""}`}
       >
-        <div>
+        <div className="dashboard-sidebar-top">
           <div className="dashboard-brand">
             <div>
               <div className="dashboard-brand-name">PLUNO STUDIO</div>
@@ -83,8 +83,7 @@ function Sidebar({ activePage }) {
               Booking List
             </Link>
 
-            {isOperational && (
-              <Link
+            <Link
                 to="/customer"
                 className={`dashboard-nav-item ${isActive("customer")}`}
                 onClick={closeMobileSidebar}
@@ -92,10 +91,8 @@ function Sidebar({ activePage }) {
                 <span>03</span>
                 Customer Data
               </Link>
-            )}
 
-            {isOperational && (
-              <Link
+            <Link
                 to="/galleries"
                 className={`dashboard-nav-item ${isActive("galleries")}`}
                 onClick={closeMobileSidebar}
@@ -103,7 +100,6 @@ function Sidebar({ activePage }) {
                 <span>04</span>
                 Client Gallery
               </Link>
-            )}
 
             {isOperational && (
               <div className="dashboard-nav-section second">FINANCE</div>
@@ -176,14 +172,23 @@ function Sidebar({ activePage }) {
               {employeeName.charAt(0).toUpperCase()}
             </div>
 
-            <div>
+            <div className="dashboard-user-copy">
               <div className="dashboard-user-name">{employeeName}</div>
               <div className="dashboard-user-role">{employeeRole}</div>
             </div>
           </div>
 
-          <button className="dashboard-logout" onClick={handleLogout}>
-            Sign out
+          <div className="dashboard-sidebar-divider" />
+
+          <button
+            type="button"
+            className="dashboard-logout"
+            onClick={handleLogout}
+          >
+            <span>Logout</span>
+            <span className="dashboard-logout-arrow" aria-hidden="true">
+              →
+            </span>
           </button>
         </div>
       </aside>

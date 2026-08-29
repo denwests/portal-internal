@@ -1901,3 +1901,161 @@ body {
     width: 100%;
   }
 }
+
+/* =========================================================
+   TARGETED E2E — COMPACT CUSTOMER TABLE / MOBILE
+   Header typography intentionally follows the existing unified header.
+========================================================= */
+.customer-table th {
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.customer-table td,
+.customer-name,
+.customer-package,
+.customer-date,
+.customer-total {
+  font-size: 12px;
+}
+
+.customer-name,
+.customer-contact,
+.customer-package {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer-actions button {
+  font-size: 10px;
+}
+
+@media (max-width: 700px) {
+  .customer-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .customer-stat-card {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .customer-stat-value {
+    font-size: 18px;
+  }
+
+  .customer-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .customer-table {
+    width: 620px;
+    min-width: 620px;
+    table-layout: fixed;
+  }
+
+  /* Total stays visible in View; this keeps the list compact. */
+  .customer-table th:nth-child(4),
+  .customer-table td:nth-child(4) {
+    display: none;
+  }
+
+  .customer-table th,
+  .customer-table td {
+    padding: 10px 8px;
+  }
+
+  .customer-table th { font-size: 9px; }
+  .customer-table td,
+  .customer-name,
+  .customer-package,
+  .customer-date { font-size: 11px; }
+
+  .customer-table th:nth-child(1),
+  .customer-table td:nth-child(1) { width: 27%; }
+  .customer-table th:nth-child(2),
+  .customer-table td:nth-child(2) { width: 23%; }
+  .customer-table th:nth-child(3),
+  .customer-table td:nth-child(3) { width: 19%; }
+  .customer-table th:nth-child(5),
+  .customer-table td:nth-child(5) { width: 15%; }
+  .customer-table th:nth-child(6),
+  .customer-table td:nth-child(6) { width: 16%; }
+
+  .customer-actions {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .customer-actions button {
+    min-width: 0;
+    padding: 6px 7px;
+    font-size: 9px;
+  }
+
+  .customer-overlay {
+    overflow: hidden;
+  }
+
+  .customer-form-box,
+  .customer-detail-box {
+    max-height: calc(100dvh - 28px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .addon-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .customer-table {
+    width: 560px;
+    min-width: 560px;
+  }
+
+  .customer-stat-card {
+    padding: 12px;
+  }
+
+  .customer-stat-label,
+  .customer-stat-note {
+    font-size: 8px;
+  }
+
+  .customer-stat-value {
+    font-size: 16px;
+  }
+}
+
+/* =========================================================
+   FINAL E2E FIXES — MOBILE HEADING / EXPORT STATE
+========================================================= */
+.customer-pdf-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (max-width: 700px) {
+  .customer-list-header h2 {
+    margin-top: 6px;
+    color: #eee;
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: -0.1px;
+  }
+
+  .customer-list-header .customer-eyebrow {
+    font-size: 8.5px;
+    line-height: 1.2;
+    letter-spacing: 1.6px;
+  }
+}

@@ -1843,3 +1843,119 @@
   .booking-eyebrow { font-size: 8.5px; }
   .booking-header-actions { width: 100%; justify-content: flex-start; }
 }
+
+/* =========================================================
+   TARGETED E2E — COMPACT TABLE / MOBILE
+   Header rules above intentionally remain unchanged.
+========================================================= */
+.booking-table-v2 th {
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.booking-table-v2 td {
+  font-size: 12px;
+}
+
+.booking-table-v2 .booking-customer-name,
+.booking-table-v2 .booking-package {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.booking-actions-v2 button {
+  font-size: 10px;
+}
+
+@media (max-width: 700px) {
+  .booking-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .booking-table-v2 {
+    width: 680px;
+    min-width: 680px;
+    table-layout: fixed;
+  }
+
+  /* Financial detail stays available in View. */
+  .booking-table-v2 th:nth-child(5),
+  .booking-table-v2 td:nth-child(5),
+  .booking-table-v2 th:nth-child(6),
+  .booking-table-v2 td:nth-child(6) {
+    display: none;
+  }
+
+  .booking-table-v2 th,
+  .booking-table-v2 td {
+    padding: 10px 8px;
+  }
+
+  .booking-table-v2 th {
+    font-size: 9px;
+  }
+
+  .booking-table-v2 td,
+  .booking-table-v2 .booking-customer-name,
+  .booking-table-v2 .booking-package {
+    font-size: 11px;
+  }
+
+  .booking-table-v2 th:nth-child(1),
+  .booking-table-v2 td:nth-child(1) { width: 22%; }
+  .booking-table-v2 th:nth-child(2),
+  .booking-table-v2 td:nth-child(2) { width: 17%; }
+  .booking-table-v2 th:nth-child(3),
+  .booking-table-v2 td:nth-child(3) { width: 10%; }
+  .booking-table-v2 th:nth-child(4),
+  .booking-table-v2 td:nth-child(4) { width: 20%; }
+  .booking-table-v2 th:nth-child(7),
+  .booking-table-v2 td:nth-child(7) { width: 13%; }
+  .booking-table-v2 th:nth-child(8),
+  .booking-table-v2 td:nth-child(8) { width: 18%; }
+
+  .booking-actions-v2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .booking-actions-v2 button {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 4px;
+    font-size: 9px;
+  }
+
+  .booking-overlay {
+    overflow: hidden;
+  }
+
+  .booking-form-box,
+  .booking-view-box,
+  .booking-payment-modal,
+  .booking-settings-modal {
+    max-height: calc(100dvh - 30px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-table-v2 {
+    width: 620px;
+    min-width: 620px;
+  }
+
+  .booking-form-box,
+  .booking-view-box,
+  .booking-payment-modal,
+  .booking-settings-modal {
+    max-height: calc(100dvh - 20px);
+  }
+}

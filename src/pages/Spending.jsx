@@ -1171,6 +1171,19 @@ function Spending() {
           : cashSpendings;
 
 
+      if (rows.length === 0) {
+
+        setErrorMessage(
+          `Tidak ada data ${category.toLowerCase()} untuk periode ini.`
+        );
+
+        return;
+      }
+
+
+      setErrorMessage("");
+
+
       const title =
         category ===
         "Studio Expenses"
@@ -1723,6 +1736,15 @@ function Spending() {
                       "Studio Expenses"
                     )
                   }
+                  disabled={
+                    loading ||
+                    studioExpenses.length === 0
+                  }
+                  title={
+                    studioExpenses.length === 0
+                      ? "Tidak ada data untuk diekspor"
+                      : "Download studio expenses PDF"
+                  }
                 >
                   Download PDF
                 </button>
@@ -1839,9 +1861,11 @@ function Spending() {
 
                       <td
                         colSpan="6"
-                        className="spending-empty"
+                        className="spending-empty table-empty-cell"
                       >
-                        Loading...
+                        <span className="table-empty-viewport">
+                          Loading...
+                        </span>
                       </td>
 
                     </tr>
@@ -1852,9 +1876,11 @@ function Spending() {
 
                       <td
                         colSpan="6"
-                        className="spending-empty"
+                        className="spending-empty table-empty-cell"
                       >
-                        No studio expenses found.
+                        <span className="table-empty-viewport">
+                          No studio expenses found.
+                        </span>
                       </td>
 
                     </tr>
@@ -2017,6 +2043,15 @@ function Spending() {
                       "Cash Spending"
                     )
                   }
+                  disabled={
+                    loading ||
+                    cashSpendings.length === 0
+                  }
+                  title={
+                    cashSpendings.length === 0
+                      ? "Tidak ada data untuk diekspor"
+                      : "Download cash spending PDF"
+                  }
                 >
                   Download PDF
                 </button>
@@ -2133,9 +2168,11 @@ function Spending() {
 
                       <td
                         colSpan="6"
-                        className="spending-empty"
+                        className="spending-empty table-empty-cell"
                       >
-                        Loading...
+                        <span className="table-empty-viewport">
+                          Loading...
+                        </span>
                       </td>
 
                     </tr>
@@ -2146,9 +2183,11 @@ function Spending() {
 
                       <td
                         colSpan="6"
-                        className="spending-empty"
+                        className="spending-empty table-empty-cell"
                       >
-                        No cash spending found.
+                        <span className="table-empty-viewport">
+                          No cash spending found.
+                        </span>
                       </td>
 
                     </tr>

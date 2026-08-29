@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../supabase";
 import { driveDownloadUrl } from "../lib/googleDrive";
+import {
+  downloadPhotosAsZip,
+  downloadPhotosSequentially,
+  isMobileDownloadDevice,
+} from "../lib/downloadGallery";
 import "./ClientGallery.css";
 
 function getVisitorId() {
@@ -31,9 +36,7 @@ function formatDate(value) {
 }
 
 function getPreviewUrl(photo) {
-  if (!photo?.preview_path) {
-    return "";
-  }
+  if (!photo?.preview_path) return "";
 
   const { data } = supabase.storage
     .from("gallery-previews")
@@ -48,10 +51,13 @@ function ClientGallery() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [activePhotoId, setActivePhotoId] = useState(null);
-  const [printSelection, setPrintSelection] = useState(() => new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedPhotos, setSelectedPhotos] = useState(() => new Set());
+  const [activityOpen, setActivityOpen] = useState(false);
   const [guestName, setGuestName] = useState(getGuestName());
   const [commentText, setCommentText] = useState("");
   const [commentSaving, setCommentSaving] = useState(false);
+  const [downloadJob, setDownloadJob] = useState(null);
 
   const visitorId = useMemo(() => getVisitorId(), []);
 
@@ -74,7 +80,9 @@ function ClientGallery() {
 
     if (!data) {
       setGallery(null);
-      setErrorMessage("Gallery tidak ditemukan, sudah expired, atau dinonaktifkan.");
+      setErrorMessage(
+        "Gallery tidak ditemukan, link sudah expired/dinonaktifkan, atau masa storage sudah habis."
+      );
       setLoading(false);
       return;
     }
@@ -88,8 +96,19 @@ function ClientGallery() {
   }, [slug, visitorId]);
 
   const photos = gallery?.photos || [];
+  const activePhoto =
+    photos.find((photo) => photo.id === activePhotoId) || null;
 
-  const activePhoto = photos.find((photo) => photo.id === activePhotoId) || null;
+  const activityPhotos = useMemo(
+    () =>
+      photos.filter(
+        (photo) =>
+          photo.liked ||
+          Number(photo.like_count || 0) > 0 ||
+          (photo.comments || []).length > 0
+      ),
+    [photos]
+  );
 
   const toggleLike = async (photo) => {
     const { data, error } = await supabase.rpc("guest_toggle_gallery_like", {
@@ -117,8 +136,8 @@ function ClientGallery() {
     }));
   };
 
-  const togglePrintSelection = (photoId) => {
-    setPrintSelection((current) => {
+  const toggleSelection = (photoId) => {
+    setSelectedPhotos((current) => {
       const next = new Set(current);
 
       if (next.has(photoId)) {
@@ -129,6 +148,15 @@ function ClientGallery() {
 
       return next;
     });
+  };
+
+  const handlePhotoClick = (photo) => {
+    if (selectionMode) {
+      toggleSelection(photo.id);
+      return;
+    }
+
+    setActivePhotoId(photo.id);
   };
 
   const addComment = async (event) => {
@@ -170,23 +198,28 @@ function ClientGallery() {
     setCommentSaving(false);
   };
 
+  const selectedPhotoList = photos.filter((photo) =>
+    selectedPhotos.has(photo.id)
+  );
+
   const sendPrintSelection = () => {
-    const selectedPhotos = photos.filter((photo) => printSelection.has(photo.id));
+    if (selectedPhotoList.length === 0) return;
 
-    if (selectedPhotos.length === 0) return;
-
-    const whatsappNumber = String(import.meta.env.VITE_PLUNO_WHATSAPP || "").replace(
-      /\D/g,
-      ""
-    );
+    const whatsappNumber = String(
+      import.meta.env.VITE_PLUNO_WHATSAPP || ""
+    ).replace(/\D/g, "");
 
     if (!whatsappNumber) {
-      alert("VITE_PLUNO_WHATSAPP belum diisi pada environment website.");
+      alert(
+        "VITE_PLUNO_WHATSAPP belum diisi pada environment production."
+      );
       return;
     }
 
     const guestUrl = window.location.href;
-    const names = selectedPhotos.map((photo, index) => `${index + 1}. ${photo.filename}`);
+    const names = selectedPhotoList.map(
+      (photo, index) => `${index + 1}. ${photo.filename}`
+    );
 
     const message = [
       "Halo Pluno Studio,",
@@ -199,7 +232,7 @@ function ClientGallery() {
       "Foto yang dipilih:",
       ...names,
       "",
-      `Total: ${selectedPhotos.length} foto`,
+      `Total: ${selectedPhotoList.length} foto`,
     ]
       .filter(Boolean)
       .join("\n");
@@ -209,6 +242,69 @@ function ClientGallery() {
       "_blank",
       "noopener,noreferrer"
     );
+  };
+
+  const runDownload = async (targetPhotos, label) => {
+    if (!targetPhotos.length || downloadJob) return;
+
+    setDownloadJob({
+      percent: 0,
+      filename: "Preparing...",
+      label,
+    });
+
+    const onProgress = ({ percent, filename }) => {
+      setDownloadJob({
+        percent,
+        filename,
+        label,
+      });
+    };
+
+    try {
+      if (isMobileDownloadDevice()) {
+        await downloadPhotosSequentially(targetPhotos, onProgress);
+      } else {
+        try {
+          await downloadPhotosAsZip(
+            targetPhotos,
+            `PLUNO-${gallery.client_name}-${gallery.session_name || "Gallery"}`,
+            onProgress
+          );
+        } catch (zipError) {
+          console.warn(
+            "ZIP DOWNLOAD FALLBACK TO SEQUENTIAL:",
+            zipError
+          );
+
+          await downloadPhotosSequentially(
+            targetPhotos,
+            onProgress
+          );
+        }
+      }
+    } catch (error) {
+      console.error("GALLERY DOWNLOAD ERROR:", error);
+      alert(
+        `Download gagal: ${error.message || "Tidak dapat mengambil file original."}`
+      );
+    } finally {
+      window.setTimeout(() => setDownloadJob(null), 450);
+    }
+  };
+
+  const focusActivityPhoto = (photo) => {
+    setActivityOpen(false);
+    setActivePhotoId(photo.id);
+
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById(`gallery-photo-${photo.id}`)
+        ?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+    });
   };
 
   if (loading) {
@@ -243,42 +339,116 @@ function ClientGallery() {
 
         <div className="client-gallery-meta">
           <span>{photos.length} PHOTOS</span>
-          {gallery.expires_at && <span>ACTIVE UNTIL {formatDate(gallery.expires_at)}</span>}
-        </div>
-
-        <div className="client-gallery-top-actions">
-          {gallery.drive_folder_url && (
-            <button
-              type="button"
-              onClick={() =>
-                window.open(gallery.drive_folder_url, "_blank", "noopener,noreferrer")
-              }
-            >
-              Download All
-            </button>
+          {gallery.link_expires_at && (
+            <span>LINK ACTIVE UNTIL {formatDate(gallery.link_expires_at)}</span>
           )}
         </div>
+
+        <div className="client-gallery-preview-note">
+          Preview ditampilkan dalam kualitas ringan untuk akses yang lebih cepat.
+          Download foto untuk mendapatkan file dengan resolusi penuh.
+        </div>
+
+        <div className="client-gallery-top-actions client-gallery-top-actions-e2e">
+          <button
+            type="button"
+            onClick={() => runDownload(photos, "Download All")}
+            disabled={photos.length === 0 || Boolean(downloadJob)}
+          >
+            Download All
+          </button>
+
+          <button
+            type="button"
+            className={selectionMode ? "active" : ""}
+            onClick={() => setSelectionMode((current) => !current)}
+          >
+            {selectionMode
+              ? `Done (${selectedPhotos.size})`
+              : "Select"}
+          </button>
+
+          <button
+            type="button"
+            className={activityOpen ? "active" : ""}
+            onClick={() => setActivityOpen((current) => !current)}
+          >
+            Activity ({activityPhotos.length})
+          </button>
+        </div>
       </header>
+
+      {activityOpen && (
+        <aside className="client-gallery-activity-panel">
+          <div className="client-gallery-activity-head">
+            <div>
+              <span>LIKES & COMMENTS</span>
+              <strong>Activity</strong>
+            </div>
+            <button type="button" onClick={() => setActivityOpen(false)}>
+              ×
+            </button>
+          </div>
+
+          {activityPhotos.length === 0 ? (
+            <div className="client-gallery-activity-empty">
+              Belum ada foto yang di-like atau dikomentari.
+            </div>
+          ) : (
+            <div className="client-gallery-activity-list">
+              {activityPhotos.map((photo) => (
+                <button
+                  type="button"
+                  key={photo.id}
+                  onClick={() => focusActivityPhoto(photo)}
+                >
+                  <img src={getPreviewUrl(photo)} alt="" />
+                  <span>
+                    <strong>{photo.filename}</strong>
+                    <small>
+                      ♥ {Number(photo.like_count || 0)} · 💬{` `}
+                      {(photo.comments || []).length}
+                    </small>
+                    {(photo.comments || []).slice(-1).map((comment) => (
+                      <em key={comment.id}>{comment.body}</em>
+                    ))}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </aside>
+      )}
 
       {photos.length === 0 ? (
         <div className="client-gallery-empty">Foto belum tersedia.</div>
       ) : (
-        <main className="client-gallery-grid">
+        <main className="client-gallery-grid client-gallery-grid-e2e">
           {photos.map((photo) => {
-            const selected = printSelection.has(photo.id);
+            const selected = selectedPhotos.has(photo.id);
 
             return (
-              <article className="client-gallery-item" key={photo.id}>
+              <article
+                className={`client-gallery-item ${selected ? "selected" : ""}`}
+                id={`gallery-photo-${photo.id}`}
+                key={photo.id}
+              >
                 <button
                   type="button"
                   className="client-gallery-photo-button"
-                  onClick={() => setActivePhotoId(photo.id)}
+                  onClick={() => handlePhotoClick(photo)}
                 >
                   <img
                     src={getPreviewUrl(photo)}
                     alt={photo.filename}
                     loading="lazy"
                   />
+
+                  {selectionMode && (
+                    <span className="client-gallery-select-mark">
+                      {selected ? "✓" : ""}
+                    </span>
+                  )}
                 </button>
 
                 <div className="client-gallery-item-footer">
@@ -294,10 +464,19 @@ function ClientGallery() {
                   <button
                     type="button"
                     className={selected ? "selected" : ""}
-                    onClick={() => togglePrintSelection(photo.id)}
+                    onClick={() => toggleSelection(photo.id)}
                   >
-                    {selected ? "Selected" : "Print"}
+                    {selected ? "Selected" : "Select"}
                   </button>
+
+                  {(photo.comments || []).length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setActivePhotoId(photo.id)}
+                    >
+                      💬 {(photo.comments || []).length}
+                    </button>
+                  )}
                 </div>
               </article>
             );
@@ -305,15 +484,27 @@ function ClientGallery() {
         </main>
       )}
 
-      {printSelection.size > 0 && (
-        <div className="client-gallery-print-bar">
+      {selectedPhotos.size > 0 && (
+        <div className="client-gallery-print-bar client-gallery-selection-bar">
           <div>
-            <strong>{printSelection.size}</strong>
-            <span>PHOTOS SELECTED FOR PRINT</span>
+            <strong>{selectedPhotos.size}</strong>
+            <span>PHOTOS SELECTED</span>
           </div>
-          <button type="button" onClick={sendPrintSelection}>
-            Send to WhatsApp
-          </button>
+
+          <div className="client-gallery-selection-actions">
+            <button
+              type="button"
+              onClick={() =>
+                runDownload(selectedPhotoList, "Download Selected")
+              }
+              disabled={Boolean(downloadJob)}
+            >
+              Download Selected
+            </button>
+            <button type="button" onClick={sendPrintSelection}>
+              Send WA for Print
+            </button>
+          </div>
         </div>
       )}
 
@@ -329,10 +520,7 @@ function ClientGallery() {
           </button>
 
           <div className="client-gallery-lightbox-image-wrap">
-            <img
-              src={getPreviewUrl(activePhoto)}
-              alt={activePhoto.filename}
-            />
+            <img src={getPreviewUrl(activePhoto)} alt={activePhoto.filename} />
           </div>
 
           <aside className="client-gallery-lightbox-panel">
@@ -352,13 +540,19 @@ function ClientGallery() {
 
               <button
                 type="button"
-                className={printSelection.has(activePhoto.id) ? "selected" : ""}
-                onClick={() => togglePrintSelection(activePhoto.id)}
+                className={
+                  selectedPhotos.has(activePhoto.id) ? "selected" : ""
+                }
+                onClick={() => toggleSelection(activePhoto.id)}
               >
-                {printSelection.has(activePhoto.id) ? "Selected for Print" : "Select for Print"}
+                {selectedPhotos.has(activePhoto.id)
+                  ? "Selected"
+                  : "Select"}
               </button>
 
-              <a href={driveDownloadUrl(activePhoto.drive_file_id)}>Download</a>
+              <a href={driveDownloadUrl(activePhoto.drive_file_id)}>
+                Download Original
+              </a>
             </div>
 
             <div className="client-gallery-comments">
@@ -366,7 +560,9 @@ function ClientGallery() {
 
               <div className="client-gallery-comment-list">
                 {(activePhoto.comments || []).length === 0 ? (
-                  <div className="client-gallery-no-comment">No comments yet.</div>
+                  <div className="client-gallery-no-comment">
+                    No comments yet.
+                  </div>
                 ) : (
                   (activePhoto.comments || []).map((comment) => (
                     <div className="client-gallery-comment" key={comment.id}>
@@ -399,6 +595,24 @@ function ClientGallery() {
               </form>
             </div>
           </aside>
+        </div>
+      )}
+
+      {downloadJob && (
+        <div className="client-gallery-download-overlay" role="status">
+          <div className="client-gallery-download-box">
+            <span>{downloadJob.label}</span>
+            <strong>{downloadJob.percent}%</strong>
+            <div className="client-gallery-download-track">
+              <div style={{ width: `${downloadJob.percent}%` }} />
+            </div>
+            <p>{downloadJob.filename}</p>
+            <small>
+              {isMobileDownloadDevice()
+                ? "Foto sedang diunduh satu per satu. Lokasi akhir mengikuti pengaturan Android/iOS."
+                : "Original sedang dikumpulkan menjadi ZIP."}
+            </small>
+          </div>
         </div>
       )}
     </div>

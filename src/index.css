@@ -10,3 +10,54 @@ body {
   margin: 0;
   padding: 0;
 }
+
+:root {
+  --pluno-modal-layer: 3000;
+}
+
+/* All page modals must sit above the mobile navigation trigger (z-index 2200). */
+.booking-overlay,
+.customer-overlay,
+.spending-overlay,
+.transactions-overlay,
+.bookkeeping-overlay,
+.employee-overlay,
+.gallery-modal-overlay,
+.dashboard-schedule-overlay {
+  z-index: var(--pluno-modal-layer) !important;
+}
+
+/* Keeps an empty/loading state inside the visible part of a wide mobile table. */
+td.table-empty-cell {
+  padding: 0 !important;
+  text-align: left !important;
+  overflow: visible !important;
+}
+
+.table-empty-viewport {
+  position: sticky;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 112px;
+  padding: 24px 16px;
+  color: #666;
+  text-align: center;
+  white-space: normal;
+}
+
+@media (max-width: 700px) {
+  .table-empty-viewport {
+    width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
+  }
+}
+
+@media (max-width: 480px) {
+  .table-empty-viewport {
+    width: calc(100vw - 28px);
+    max-width: calc(100vw - 28px);
+  }
+}
