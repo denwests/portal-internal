@@ -7,6 +7,8 @@ import {
 
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
+import Privacy from "./pages/Privacy";
+
 import Dashboard from "./pages/Dashboard";
 import Booking from "./pages/Booking";
 import Customer from "./pages/Customer";
@@ -15,6 +17,10 @@ import Transactions from "./pages/Transactions";
 import Bookkeeping from "./pages/Bookkeeping";
 import Employee from "./pages/Employee";
 import Documents from "./pages/Documents";
+
+import GalleryManager from "./pages/GalleryManager";
+import ClientGallery from "./pages/ClientGallery";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 
@@ -24,10 +30,12 @@ const ALL_ROLES = [
   "Staff",
 ];
 
+
 const OPERATIONAL_ROLES = [
   "Founder",
   "Administrator",
 ];
+
 
 const FOUNDER_ONLY = [
   "Founder",
@@ -49,12 +57,43 @@ function App() {
 
         <Route
           path="/login"
-          element={<Login />}
+          element={
+            <Login />
+          }
         />
+
 
         <Route
           path="/reset-password"
-          element={<ResetPassword />}
+          element={
+            <ResetPassword />
+          }
+        />
+
+
+        {/* =================================================
+            PRIVACY POLICY
+            Public - digunakan juga untuk Google OAuth
+        ================================================= */}
+
+        <Route
+          path="/privacy"
+          element={
+            <Privacy />
+          }
+        />
+
+
+        {/* =================================================
+            CLIENT GALLERY
+            Public guest link
+        ================================================= */}
+
+        <Route
+          path="/gallery/:slug"
+          element={
+            <ClientGallery />
+          }
         />
 
 
@@ -66,45 +105,86 @@ function App() {
         <Route
           path="/dashboard"
           element={
+
             <ProtectedRoute
-              allowedRoles={ALL_ROLES}
+              allowedRoles={
+                ALL_ROLES
+              }
             >
+
               <Dashboard />
+
             </ProtectedRoute>
+
           }
         />
 
 
         {/* =================================================
-            BOOKING LIST
+            BOOKING
             Founder / Administrator / Staff
         ================================================= */}
 
         <Route
           path="/booking"
           element={
+
             <ProtectedRoute
-              allowedRoles={ALL_ROLES}
+              allowedRoles={
+                ALL_ROLES
+              }
             >
+
               <Booking />
+
             </ProtectedRoute>
+
           }
         />
 
 
         {/* =================================================
-            CUSTOMER DATA
+            CUSTOMER
             Founder / Administrator
         ================================================= */}
 
         <Route
           path="/customer"
           element={
+
             <ProtectedRoute
-              allowedRoles={OPERATIONAL_ROLES}
+              allowedRoles={
+                OPERATIONAL_ROLES
+              }
             >
+
               <Customer />
+
             </ProtectedRoute>
+
+          }
+        />
+
+
+        {/* =================================================
+            CLIENT GALLERY MANAGER
+            Founder / Administrator
+        ================================================= */}
+
+        <Route
+          path="/galleries"
+          element={
+
+            <ProtectedRoute
+              allowedRoles={
+                OPERATIONAL_ROLES
+              }
+            >
+
+              <GalleryManager />
+
+            </ProtectedRoute>
+
           }
         />
 
@@ -117,11 +197,17 @@ function App() {
         <Route
           path="/spending"
           element={
+
             <ProtectedRoute
-              allowedRoles={OPERATIONAL_ROLES}
+              allowedRoles={
+                OPERATIONAL_ROLES
+              }
             >
+
               <Spending />
+
             </ProtectedRoute>
+
           }
         />
 
@@ -134,11 +220,17 @@ function App() {
         <Route
           path="/transactions"
           element={
+
             <ProtectedRoute
-              allowedRoles={OPERATIONAL_ROLES}
+              allowedRoles={
+                OPERATIONAL_ROLES
+              }
             >
+
               <Transactions />
+
             </ProtectedRoute>
+
           }
         />
 
@@ -151,11 +243,17 @@ function App() {
         <Route
           path="/bookkeeping"
           element={
+
             <ProtectedRoute
-              allowedRoles={OPERATIONAL_ROLES}
+              allowedRoles={
+                OPERATIONAL_ROLES
+              }
             >
+
               <Bookkeeping />
+
             </ProtectedRoute>
+
           }
         />
 
@@ -168,11 +266,17 @@ function App() {
         <Route
           path="/employee"
           element={
+
             <ProtectedRoute
-              allowedRoles={FOUNDER_ONLY}
+              allowedRoles={
+                FOUNDER_ONLY
+              }
             >
+
               <Employee />
+
             </ProtectedRoute>
+
           }
         />
 
@@ -185,11 +289,17 @@ function App() {
         <Route
           path="/documents"
           element={
+
             <ProtectedRoute
-              allowedRoles={FOUNDER_ONLY}
+              allowedRoles={
+                FOUNDER_ONLY
+              }
             >
+
               <Documents />
+
             </ProtectedRoute>
+
           }
         />
 
@@ -201,10 +311,12 @@ function App() {
         <Route
           path="/"
           element={
+
             <Navigate
               to="/dashboard"
               replace
             />
+
           }
         />
 
@@ -216,10 +328,12 @@ function App() {
         <Route
           path="*"
           element={
+
             <Navigate
               to="/dashboard"
               replace
             />
+
           }
         />
 

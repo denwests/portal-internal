@@ -1,522 +1,194 @@
-import {
-  useState,
-} from "react";
-
-import {
-  Link,
-} from "react-router-dom";
-
-import {
-  supabase,
-} from "../supabase";
-
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "../supabase";
 import "./Sidebar.css";
 
-function Sidebar({
-  activePage,
-}) {
+function Sidebar({ activePage }) {
+  const employeeName = localStorage.getItem("employeeName") || "User";
+  const employeeRole = localStorage.getItem("employeeRole") || "Staff";
 
-  const employeeName =
-    localStorage.getItem(
-      "employeeName"
-    ) || "User";
-
-  const employeeRole =
-    localStorage.getItem(
-      "employeeRole"
-    ) || "Staff";
-
-
-  /* =================================================
-     MOBILE SIDEBAR
-  ================================================= */
-
-  const [
-    sidebarOpen,
-    setSidebarOpen,
-  ] = useState(false);
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const closeMobileSidebar = () => {
-
     setSidebarOpen(false);
-
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
 
-  /* =================================================
-     LOGOUT
-  ================================================= */
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("employeeId");
+    localStorage.removeItem("employeeName");
+    localStorage.removeItem("employeeRole");
 
-  const handleLogout =
-    async () => {
-
-      await supabase.auth.signOut();
-
-
-      localStorage.removeItem(
-        "isLoggedIn"
-      );
-
-      localStorage.removeItem(
-        "employeeId"
-      );
-
-      localStorage.removeItem(
-        "employeeName"
-      );
-
-      localStorage.removeItem(
-        "employeeRole"
-      );
-
-
-      window.location.href =
-        "/login";
-
-    };
-
-
-  /* =================================================
-     ACTIVE PAGE
-  ================================================= */
-
-  const isActive = (
-    page
-  ) => {
-
-    return activePage === page
-      ? "active"
-      : "";
-
+    window.location.href = "/login";
   };
 
+  const isActive = (page) => (activePage === page ? "active" : "");
+
+  const isOperational =
+    employeeRole === "Founder" || employeeRole === "Administrator";
 
   return (
-
     <>
-
-      {/* =================================================
-          MOBILE LEFT RAIL
-      ================================================= */}
-
-      <div
-        className="dashboard-mobile-rail"
-        aria-hidden="true"
-      ></div>
-
-
-      {/* =================================================
-          MOBILE MENU BUTTON
-      ================================================= */}
+      <div className="dashboard-mobile-rail" aria-hidden="true"></div>
 
       <button
         type="button"
-        className={`dashboard-mobile-trigger ${
-          sidebarOpen
-            ? "open"
-            : ""
-        }`}
-        onClick={() =>
-          setSidebarOpen(
-            (current) =>
-              !current
-          )
-        }
-        aria-label={
-          sidebarOpen
-            ? "Close navigation"
-            : "Open navigation"
-        }
+        className={`dashboard-mobile-trigger ${sidebarOpen ? "open" : ""}`}
+        onClick={() => setSidebarOpen((current) => !current)}
+        aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
       >
-
         <span></span>
         <span></span>
         <span></span>
-
       </button>
 
-
-      {/* =================================================
-          MOBILE OVERLAY
-      ================================================= */}
-
       {sidebarOpen && (
-
         <div
           className="dashboard-mobile-overlay"
-          onClick={
-            closeMobileSidebar
-          }
+          onClick={closeMobileSidebar}
         />
-
       )}
 
-
-      {/* =================================================
-          SIDEBAR
-      ================================================= */}
-
       <aside
-        className={`dashboard-sidebar ${
-          sidebarOpen
-            ? "mobile-open"
-            : ""
-        }`}
+        className={`dashboard-sidebar ${sidebarOpen ? "mobile-open" : ""}`}
       >
-
-        {/* =================================================
-            TOP
-        ================================================= */}
-
         <div>
-
-
-          {/* =================================================
-              BRAND
-          ================================================= */}
-
           <div className="dashboard-brand">
-
             <div>
-
-              <div className="dashboard-brand-name">
-                PLUNO STUDIO
-              </div>
-
-              <div className="dashboard-brand-subtitle">
-                INTERNAL PORTAL
-              </div>
-
+              <div className="dashboard-brand-name">PLUNO STUDIO</div>
+              <div className="dashboard-brand-subtitle">INTERNAL PORTAL</div>
             </div>
-
           </div>
 
-
-          {/* =================================================
-              NAVIGATION
-          ================================================= */}
-
           <nav className="dashboard-navigation">
-
-
-            {/* =================================================
-                WORKSPACE
-            ================================================= */}
-
-            <div className="dashboard-nav-section">
-              WORKSPACE
-            </div>
-
-
-            {/* 01 DASHBOARD */}
+            <div className="dashboard-nav-section">WORKSPACE</div>
 
             <Link
               to="/dashboard"
-              className={`dashboard-nav-item ${
-                isActive(
-                  "dashboard"
-                )
-              }`}
-              onClick={
-                closeMobileSidebar
-              }
+              className={`dashboard-nav-item ${isActive("dashboard")}`}
+              onClick={closeMobileSidebar}
             >
-
-              <span>
-                01
-              </span>
-
+              <span>01</span>
               Dashboard
-
             </Link>
-
-
-            {/* 02 BOOKING */}
 
             <Link
               to="/booking"
-              className={`dashboard-nav-item ${
-                isActive(
-                  "booking"
-                )
-              }`}
-              onClick={
-                closeMobileSidebar
-              }
+              className={`dashboard-nav-item ${isActive("booking")}`}
+              onClick={closeMobileSidebar}
             >
-
-              <span>
-                02
-              </span>
-
+              <span>02</span>
               Booking List
-
             </Link>
 
-
-            {/* 03 CUSTOMER */}
-
-            {(employeeRole ===
-              "Founder" ||
-              employeeRole ===
-              "Administrator") && (
-
+            {isOperational && (
               <Link
                 to="/customer"
-                className={`dashboard-nav-item ${
-                  isActive(
-                    "customer"
-                  )
-                }`}
-                onClick={
-                  closeMobileSidebar
-                }
+                className={`dashboard-nav-item ${isActive("customer")}`}
+                onClick={closeMobileSidebar}
               >
-
-                <span>
-                  03
-                </span>
-
+                <span>03</span>
                 Customer Data
-
               </Link>
-
             )}
 
-
-            {/* =================================================
-                FINANCE
-            ================================================= */}
-
-            {(employeeRole ===
-              "Founder" ||
-              employeeRole ===
-              "Administrator") && (
-
-              <div className="dashboard-nav-section second">
-                FINANCE
-              </div>
-
+            {isOperational && (
+              <Link
+                to="/galleries"
+                className={`dashboard-nav-item ${isActive("galleries")}`}
+                onClick={closeMobileSidebar}
+              >
+                <span>04</span>
+                Client Gallery
+              </Link>
             )}
 
+            {isOperational && (
+              <div className="dashboard-nav-section second">FINANCE</div>
+            )}
 
-            {/* 04 SPENDING */}
-
-            {(employeeRole ===
-              "Founder" ||
-              employeeRole ===
-              "Administrator") && (
-
+            {isOperational && (
               <Link
                 to="/spending"
-                className={`dashboard-nav-item ${
-                  isActive(
-                    "spending"
-                  )
-                }`}
-                onClick={
-                  closeMobileSidebar
-                }
+                className={`dashboard-nav-item ${isActive("spending")}`}
+                onClick={closeMobileSidebar}
               >
-
-                <span>
-                  04
-                </span>
-
+                <span>05</span>
                 Spending
-
               </Link>
-
             )}
 
-
-            {/* 05 TRANSACTIONS */}
-
-            {(employeeRole ===
-              "Founder" ||
-              employeeRole ===
-              "Administrator") && (
-
+            {isOperational && (
               <Link
                 to="/transactions"
-                className={`dashboard-nav-item ${
-                  isActive(
-                    "transactions"
-                  )
-                }`}
-                onClick={
-                  closeMobileSidebar
-                }
+                className={`dashboard-nav-item ${isActive("transactions")}`}
+                onClick={closeMobileSidebar}
               >
-
-                <span>
-                  05
-                </span>
-
+                <span>06</span>
                 Transactions
-
               </Link>
-
             )}
 
-
-            {/* 06 BOOKKEEPING */}
-
-            {(employeeRole ===
-              "Founder" ||
-              employeeRole ===
-              "Administrator") && (
-
+            {isOperational && (
               <Link
                 to="/bookkeeping"
-                className={`dashboard-nav-item ${
-                  isActive(
-                    "bookkeeping"
-                  )
-                }`}
-                onClick={
-                  closeMobileSidebar
-                }
+                className={`dashboard-nav-item ${isActive("bookkeeping")}`}
+                onClick={closeMobileSidebar}
               >
-
-                <span>
-                  06
-                </span>
-
+                <span>07</span>
                 Bookkeeping
-
               </Link>
-
             )}
 
-
-            {/* =================================================
-                MANAGEMENT
-            ================================================= */}
-
-            {employeeRole ===
-              "Founder" && (
-
-              <div className="dashboard-nav-section second">
-                MANAGEMENT
-              </div>
-
+            {employeeRole === "Founder" && (
+              <div className="dashboard-nav-section second">MANAGEMENT</div>
             )}
 
-
-            {/* 07 EMPLOYEE */}
-
-            {employeeRole ===
-              "Founder" && (
-
+            {employeeRole === "Founder" && (
               <Link
                 to="/employee"
-                className={`dashboard-nav-item ${
-                  isActive(
-                    "employee"
-                  )
-                }`}
-                onClick={
-                  closeMobileSidebar
-                }
+                className={`dashboard-nav-item ${isActive("employee")}`}
+                onClick={closeMobileSidebar}
               >
-
-                <span>
-                  07
-                </span>
-
+                <span>08</span>
                 Employee
-
               </Link>
-
             )}
 
-
-            {/* 08 DOCUMENTS */}
-
-            {employeeRole ===
-              "Founder" && (
-
+            {employeeRole === "Founder" && (
               <Link
                 to="/documents"
-                className={`dashboard-nav-item ${
-                  isActive(
-                    "documents"
-                  )
-                }`}
-                onClick={
-                  closeMobileSidebar
-                }
+                className={`dashboard-nav-item ${isActive("documents")}`}
+                onClick={closeMobileSidebar}
               >
-
-                <span>
-                  08
-                </span>
-
+                <span>09</span>
                 Documents
-
               </Link>
-
             )}
-
           </nav>
-
         </div>
-
-
-        {/* =================================================
-            USER AREA
-        ================================================= */}
 
         <div className="dashboard-sidebar-bottom">
-
-
           <div className="dashboard-user">
-
             <div className="dashboard-avatar">
-
-              {employeeName
-                .charAt(0)
-                .toUpperCase()}
-
+              {employeeName.charAt(0).toUpperCase()}
             </div>
-
 
             <div>
-
-              <div className="dashboard-user-name">
-                {employeeName}
-              </div>
-
-              <div className="dashboard-user-role">
-                {employeeRole}
-              </div>
-
+              <div className="dashboard-user-name">{employeeName}</div>
+              <div className="dashboard-user-role">{employeeRole}</div>
             </div>
-
           </div>
 
-
-          <button
-            className="dashboard-logout"
-            onClick={
-              handleLogout
-            }
-          >
+          <button className="dashboard-logout" onClick={handleLogout}>
             Sign out
           </button>
-
-
         </div>
-
       </aside>
-
     </>
-
   );
-
 }
-
 
 export default Sidebar;
