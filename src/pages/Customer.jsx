@@ -329,30 +329,6 @@ function Customer() {
   };
 
   /* =========================================================
-     ADD
-  ========================================================= */
-
-  const openAddForm = () => {
-    if (!canManageCustomer) return;
-
-    setFormData({
-      name: "",
-      phone: "",
-      package: "",
-      date: "",
-      packagePrice: "",
-      addon: "",
-      addonNote: "",
-      addonPaymentMethod: "Cash",
-      status: "Proses",
-    });
-
-    setSelectedCustomer(null);
-    setErrorMessage("");
-    setModalType("add");
-  };
-
-  /* =========================================================
      EDIT
   ========================================================= */
 
@@ -543,6 +519,13 @@ function Customer() {
       return;
     }
 
+    if (modalType !== "edit" || !selectedCustomer) {
+      setErrorMessage(
+        "Customer baru harus dibuat melalui Booking."
+      );
+      return;
+    }
+
     const customerData = {
       name: formData.name.trim(),
       phone: formData.phone.trim(),
@@ -552,120 +535,63 @@ function Customer() {
       addon: Number(formData.addon || 0),
       addonNote: formData.addonNote,
       status: formData.status,
-      total:
-        modalType === "edit" && selectedCustomer
-          ? Number(selectedCustomer.total || 0)
-          : 0,
+      total: Number(selectedCustomer.total || 0),
     };
 
     /* =====================================================
        EDIT
     ===================================================== */
 
-    if (modalType === "edit") {
-      const { data, error } = await supabase
-        .from("customers")
-        .update(convertToDatabase(customerData))
-        .eq("id", selectedCustomer.id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error("UPDATE CUSTOMER ERROR:", error);
-
-        setErrorMessage(
-          `Gagal memperbarui customer: ${error.message}`
-        );
-        return;
-      }
-
-      const updatedCustomer = convertFromDatabase(data);
-
-      try {
-        await syncAddonTransaction(
-          updatedCustomer,
-          Number(formData.addon || 0),
-          formData.addonPaymentMethod,
-          formData.addonNote
-        );
-      } catch (transactionError) {
-        console.error("ADD-ON TRANSACTION SYNC ERROR:", transactionError);
-
-        await supabase
-          .from("customers")
-          .update(convertToDatabase(selectedCustomer))
-          .eq("id", selectedCustomer.id);
-
-        setErrorMessage(
-          `Customer tidak disimpan karena transaksi add-on gagal: ${transactionError.message}`
-        );
-        return;
-      }
-
-      setCustomers((current) =>
-        current.map((customer) =>
-          customer.id === selectedCustomer.id
-            ? updatedCustomer
-            : customer
-        )
-      );
-
-      if (updatedCustomer.date) {
-        setSelectedYear(updatedCustomer.date.slice(0, 4));
-        setSelectedMonth(updatedCustomer.date.slice(5, 7));
-      }
-
-      closeModal();
-      return;
-    }
-
-    /* =====================================================
-       ADD
-    ===================================================== */
-
     const { data, error } = await supabase
       .from("customers")
-      .insert([convertToDatabase(customerData)])
+      .update(convertToDatabase(customerData))
+      .eq("id", selectedCustomer.id)
       .select()
       .single();
 
     if (error) {
-      console.error("INSERT CUSTOMER ERROR:", error);
+      console.error("UPDATE CUSTOMER ERROR:", error);
 
       setErrorMessage(
-        `Gagal menyimpan customer: ${error.message}`
+        `Gagal memperbarui customer: ${error.message}`
       );
       return;
     }
 
-    const newCustomer = convertFromDatabase(data);
+    const updatedCustomer = convertFromDatabase(data);
 
     try {
       await syncAddonTransaction(
-        newCustomer,
+        updatedCustomer,
         Number(formData.addon || 0),
         formData.addonPaymentMethod,
         formData.addonNote
       );
     } catch (transactionError) {
-      console.error("ADD-ON TRANSACTION CREATE ERROR:", transactionError);
+      console.error("ADD-ON TRANSACTION SYNC ERROR:", transactionError);
 
       await supabase
         .from("customers")
-        .delete()
-        .eq("id", newCustomer.id);
+        .update(convertToDatabase(selectedCustomer))
+        .eq("id", selectedCustomer.id);
 
       setErrorMessage(
-        `Customer dibatalkan karena transaksi add-on gagal: ${transactionError.message}`
+        `Customer tidak disimpan karena transaksi add-on gagal: ${transactionError.message}`
       );
       return;
     }
 
-    setCustomers((current) => [...current, newCustomer]);
+    setCustomers((current) =>
+      current.map((customer) =>
+        customer.id === selectedCustomer.id
+          ? updatedCustomer
+          : customer
+      )
+    );
 
-    if (newCustomer.date) {
-      setSelectedYear(newCustomer.date.slice(0, 4));
-      setSelectedMonth(newCustomer.date.slice(5, 7));
+    if (updatedCustomer.date) {
+      setSelectedYear(updatedCustomer.date.slice(0, 4));
+      setSelectedMonth(updatedCustomer.date.slice(5, 7));
     }
 
     closeModal();
@@ -861,14 +787,6 @@ function Customer() {
                   >
                     Download PDF
                   </button>
-
-                  <button
-                    type="button"
-                    className="add-customer-button"
-                    onClick={openAddForm}
-                  >
-                    Add
-                  </button>
                 </div>
               )}
             </div>
@@ -992,30 +910,20 @@ function Customer() {
         </footer>
       </main>
 
-      {/* ADD / EDIT */}
+      {/* EDIT */}
 
-      {(modalType === "add" || modalType === "edit") && (
+      {modalType === "edit" && selectedCustomer && (
         <div className="customer-overlay">
           <div className="customer-form-box">
             <div className="customer-form-header">
               <div>
                 <div className="customer-form-kicker">
-                  {modalType === "edit"
-                    ? "EDIT CUSTOMER"
-                    : "CUSTOMER DATA"}
+                  EDIT CUSTOMER
                 </div>
 
-                <h2>
-                  {modalType === "edit"
-                    ? "Edit Customer"
-                    : "Tambah Customer"}
-                </h2>
+                <h2>Edit Customer</h2>
 
-                <p>
-                  {modalType === "edit"
-                    ? "Perbarui informasi customer."
-                    : "Masukkan informasi customer baru."}
-                </p>
+                <p>Perbarui informasi customer.</p>
               </div>
 
               <button
@@ -1191,19 +1099,17 @@ function Customer() {
               </div>
 
               <div className="customer-form-footer">
-                {modalType === "edit" && (
-                  <button
-                    type="button"
-                    className="delete-button"
-                    onClick={() =>
-                      deleteCustomer(
-                        selectedCustomer
-                      )
-                    }
-                  >
-                    Delete
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="delete-button"
+                  onClick={() =>
+                    deleteCustomer(
+                      selectedCustomer
+                    )
+                  }
+                >
+                  Delete
+                </button>
 
                 <div className="form-footer-right">
                   <button
@@ -1218,9 +1124,7 @@ function Customer() {
                     type="submit"
                     className="customer-save"
                   >
-                    {modalType === "edit"
-                      ? "Save Changes"
-                      : "Save Customer"}
+                    Save Changes
                   </button>
                 </div>
               </div>
