@@ -1120,10 +1120,6 @@ function Transactions() {
             </div>
 
             <div className="transactions-header-actions">
-              <span className="transactions-auto-label">
-                AUTO FROM BOOKING
-              </span>
-
               <button
                 type="button"
                 className="transactions-pdf-button"
