@@ -1707,3 +1707,377 @@ body {
   .dashboard-heading-actions { width: 100%; justify-content: flex-start; }
   .dashboard-performance-filter { flex: 1; min-width: 220px; }
 }
+
+/* =========================================================
+   DASHBOARD REMINDER NOTES
+   Founder / Administrator manage, Staff read-only
+========================================================= */
+
+.dashboard-left-stack {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.dashboard-left-stack .revenue-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dashboard-left-stack .revenue-chart {
+  flex: 1;
+  height: auto;
+  min-height: 220px;
+}
+
+.dashboard-notes-card {
+  overflow: hidden;
+  min-height: 150px;
+}
+
+.dashboard-note-add {
+  min-width: 58px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid #3a3a3a;
+  background: #eee;
+  color: #111;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.dashboard-note-add:hover {
+  background: #d9d9d9;
+  border-color: #d9d9d9;
+}
+
+.dashboard-notes-list {
+  min-height: 82px;
+  max-height: 150px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a3a transparent;
+}
+
+.dashboard-notes-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.dashboard-notes-list::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+}
+
+.dashboard-note-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #292929;
+}
+
+.dashboard-note-item:last-child {
+  border-bottom: 0;
+}
+
+.dashboard-note-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.dashboard-note-main strong {
+  display: block;
+  margin: 0;
+  color: #eee;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-note-main p {
+  margin: 5px 0 7px;
+  color: #929292;
+  font-size: 10.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-note-main span {
+  display: block;
+  color: #555;
+  font-size: 8.5px;
+  letter-spacing: 0.3px;
+}
+
+.dashboard-note-delete {
+  flex-shrink: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 8.5px;
+  transition: color 0.15s ease;
+}
+
+.dashboard-note-delete:hover {
+  color: #d2a0a0;
+}
+
+.dashboard-notes-empty {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  padding: 16px 18px;
+  color: #5f5f5f;
+  font-size: 10px;
+}
+
+.dashboard-note-inline-error {
+  padding: 9px 18px;
+  border-top: 1px solid #453030;
+  background: #241b1b;
+  color: #c99595;
+  font-size: 9.5px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   REMINDER NOTE MODAL
+========================================================= */
+
+.dashboard-note-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.dashboard-note-modal {
+  width: min(460px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: #181818;
+  border: 1px solid #303030;
+  color: #eee;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+
+.dashboard-note-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px;
+  border-bottom: 1px solid #2d2d2d;
+}
+
+.dashboard-note-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.dashboard-note-close {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid #303030;
+  background: #151515;
+  color: #888;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.dashboard-note-close:hover {
+  color: #fff;
+  border-color: #4a4a4a;
+}
+
+.dashboard-note-modal form {
+  padding: 20px;
+}
+
+.dashboard-note-field {
+  margin-bottom: 14px;
+}
+
+.dashboard-note-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #777;
+  font-size: 8.5px;
+  letter-spacing: 1.5px;
+}
+
+.dashboard-note-field input,
+.dashboard-note-field textarea {
+  width: 100%;
+  border: 1px solid #303030;
+  border-radius: 0;
+  outline: 0;
+  background: #202020;
+  color: #eee;
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.5;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.dashboard-note-field input {
+  height: 42px;
+  padding: 0 13px;
+}
+
+.dashboard-note-field textarea {
+  min-height: 130px;
+  padding: 12px 13px;
+  resize: vertical;
+}
+
+.dashboard-note-field input:focus,
+.dashboard-note-field textarea:focus {
+  border-color: #555;
+  background: #222;
+}
+
+.dashboard-note-field input::placeholder,
+.dashboard-note-field textarea::placeholder {
+  color: #666;
+}
+
+.dashboard-note-form-error {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #453030;
+  background: #241b1b;
+  color: #c99595;
+  font-size: 9.5px;
+  line-height: 1.45;
+}
+
+.dashboard-note-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 4px;
+}
+
+.dashboard-note-cancel,
+.dashboard-note-save {
+  min-width: 105px;
+  height: 38px;
+  padding: 0 15px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+}
+
+.dashboard-note-cancel {
+  border: 1px solid #303030;
+  background: transparent;
+  color: #888;
+}
+
+.dashboard-note-save {
+  border: 1px solid #eee;
+  background: #eee;
+  color: #111;
+  font-weight: 500;
+}
+
+.dashboard-note-cancel:hover {
+  color: #fff;
+  border-color: #4a4a4a;
+}
+
+.dashboard-note-save:hover {
+  background: #d9d9d9;
+  border-color: #d9d9d9;
+}
+
+.dashboard-note-cancel:disabled,
+.dashboard-note-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .dashboard-left-stack {
+    grid-template-rows: auto auto;
+    gap: 10px;
+  }
+
+  .dashboard-left-stack .revenue-card {
+    height: auto;
+  }
+
+  .dashboard-left-stack .revenue-chart {
+    min-height: 230px;
+  }
+
+  .dashboard-notes-list {
+    max-height: 230px;
+  }
+
+  .dashboard-note-item {
+    padding: 14px 16px;
+  }
+
+  .dashboard-note-main strong {
+    font-size: 12px;
+  }
+
+  .dashboard-note-main p {
+    font-size: 10.5px;
+  }
+
+  .dashboard-note-overlay {
+    align-items: flex-end;
+    padding: 14px;
+  }
+
+  .dashboard-note-modal {
+    width: 100%;
+    max-height: calc(100vh - 28px);
+  }
+
+  .dashboard-note-modal-header,
+  .dashboard-note-modal form {
+    padding: 17px;
+  }
+
+  .dashboard-note-form-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-note-cancel,
+  .dashboard-note-save {
+    width: 100%;
+    min-width: 0;
+  }
+}

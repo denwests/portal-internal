@@ -39,6 +39,15 @@ function Dashboard() {
     ) || "Staff";
 
 
+  const canManageNotes =
+    [
+      "Founder",
+      "Administrator",
+    ].includes(
+      employeeRole
+    );
+
+
   /* =======================================================
      DATE
   ======================================================= */
@@ -102,6 +111,58 @@ function Dashboard() {
     loading,
     setLoading,
   ] = useState(true);
+
+
+  /* =======================================================
+     REMINDER NOTES
+  ======================================================= */
+
+  const [
+    notes,
+    setNotes,
+  ] = useState([]);
+
+
+  const [
+    notesLoading,
+    setNotesLoading,
+  ] = useState(true);
+
+
+  const [
+    showNoteForm,
+    setShowNoteForm,
+  ] = useState(false);
+
+
+  const [
+    noteTitle,
+    setNoteTitle,
+  ] = useState(
+    ""
+  );
+
+
+  const [
+    noteDescription,
+    setNoteDescription,
+  ] = useState(
+    ""
+  );
+
+
+  const [
+    savingNote,
+    setSavingNote,
+  ] = useState(false);
+
+
+  const [
+    noteError,
+    setNoteError,
+  ] = useState(
+    ""
+  );
 
 
   /* =======================================================
@@ -609,6 +670,307 @@ function Dashboard() {
 
 
   /* =======================================================
+     LOAD REMINDER NOTES
+  ======================================================= */
+
+  const fetchNotes =
+    async () => {
+
+      setNotesLoading(true);
+      setNoteError(
+        ""
+      );
+
+
+      const {
+        data,
+        error,
+      } = await supabase
+        .from(
+          "dashboard_notes"
+        )
+        .select(
+          "id, title, description, created_by, created_at"
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false,
+          }
+        );
+
+
+      if (error) {
+
+        console.error(
+          "DASHBOARD NOTES ERROR:",
+          error
+        );
+
+        setNotes([]);
+        setNoteError(
+          "Reminder belum dapat dimuat."
+        );
+        setNotesLoading(false);
+        return;
+
+      }
+
+
+      setNotes(
+        data || []
+      );
+      setNotesLoading(false);
+
+    };
+
+
+  useEffect(() => {
+
+    fetchNotes();
+
+  }, []);
+
+
+  const openNoteForm =
+    () => {
+
+      if (!canManageNotes) {
+        return;
+      }
+
+      setNoteTitle(
+        ""
+      );
+      setNoteDescription(
+        ""
+      );
+      setNoteError(
+        ""
+      );
+      setShowNoteForm(true);
+
+    };
+
+
+  const closeNoteForm =
+    () => {
+
+      if (savingNote) {
+        return;
+      }
+
+      setShowNoteForm(false);
+      setNoteError(
+        ""
+      );
+
+    };
+
+
+  const handleSaveNote =
+    async (event) => {
+
+      event.preventDefault();
+
+      if (!canManageNotes) {
+        return;
+      }
+
+
+      const cleanTitle =
+        noteTitle.trim();
+
+      const cleanDescription =
+        noteDescription.trim();
+
+
+      if (
+        !cleanTitle ||
+        !cleanDescription
+      ) {
+
+        setNoteError(
+          "Judul dan deskripsi wajib diisi."
+        );
+        return;
+
+      }
+
+
+      setSavingNote(true);
+      setNoteError(
+        ""
+      );
+
+
+      const {
+        data: sessionData,
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+
+      const userId =
+        sessionData?.session?.user?.id;
+
+
+      if (
+        sessionError ||
+        !userId
+      ) {
+
+        setNoteError(
+          "Sesi login tidak ditemukan. Silakan login kembali."
+        );
+        setSavingNote(false);
+        return;
+
+      }
+
+
+      const {
+        data,
+        error,
+      } = await supabase
+        .from(
+          "dashboard_notes"
+        )
+        .insert([
+          {
+            title: cleanTitle,
+            description:
+              cleanDescription,
+            created_by:
+              userId,
+          },
+        ])
+        .select(
+          "id, title, description, created_by, created_at"
+        )
+        .single();
+
+
+      if (error) {
+
+        console.error(
+          "DASHBOARD NOTE INSERT ERROR:",
+          error
+        );
+
+        setNoteError(
+          error.message ||
+          "Gagal menambahkan reminder."
+        );
+        setSavingNote(false);
+        return;
+
+      }
+
+
+      setNotes(
+        (current) => [
+          data,
+          ...current,
+        ]
+      );
+
+      setSavingNote(false);
+      setShowNoteForm(false);
+      setNoteTitle(
+        ""
+      );
+      setNoteDescription(
+        ""
+      );
+
+    };
+
+
+  const handleDeleteNote =
+    async (note) => {
+
+      if (
+        !canManageNotes ||
+        !note?.id
+      ) {
+        return;
+      }
+
+
+      const confirmed =
+        window.confirm(
+          `Hapus reminder "${note.title}"?`
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      const {
+        error,
+      } = await supabase
+        .from(
+          "dashboard_notes"
+        )
+        .delete()
+        .eq(
+          "id",
+          note.id
+        );
+
+
+      if (error) {
+
+        console.error(
+          "DASHBOARD NOTE DELETE ERROR:",
+          error
+        );
+
+        setNoteError(
+          error.message ||
+          "Gagal menghapus reminder."
+        );
+        return;
+
+      }
+
+
+      setNotes(
+        (current) =>
+          current.filter(
+            (item) =>
+              item.id !==
+              note.id
+          )
+      );
+
+    };
+
+
+  const formatNoteDate =
+    (value) => {
+
+      if (!value) {
+        return "";
+      }
+
+      return new Date(
+        value
+      ).toLocaleDateString(
+        "id-ID",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }
+      );
+
+    };
+
+
+  /* =======================================================
      CALENDAR CELLS
   ======================================================= */
 
@@ -850,6 +1212,40 @@ function Dashboard() {
 
 
         {/* =================================================
+            TOPBAR
+        ================================================= */}
+
+        <header className="dashboard-topbar">
+
+          <div>
+
+            <div className="dashboard-eyebrow">
+              PLUNO STUDIO · INTERNAL PORTAL
+            </div>
+
+            <h1>
+              Dashboard
+            </h1>
+
+            <p>
+              Overview of your studio activity.
+            </p>
+
+          </div>
+
+
+          <div className="dashboard-status">
+
+            <span></span>
+
+            Studio Online
+
+          </div>
+
+        </header>
+
+
+        {/* =================================================
             OVERVIEW
         ================================================= */}
 
@@ -871,14 +1267,7 @@ function Dashboard() {
             </div>
 
 
-            <div className="dashboard-heading-actions">
-
-              <div className="dashboard-status">
-                <span></span>
-                Studio Online
-              </div>
-
-              <div className="dashboard-performance-filter">
+            <div className="dashboard-performance-filter">
 
               <select
                 value={
@@ -933,8 +1322,6 @@ function Dashboard() {
                 )}
 
               </select>
-
-              </div>
 
             </div>
 
@@ -1061,11 +1448,135 @@ function Dashboard() {
           <div className="dashboard-content-grid">
 
 
-            {/* =================================================
-                MONTHLY REVENUE
-            ================================================= */}
+            <div className="dashboard-left-stack">
 
-            <div className="dashboard-card revenue-card">
+
+              {/* =================================================
+                  REMINDER NOTES
+              ================================================= */}
+
+              <div className="dashboard-card dashboard-notes-card">
+
+                <div className="dashboard-card-header">
+
+                  <div>
+
+                    <div className="dashboard-card-kicker">
+                      NOTES
+                    </div>
+
+                    <h3>
+                      Reminder Notes
+                    </h3>
+
+                  </div>
+
+
+                  {canManageNotes && (
+
+                    <button
+                      type="button"
+                      className="dashboard-note-add"
+                      onClick={
+                        openNoteForm
+                      }
+                    >
+                      Add
+                    </button>
+
+                  )}
+
+                </div>
+
+
+                <div className="dashboard-notes-list">
+
+                  {notesLoading ? (
+
+                    <div className="dashboard-notes-empty">
+                      Loading reminder...
+                    </div>
+
+                  ) : notes.length === 0 ? (
+
+                    <div className="dashboard-notes-empty">
+                      No reminder yet.
+                    </div>
+
+                  ) : (
+
+                    notes.map(
+                      (note) => (
+
+                        <div
+                          className="dashboard-note-item"
+                          key={
+                            note.id
+                          }
+                        >
+
+                          <div className="dashboard-note-main">
+
+                            <strong>
+                              {note.title}
+                            </strong>
+
+                            <p>
+                              {note.description}
+                            </p>
+
+                            <span>
+                              {formatNoteDate(
+                                note.created_at
+                              )}
+                            </span>
+
+                          </div>
+
+
+                          {canManageNotes && (
+
+                            <button
+                              type="button"
+                              className="dashboard-note-delete"
+                              onClick={() =>
+                                handleDeleteNote(
+                                  note
+                                )
+                              }
+                            >
+                              Delete
+                            </button>
+
+                          )}
+
+                        </div>
+
+                      )
+                    )
+
+                  )}
+
+                </div>
+
+
+                {noteError &&
+                  !showNoteForm && (
+
+                  <div className="dashboard-note-inline-error">
+                    {noteError}
+                  </div>
+
+                )}
+
+              </div>
+
+
+              {/* =================================================
+                  MONTHLY REVENUE
+              ================================================= */}
+
+              <div className="dashboard-card revenue-card">
 
               <div className="dashboard-card-header">
 
@@ -1150,6 +1661,9 @@ function Dashboard() {
                 )}
 
               </div>
+
+            </div>
+
 
             </div>
 
@@ -1387,6 +1901,159 @@ function Dashboard() {
           </div>
 
         </section>
+
+
+        {/* =================================================
+            REMINDER NOTE MODAL
+        ================================================= */}
+
+        {showNoteForm && (
+
+          <div
+            className="dashboard-note-overlay"
+            onMouseDown={(event) => {
+
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                closeNoteForm();
+              }
+
+            }}
+          >
+
+            <div className="dashboard-note-modal">
+
+              <div className="dashboard-note-modal-header">
+
+                <div>
+
+                  <div className="dashboard-card-kicker">
+                    NEW REMINDER
+                  </div>
+
+                  <h3>
+                    Add Note
+                  </h3>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  className="dashboard-note-close"
+                  onClick={
+                    closeNoteForm
+                  }
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+
+              </div>
+
+
+              <form
+                onSubmit={
+                  handleSaveNote
+                }
+              >
+
+                <div className="dashboard-note-field">
+
+                  <label>
+                    TITLE
+                  </label>
+
+                  <input
+                    type="text"
+                    value={
+                      noteTitle
+                    }
+                    maxLength="120"
+                    placeholder="Judul reminder"
+                    onChange={(event) =>
+                      setNoteTitle(
+                        event.target.value
+                      )
+                    }
+                    required
+                  />
+
+                </div>
+
+
+                <div className="dashboard-note-field">
+
+                  <label>
+                    DESCRIPTION
+                  </label>
+
+                  <textarea
+                    value={
+                      noteDescription
+                    }
+                    maxLength="1000"
+                    rows="5"
+                    placeholder="Deskripsi reminder"
+                    onChange={(event) =>
+                      setNoteDescription(
+                        event.target.value
+                      )
+                    }
+                    required
+                  />
+
+                </div>
+
+
+                {noteError && (
+
+                  <div className="dashboard-note-form-error">
+                    {noteError}
+                  </div>
+
+                )}
+
+
+                <div className="dashboard-note-form-footer">
+
+                  <button
+                    type="button"
+                    className="dashboard-note-cancel"
+                    onClick={
+                      closeNoteForm
+                    }
+                    disabled={
+                      savingNote
+                    }
+                  >
+                    Cancel
+                  </button>
+
+
+                  <button
+                    type="submit"
+                    className="dashboard-note-save"
+                    disabled={
+                      savingNote
+                    }
+                  >
+                    {savingNote
+                      ? "Saving..."
+                      : "Save Note"}
+                  </button>
+
+                </div>
+
+              </form>
+
+            </div>
+
+          </div>
+
+        )}
 
 
         {/* =================================================
