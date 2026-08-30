@@ -6,6 +6,8 @@ import {
 
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import TablePagination from "../components/TablePagination";
+import useTablePagination from "../hooks/useTablePagination";
 import {
   getRevenueDate,
   isRevenueInMonth,
@@ -539,6 +541,11 @@ function Transactions() {
       );
     });
   }, [transactions, selectedMonth, selectedYear]);
+
+  const transactionPagination = useTablePagination(
+    filteredTransactions,
+    `${selectedMonth}-${selectedYear}`
+  );
 
   const fixedRevenueTransactions = useMemo(() => {
     return transactions.filter((item) =>
@@ -1186,7 +1193,7 @@ function Transactions() {
                     </td>
                   </tr>
                 ) : (
-                  filteredTransactions.map((item) => (
+                  transactionPagination.visibleItems.map((item) => (
                     <tr key={item.id}>
                       <td>{formatDate(item.transaction_date)}</td>
                       <td>{formatDate(getRevenueDate(item))}</td>
@@ -1280,6 +1287,13 @@ function Transactions() {
               </tbody>
             </table>
           </div>
+
+          <TablePagination
+            currentPage={transactionPagination.currentPage}
+            totalPages={transactionPagination.totalPages}
+            onPageChange={transactionPagination.setCurrentPage}
+            label="transaksi"
+          />
         </section>
 
         <footer className="transactions-footer">

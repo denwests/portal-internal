@@ -3,6 +3,9 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import TablePagination from "../components/TablePagination";
+import useTablePagination from "../hooks/useTablePagination";
+import { summarizeCustomerFinance } from "../lib/customerFinance";
 import "./Customer.css";
 
 /* =========================================================
@@ -33,10 +36,6 @@ function calculateMdr(amount, paymentMethod) {
     mdrAmount,
     netAmount: gross - mdrAmount,
   };
-}
-
-function maskMoney() {
-  return "••••••";
 }
 
 /* =========================================================
@@ -86,18 +85,41 @@ function getGrandTotal(customer) {
 ========================================================= */
 
 function convertFromDatabase(customer) {
+  const packagePrice = Number(customer.price || 0);
+  const addon = Number(customer.addon || 0);
+  const storedTotal = Number(customer.total || 0);
+  const fallbackPackageValue =
+    String(customer.status || "").toLowerCase() === "canceled"
+      ? storedTotal
+      : packagePrice + addon;
+
   return {
     id: customer.id,
     name: customer.name || "",
     phone: customer.phone || "",
     package: customer.package || "",
     date: customer.date || "",
-    packagePrice: Number(customer.price || 0),
-    addon: Number(customer.addon || 0),
+    packagePrice,
+    addon,
     addonNote: customer.addon_note || "",
     total: Number(customer.total || 0),
     status: customer.status || "Proses",
     createdAt: customer.created_at,
+    totalPackageValue: Number(
+      customer.total_package_value ?? fallbackPackageValue
+    ),
+    totalMdrValue: Number(customer.total_mdr_value || 0),
+    totalNetValue: Number(
+      customer.total_net_value ?? fallbackPackageValue
+    ),
+    linkedTransactionCount: Number(
+      customer.linked_transaction_count || 0
+    ),
+    reconciliationDifference: Number(
+      customer.reconciliation_difference || 0
+    ),
+    reconciliationStatus:
+      customer.reconciliation_status || "not_calculated",
   };
 }
 
@@ -127,7 +149,6 @@ function Customer() {
   const employeeRole =
     localStorage.getItem("employeeRole") || "Staff";
 
-  const isStaff = employeeRole === "Staff";
   const canManageCustomer =
     employeeRole === "Founder" || employeeRole === "Administrator";
 
@@ -198,7 +219,7 @@ function Customer() {
     setErrorMessage("");
 
     const { data, error } = await supabase
-      .rpc("get_customer_list_for_current_user");
+      .rpc("get_customer_finance_summary");
 
     if (error) {
       console.error("CUSTOMER FETCH ERROR:", error);
@@ -217,6 +238,8 @@ function Customer() {
   };
 
   useEffect(() => {
+    // Initial data hydration is intentionally delegated to the async loader.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCustomers();
   }, []);
 
@@ -257,12 +280,15 @@ function Customer() {
       .includes(search.toLowerCase().trim())
   );
 
-  const totalCustomer = monthCustomers.length;
-
-  const totalRevenue = monthCustomers.reduce(
-    (total, customer) => total + getGrandTotal(customer),
-    0
+  const customerPagination = useTablePagination(
+    filteredCustomers,
+    `${activeMonth}-${activeYear}-${search}`
   );
+
+  const financeSummary = summarizeCustomerFinance(monthCustomers);
+  const totalCustomer = financeSummary.customerCount;
+  const totalRevenue = financeSummary.totalPackageValue;
+  const totalNetRevenue = financeSummary.totalNetValue;
 
   /* =========================================================
      PDF
@@ -305,12 +331,20 @@ function Customer() {
 
     autoTable(doc, {
       startY: 40,
-      head: [["Customer", "Package", "Date", "Total", "Status"]],
+      head: [[
+        "Customer",
+        "Package",
+        "Date",
+        "Total Package Value",
+        "Total Net Value",
+        "Status",
+      ]],
       body: filteredCustomers.map((customer) => [
         customer.name || "-",
         customer.package || "-",
         formatDate(customer.date),
-        formatRupiah(getGrandTotal(customer)),
+        formatRupiah(customer.totalPackageValue),
+        formatRupiah(customer.totalNetValue),
         customer.status || "-",
       ]),
       styles: {
@@ -581,13 +615,7 @@ function Customer() {
       return;
     }
 
-    setCustomers((current) =>
-      current.map((customer) =>
-        customer.id === selectedCustomer.id
-          ? updatedCustomer
-          : customer
-      )
-    );
+    await fetchCustomers();
 
     if (updatedCustomer.date) {
       setSelectedYear(updatedCustomer.date.slice(0, 4));
@@ -731,13 +759,25 @@ function Customer() {
             </div>
 
             <div className="customer-stat-value">
-              {loading
-                ? "..."
-                : isStaff ? maskMoney() : formatRupiah(totalRevenue)}
+              {loading ? "..." : formatRupiah(totalRevenue)}
             </div>
 
             <div className="customer-stat-note">
-              Total transaksi bulan ini
+              Nilai final customer bulan ini
+            </div>
+          </div>
+
+          <div className="customer-stat-card revenue net">
+            <div className="customer-stat-label">
+              TOTAL NET VALUE
+            </div>
+
+            <div className="customer-stat-value">
+              {loading ? "..." : formatRupiah(totalNetRevenue)}
+            </div>
+
+            <div className="customer-stat-note">
+              Setelah MDR transaksi terkait
             </div>
           </div>
         </section>
@@ -797,9 +837,9 @@ function Customer() {
               <thead>
                 <tr>
                   <th>CUSTOMER</th>
-                  <th>PACKAGE</th>
+                  <th>TOTAL PACKAGE VALUE</th>
+                  <th>TOTAL NET VALUE</th>
                   <th>DATE</th>
-                  <th>TOTAL</th>
                   <th>STATUS</th>
                   <th>ACTION</th>
                 </tr>
@@ -833,7 +873,7 @@ function Customer() {
                     </td>
                   </tr>
                 ) : (
-                  filteredCustomers.map((customer) => (
+                  customerPagination.visibleItems.map((customer) => (
                     <tr key={customer.id}>
                       <td>
                         <div className="customer-name">
@@ -841,22 +881,25 @@ function Customer() {
                         </div>
 
                         <div className="customer-contact">
-                          {customer.phone}
+                          {customer.package || "-"} · {customer.phone}
                         </div>
                       </td>
 
-                      <td className="customer-package">
-                        {customer.package || "-"}
+                      <td className="customer-total">
+                        {formatRupiah(customer.totalPackageValue)}
+                      </td>
+
+                      <td className="customer-total customer-net-value">
+                        {formatRupiah(customer.totalNetValue)}
+                        {customer.reconciliationStatus === "needs_review" && (
+                          <span className="customer-finance-warning">
+                            Check link
+                          </span>
+                        )}
                       </td>
 
                       <td className="customer-date">
                         {formatDate(customer.date)}
-                      </td>
-
-                      <td className="customer-total">
-                        {isStaff
-                          ? maskMoney()
-                          : formatRupiah(getGrandTotal(customer))}
                       </td>
 
                       <td>
@@ -902,6 +945,13 @@ function Customer() {
               </tbody>
             </table>
           </div>
+
+          <TablePagination
+            currentPage={customerPagination.currentPage}
+            totalPages={customerPagination.totalPages}
+            onPageChange={customerPagination.setCurrentPage}
+            label="customer"
+          />
         </section>
 
         <footer className="customer-footer">
@@ -1197,9 +1247,7 @@ function Customer() {
                 <span>PACKAGE PRICE</span>
 
                 <strong>
-                  {isStaff
-                    ? maskMoney()
-                    : formatRupiah(selectedCustomer.packagePrice)}
+                  {formatRupiah(selectedCustomer.packagePrice)}
                 </strong>
               </div>
 
@@ -1207,9 +1255,7 @@ function Customer() {
                 <span>ADD-ON</span>
 
                 <strong>
-                  {isStaff
-                    ? maskMoney()
-                    : formatRupiah(selectedCustomer.addon)}
+                  {formatRupiah(selectedCustomer.addon)}
                 </strong>
               </div>
 
@@ -1222,12 +1268,26 @@ function Customer() {
               </div>
 
               <div className="detail-item">
-                <span>GRAND TOTAL</span>
+                <span>TOTAL PACKAGE VALUE</span>
 
                 <strong>
-                  {isStaff
-                    ? maskMoney()
-                    : formatRupiah(getGrandTotal(selectedCustomer))}
+                  {formatRupiah(selectedCustomer.totalPackageValue)}
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>TOTAL MDR</span>
+
+                <strong>
+                  {formatRupiah(selectedCustomer.totalMdrValue)}
+                </strong>
+              </div>
+
+              <div className="detail-item">
+                <span>TOTAL NET VALUE</span>
+
+                <strong>
+                  {formatRupiah(selectedCustomer.totalNetValue)}
                 </strong>
               </div>
 
@@ -1311,6 +1371,14 @@ function Customer() {
               {formatRupiah(totalRevenue)}
             </strong>
           </div>
+
+          <div>
+            <span>TOTAL NET VALUE</span>
+
+            <strong>
+              {formatRupiah(totalNetRevenue)}
+            </strong>
+          </div>
         </div>
 
         <table className="print-table">
@@ -1321,7 +1389,8 @@ function Customer() {
               <th>PHONE</th>
               <th>PACKAGE</th>
               <th>SESSION DATE</th>
-              <th>TOTAL</th>
+              <th>PACKAGE VALUE</th>
+              <th>NET VALUE</th>
               <th>STATUS</th>
             </tr>
           </thead>
@@ -1345,8 +1414,12 @@ function Customer() {
 
                 <td>
                   {formatRupiah(
-                    getGrandTotal(customer)
+                    customer.totalPackageValue
                   )}
+                </td>
+
+                <td>
+                  {formatRupiah(customer.totalNetValue)}
                 </td>
 
                 <td>{customer.status}</td>

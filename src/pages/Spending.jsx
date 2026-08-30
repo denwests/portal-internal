@@ -7,6 +7,8 @@ import {
 
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import TablePagination from "../components/TablePagination";
+import useTablePagination from "../hooks/useTablePagination";
 
 import "./Spending.css";
 
@@ -535,6 +537,16 @@ function Spending() {
           item.category
         ) === "cash"
     );
+
+  const spendingPeriodKey = `${activeMonth}-${activeYear}`;
+  const studioPagination = useTablePagination(
+    studioExpenses,
+    spendingPeriodKey
+  );
+  const cashPagination = useTablePagination(
+    cashSpendings,
+    spendingPeriodKey
+  );
 
 
   /* =======================================================
@@ -1887,7 +1899,7 @@ function Spending() {
 
                   ) : (
 
-                    studioExpenses.map(
+                    studioPagination.visibleItems.map(
                       (
                         item
                       ) => (
@@ -1986,6 +1998,13 @@ function Spending() {
               </table>
 
             </div>
+
+            <TablePagination
+              currentPage={studioPagination.currentPage}
+              totalPages={studioPagination.totalPages}
+              onPageChange={studioPagination.setCurrentPage}
+              label="studio spending"
+            />
 
 
             <div className="spending-summary">
@@ -2194,7 +2213,7 @@ function Spending() {
 
                   ) : (
 
-                    cashSpendings.map(
+                    cashPagination.visibleItems.map(
                       (
                         item
                       ) => (
@@ -2293,6 +2312,13 @@ function Spending() {
               </table>
 
             </div>
+
+            <TablePagination
+              currentPage={cashPagination.currentPage}
+              totalPages={cashPagination.totalPages}
+              onPageChange={cashPagination.setCurrentPage}
+              label="cash spending"
+            />
 
 
             <div className="spending-summary">

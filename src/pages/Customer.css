@@ -231,7 +231,7 @@ body {
 
 .customer-stat-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -245,6 +245,31 @@ body {
 
 .customer-stat-card.revenue {
   background: #1d1d1d;
+}
+
+/* =========================================================
+   FINANCE LOGIC FIX — SIDEBAR SAFE AREA / THREE SUMMARY CARDS
+========================================================= */
+
+@media (min-width: 701px) {
+  .customer-main {
+    width: auto;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .customer-main {
+    margin-left: 0;
+  }
+
+  .customer-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.customer-stat-card.net {
+  border-color: #3a3a3a;
 }
 
 .customer-stat-label {
@@ -407,32 +432,45 @@ body {
 
 .customer-table th:nth-child(1),
 .customer-table td:nth-child(1) {
-  width: 20%;
+  width: 24%;
 }
 
 .customer-table th:nth-child(2),
 .customer-table td:nth-child(2) {
-  width: 14%;
+  width: 20%;
 }
 
 .customer-table th:nth-child(3),
 .customer-table td:nth-child(3) {
-  width: 12%;
+  width: 20%;
 }
 
 .customer-table th:nth-child(4),
 .customer-table td:nth-child(4) {
-  width: 24%;
+  width: 14%;
 }
 
 .customer-table th:nth-child(5),
 .customer-table td:nth-child(5) {
-  width: 13%;
+  width: 10%;
 }
 
 .customer-table th:nth-child(6),
 .customer-table td:nth-child(6) {
-  width: 17%;
+  width: 12%;
+}
+
+.customer-net-value {
+  color: #f2f2f2;
+}
+
+.customer-finance-warning {
+  display: block;
+  margin-top: 4px;
+  color: #d8aa68;
+  font-size: 7px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
 /* =========================================================
@@ -1425,31 +1463,35 @@ body {
   }
 
   .print-table th:nth-child(1) {
-    width: 7%;
+    width: 6%;
   }
 
   .print-table th:nth-child(2) {
-    width: 19%;
+    width: 16%;
   }
 
   .print-table th:nth-child(3) {
-    width: 16%;
+    width: 14%;
   }
 
   .print-table th:nth-child(4) {
-    width: 18%;
-  }
-
-  .print-table th:nth-child(5) {
-    width: 16%;
-  }
-
-  .print-table th:nth-child(6) {
     width: 15%;
   }
 
+  .print-table th:nth-child(5) {
+    width: 14%;
+  }
+
+  .print-table th:nth-child(6) {
+    width: 14%;
+  }
+
   .print-table th:nth-child(7) {
-    width: 9%;
+    width: 14%;
+  }
+
+  .print-table th:nth-child(8) {
+    width: 7%;
   }
 
   .print-footer {
@@ -2057,5 +2099,9 @@ body {
     font-size: 8.5px;
     line-height: 1.2;
     letter-spacing: 1.6px;
+  }
+
+  .customer-stat-grid {
+    grid-template-columns: 1fr;
   }
 }

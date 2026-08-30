@@ -144,8 +144,8 @@ function App() {
 
 
         {/* =================================================
-            CUSTOMER
-            Founder / Administrator / Staff (Staff read-only masked)
+            CUSTOMER FINANCE
+            Founder / Administrator
         ================================================= */}
 
         <Route
@@ -154,7 +154,7 @@ function App() {
 
             <ProtectedRoute
               allowedRoles={
-                ALL_ROLES
+                OPERATIONAL_ROLES
               }
             >
 

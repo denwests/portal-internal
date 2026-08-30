@@ -84,20 +84,11 @@ function Sidebar({ activePage }) {
             </Link>
 
             <Link
-                to="/customer"
-                className={`dashboard-nav-item ${isActive("customer")}`}
-                onClick={closeMobileSidebar}
-              >
-                <span>03</span>
-                Customer Data
-              </Link>
-
-            <Link
                 to="/galleries"
                 className={`dashboard-nav-item ${isActive("galleries")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>04</span>
+                <span>03</span>
                 Client Gallery
               </Link>
 
@@ -107,23 +98,34 @@ function Sidebar({ activePage }) {
 
             {isOperational && (
               <Link
-                to="/spending"
-                className={`dashboard-nav-item ${isActive("spending")}`}
+                to="/transactions"
+                className={`dashboard-nav-item ${isActive("transactions")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>05</span>
-                Spending
+                <span>04</span>
+                Transactions
               </Link>
             )}
 
             {isOperational && (
               <Link
-                to="/transactions"
-                className={`dashboard-nav-item ${isActive("transactions")}`}
+                to="/customer"
+                className={`dashboard-nav-item ${isActive("customer")}`}
+                onClick={closeMobileSidebar}
+              >
+                <span>05</span>
+                Customer Data
+              </Link>
+            )}
+
+            {isOperational && (
+              <Link
+                to="/spending"
+                className={`dashboard-nav-item ${isActive("spending")}`}
                 onClick={closeMobileSidebar}
               >
                 <span>06</span>
-                Transactions
+                Spending
               </Link>
             )}
 

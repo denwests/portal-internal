@@ -5,6 +5,9 @@ import Sidebar from "../components/Sidebar";
 import {
   isRevenueInRange,
 } from "../lib/revenuePeriod";
+import {
+  customerFinanceToRevenueRow,
+} from "../lib/customerFinance";
 import "./Bookkeeping.css";
 
 /* =========================================================
@@ -14,7 +17,7 @@ import "./Bookkeeping.css";
 ========================================================= */
 
 const SPENDINGS_TABLE = "spendings";
-const TRANSACTIONS_TABLE = "transactions";
+const CUSTOMER_FINANCE_RPC = "get_customer_finance_summary";
 const REPORTS_TABLE = "bookkeeping_reports";
 
 /* =========================================================
@@ -195,20 +198,6 @@ function getSpendingDate(item) {
   return item.date || item.transaction_date || null;
 }
 
-function isQrisTransaction(transaction) {
-  const possibleValues = [
-    transaction.payment_method,
-    transaction.payment_type,
-    transaction.method,
-    transaction.payment,
-    transaction.channel,
-  ];
-
-  return possibleValues.some((value) =>
-    String(value || "").toLowerCase().includes("qris")
-  );
-}
-
 function escapeHTML(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -225,7 +214,7 @@ function escapeHTML(value) {
 function Bookkeeping() {
   const [reports, setReports] = useState([]);
   const [spending, setSpending] = useState([]);
-  const [transactions, setTransactions] = useState([]);
+  const [revenueRows, setRevenueRows] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -253,7 +242,7 @@ function Bookkeeping() {
     async function fetchData() {
       const [
         spendingResult,
-        transactionResult,
+        customerFinanceResult,
         reportResult,
       ] = await Promise.all([
         supabase
@@ -263,12 +252,7 @@ function Bookkeeping() {
             ascending: false,
           }),
 
-        supabase
-          .from(TRANSACTIONS_TABLE)
-          .select("*")
-          .order("transaction_date", {
-            ascending: false,
-          }),
+        supabase.rpc(CUSTOMER_FINANCE_RPC),
 
         supabase
           .from(REPORTS_TABLE)
@@ -297,18 +281,20 @@ function Bookkeeping() {
         );
       }
 
-      if (transactionResult.error) {
+      if (customerFinanceResult.error) {
         console.error(
-          "BOOKKEEPING TRANSACTION ERROR:",
-          transactionResult.error
+          "BOOKKEEPING CUSTOMER FINANCE ERROR:",
+          customerFinanceResult.error
         );
 
         errors.push(
-          `Failed to load transaction data: ${transactionResult.error.message}`
+          `Failed to load Customer Data: ${customerFinanceResult.error.message}`
         );
       } else {
-        setTransactions(
-          transactionResult.data || []
+        setRevenueRows(
+          (customerFinanceResult.data || [])
+            .filter((customer) => customer.is_final)
+            .map(customerFinanceToRevenueRow)
         );
       }
 
@@ -375,10 +361,10 @@ function Bookkeeping() {
     toDate,
   ]);
 
-  const filteredTransactions = useMemo(() => {
+  const filteredRevenueRows = useMemo(() => {
     if (!fromDate || !toDate) return [];
 
-    return transactions.filter(
+    return revenueRows.filter(
       (item) =>
         isRevenueInRange(
           item,
@@ -387,7 +373,7 @@ function Bookkeeping() {
         )
     );
   }, [
-    transactions,
+    revenueRows,
     fromDate,
     toDate,
   ]);
@@ -417,7 +403,7 @@ function Bookkeeping() {
     );
 
   const grossRevenue =
-    filteredTransactions.reduce(
+    filteredRevenueRows.reduce(
       (
         total,
         item
@@ -429,11 +415,9 @@ function Bookkeeping() {
       0
     );
 
-  const qrisGrossRevenue =
-    filteredTransactions
-      .filter(
-        isQrisTransaction
-      )
+  const revenueWithMdr =
+    filteredRevenueRows
+      .filter((item) => Number(item.mdr_amount || 0) > 0)
       .reduce(
         (
           total,
@@ -446,25 +430,21 @@ function Bookkeeping() {
         0
       );
 
-  const nonQrisRevenue =
+  const revenueWithoutMdr =
     grossRevenue -
-    qrisGrossRevenue;
+    revenueWithMdr;
 
   /* =======================================================
-     TRANSACTION NET REVENUE
+     CUSTOMER FINAL REVENUE
 
-     Transactions is the financial source of truth.
-     MDR is recorded when each payment is created.
-     Fixed transaction rule:
-     - QRIS <= Rp500.000: 0%
-     - QRIS > Rp500.000: 0.3%
-     - Cash: 0%
-     Bookkeeping reads the stored transaction values and does
-     not recalculate MDR from a configurable setting.
+     Customer Data is the financial source of truth.
+     The database RPC groups the existing transactions for
+     each customer and returns the final package, MDR, and net
+     values. Transactions remains the cash-receipt ledger.
   ======================================================= */
 
   const qrisMdrAmount =
-    filteredTransactions.reduce(
+    filteredRevenueRows.reduce(
       (total, item) =>
         total +
         Number(
@@ -474,15 +454,15 @@ function Bookkeeping() {
     );
 
   const qrisMdrPercentage =
-    qrisGrossRevenue > 0
+    grossRevenue > 0
       ? (
           qrisMdrAmount /
-          qrisGrossRevenue
+          grossRevenue
         ) * 100
       : 0;
 
   const netRevenue =
-    filteredTransactions.reduce(
+    filteredRevenueRows.reduce(
       (total, item) =>
         total +
         Number(
@@ -823,10 +803,13 @@ function Bookkeeping() {
             filteredSpending,
 
           transaction_items:
-            filteredTransactions,
+            filteredRevenueRows,
+
+          customer_revenue_items:
+            filteredRevenueRows,
 
           revenue_basis:
-            "booking_event_date",
+            "customer_final_value",
 
           revenue_summary: {
 
@@ -834,10 +817,10 @@ function Bookkeeping() {
               grossRevenue,
 
             qris_gross_revenue:
-              qrisGrossRevenue,
+              revenueWithMdr,
 
             non_qris_revenue:
-              nonQrisRevenue,
+              revenueWithoutMdr,
 
             qris_mdr_percentage:
               qrisMdrPercentage,
@@ -1480,14 +1463,14 @@ td {
 <div class="section">
 
   <div class="section-title">
-    01 · Fixed Revenue by Event Date
+    01 · Customer Final Revenue by Event Date
   </div>
 
   <div class="summary">
 
     <div class="summary-row">
       <span>
-        Fixed Gross Revenue
+        Total Package Value
       </span>
 
       <strong>
@@ -1499,7 +1482,7 @@ td {
 
     <div class="summary-row">
       <span>
-        QRIS Fixed Revenue
+        Revenue With MDR
       </span>
 
       <strong>
@@ -1511,7 +1494,7 @@ td {
 
     <div class="summary-row">
       <span>
-        Non-QRIS Fixed Revenue
+        Revenue Without MDR
       </span>
 
       <strong>
@@ -1524,11 +1507,7 @@ td {
     <div class="summary-row">
 
       <span>
-        Fixed Revenue MDR
-
-        <span class="muted">
-          (0% ≤ Rp500.000 · 0.3% &gt; Rp500.000)
-        </span>
+        Total MDR
 
       </span>
 
@@ -1543,7 +1522,7 @@ td {
     <div class="summary-row total">
 
       <span>
-        Fixed Net Revenue
+        Total Net Value
       </span>
 
       <strong>
@@ -1939,7 +1918,7 @@ td {
             <div>
 
               <span>
-                REVENUE BY EVENT DATE · EXPENSE BY PAYMENT DATE
+                CUSTOMER FINAL VALUE BY EVENT DATE · EXPENSE BY PAYMENT DATE
               </span>
 
               <strong>
@@ -1988,7 +1967,7 @@ td {
 
 
  {/* =================================================
-    CURRENT FIXED REVENUE · BY EVENT DATE
+    CURRENT CUSTOMER REVENUE · BY EVENT DATE
 ================================================= */}
 
 <section className="bookkeeping-overview">
@@ -2002,7 +1981,7 @@ td {
     <div>
 
       <span>
-        FIXED GROSS REVENUE
+        TOTAL PACKAGE VALUE
       </span>
 
       <strong>
@@ -2017,7 +1996,7 @@ td {
     <div>
 
       <span>
-        FIXED REVENUE MDR
+        TOTAL MDR
       </span>
 
       <strong>
@@ -2032,7 +2011,7 @@ td {
     <div>
 
       <span>
-        FIXED NET REVENUE
+        TOTAL NET VALUE
       </span>
 
       <strong>

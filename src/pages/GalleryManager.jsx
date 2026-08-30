@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import TablePagination from "../components/TablePagination";
+import useTablePagination from "../hooks/useTablePagination";
 import {
   createGalleryFolder,
   deleteDriveItem,
@@ -214,6 +216,8 @@ function GalleryManager() {
       .toLowerCase()
       .includes(keyword);
   });
+
+  const galleryPagination = useTablePagination(filteredGalleries, search);
 
   const totalPhotos = normalizedGalleries.reduce(
     (sum, gallery) => sum + gallery.photoCount,
@@ -716,7 +720,7 @@ function GalleryManager() {
                     </td>
                   </tr>
                 ) : (
-                  filteredGalleries.map((gallery) => {
+                  galleryPagination.visibleItems.map((gallery) => {
                     const linkActive =
                       gallery.status === "active" &&
                       !gallery.linkExpired &&
@@ -845,6 +849,13 @@ function GalleryManager() {
               </tbody>
             </table>
           </div>
+
+          <TablePagination
+            currentPage={galleryPagination.currentPage}
+            totalPages={galleryPagination.totalPages}
+            onPageChange={galleryPagination.setCurrentPage}
+            label="galeri"
+          />
         </section>
 
         <input

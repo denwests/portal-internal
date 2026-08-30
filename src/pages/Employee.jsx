@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import TablePagination from "../components/TablePagination";
+import useTablePagination from "../hooks/useTablePagination";
 import "./Employee.css";
 
 function Employee() {
@@ -72,6 +74,8 @@ function Employee() {
 
     return text.toLowerCase().includes(search.toLowerCase());
   });
+
+  const employeePagination = useTablePagination(filteredEmployees, search);
 
   const totalActive = employees.filter(
     (employee) => employee.status === "Aktif"
@@ -475,7 +479,7 @@ function Employee() {
                     </td>
                   </tr>
                 ) : (
-                  filteredEmployees.map((employee) => (
+                  employeePagination.visibleItems.map((employee) => (
                     <tr key={employee.id}>
                       <td>
                         <div className="employee-name">
@@ -532,6 +536,13 @@ function Employee() {
               </tbody>
             </table>
           </div>
+
+          <TablePagination
+            currentPage={employeePagination.currentPage}
+            totalPages={employeePagination.totalPages}
+            onPageChange={employeePagination.setCurrentPage}
+            label="karyawan"
+          />
         </section>
 
         <footer className="employee-footer">
