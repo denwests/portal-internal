@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../supabase";
+import { getSocialSummary, isSocialApiConfigured } from "../lib/socialApi";
 import "./Sidebar.css";
 
 function Sidebar({ activePage }) {
@@ -8,6 +9,7 @@ function Sidebar({ activePage }) {
   const employeeRole = localStorage.getItem("employeeRole") || "Staff";
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [socialBadge, setSocialBadge] = useState(0);
 
   const closeMobileSidebar = () => {
     setSidebarOpen(false);
@@ -28,6 +30,43 @@ function Sidebar({ activePage }) {
 
   const isOperational =
     employeeRole === "Founder" || employeeRole === "Administrator";
+
+  useEffect(() => {
+    if (!isOperational || !isSocialApiConfigured()) {
+      return undefined;
+    }
+
+    let active = true;
+
+    const loadBadge = async () => {
+      try {
+        const summary = await getSocialSummary();
+
+        if (active) {
+          setSocialBadge(Number(summary?.counts?.need_reply || 0));
+        }
+      } catch {
+        if (active) {
+          setSocialBadge(0);
+        }
+      }
+    };
+
+    const handleInboxUpdate = () => {
+      void loadBadge();
+    };
+
+    void loadBadge();
+
+    const intervalId = window.setInterval(loadBadge, 60000);
+    window.addEventListener("social-inbox-updated", handleInboxUpdate);
+
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener("social-inbox-updated", handleInboxUpdate);
+    };
+  }, [isOperational]);
 
   return (
     <>
@@ -84,13 +123,32 @@ function Sidebar({ activePage }) {
             </Link>
 
             <Link
-                to="/galleries"
-                className={`dashboard-nav-item ${isActive("galleries")}`}
+              to="/galleries"
+              className={`dashboard-nav-item ${isActive("galleries")}`}
+              onClick={closeMobileSidebar}
+            >
+              <span>03</span>
+              Client Gallery
+            </Link>
+
+            {isOperational && (
+              <Link
+                to="/social-media"
+                className={`dashboard-nav-item ${isActive("social-media")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>03</span>
-                Client Gallery
+                <span>04</span>
+                <span className="dashboard-nav-label">Social Media</span>
+                {socialBadge > 0 && (
+                  <span
+                    className="dashboard-nav-badge"
+                    aria-label={`${socialBadge} komentar perlu dibalas`}
+                  >
+                    {socialBadge > 99 ? "99+" : socialBadge}
+                  </span>
+                )}
               </Link>
+            )}
 
             {isOperational && (
               <div className="dashboard-nav-section second">FINANCE</div>
@@ -102,7 +160,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("transactions")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>04</span>
+                <span>05</span>
                 Transactions
               </Link>
             )}
@@ -113,7 +171,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("customer")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>05</span>
+                <span>06</span>
                 Customer Data
               </Link>
             )}
@@ -124,7 +182,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("spending")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>06</span>
+                <span>07</span>
                 Spending
               </Link>
             )}
@@ -135,7 +193,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("bookkeeping")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>07</span>
+                <span>08</span>
                 Bookkeeping
               </Link>
             )}
@@ -150,7 +208,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("employee")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>08</span>
+                <span>09</span>
                 Employee
               </Link>
             )}
@@ -161,7 +219,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("documents")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>09</span>
+                <span>10</span>
                 Documents
               </Link>
             )}

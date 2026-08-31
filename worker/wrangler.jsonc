@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pluno-social-inbox",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-30",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "triggers": {
+    "crons": ["*/10 * * * *"]
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://pluno-internal.denwests-id.workers.dev,http://localhost:5173",
+    "SOCIAL_ALLOWED_ROLES": "Founder,Administrator",
+    "META_GRAPH_VERSION": "v25.0",
+    "SYNC_POST_LIMIT": "25",
+    "INSTAGRAM_ACCOUNT_ID": "",
+    "INSTAGRAM_USERNAME": "plunostudio",
+    "THREADS_USER_ID": "",
+    "THREADS_USERNAME": "",
+    "TIKTOK_BUSINESS_ID": "",
+    "TIKTOK_USERNAME": ""
+  }
+}

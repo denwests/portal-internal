@@ -17,6 +17,7 @@ import Transactions from "./pages/Transactions";
 import Bookkeeping from "./pages/Bookkeeping";
 import Employee from "./pages/Employee";
 import Documents from "./pages/Documents";
+import SocialMedia from "./pages/SocialMedia";
 
 import GalleryManager from "./pages/GalleryManager";
 import ClientGallery from "./pages/ClientGallery";
@@ -182,6 +183,29 @@ function App() {
             >
 
               <GalleryManager />
+
+            </ProtectedRoute>
+
+          }
+        />
+
+
+        {/* =================================================
+            SOCIAL MEDIA MONITORING
+            Founder / Administrator
+        ================================================= */}
+
+        <Route
+          path="/social-media"
+          element={
+
+            <ProtectedRoute
+              allowedRoles={
+                OPERATIONAL_ROLES
+              }
+            >
+
+              <SocialMedia />
 
             </ProtectedRoute>
 
