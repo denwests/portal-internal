@@ -198,18 +198,22 @@ function Sidebar({ activePage }) {
               </Link>
             )}
 
-            <div className="dashboard-nav-section second">
-              SOCIAL MEDIA MANAGEMENT
-            </div>
+            {isOperational && (
+              <div className="dashboard-nav-section second">
+                SOCIAL MEDIA MANAGEMENT
+              </div>
+            )}
 
-            <Link
-              to="/smm-timeline"
-              className={`dashboard-nav-item ${isActive("smm-timeline")}`}
-              onClick={closeMobileSidebar}
-            >
-              <span>09</span>
-              Timeline
-            </Link>
+            {isOperational && (
+              <Link
+                to="/smm-timeline"
+                className={`dashboard-nav-item ${isActive("smm-timeline")}`}
+                onClick={closeMobileSidebar}
+              >
+                <span>09</span>
+                Timeline
+              </Link>
+            )}
 
             {employeeRole === "Founder" && (
               <div className="dashboard-nav-section second">MANAGEMENT</div>
