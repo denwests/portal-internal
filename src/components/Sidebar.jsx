@@ -198,6 +198,19 @@ function Sidebar({ activePage }) {
               </Link>
             )}
 
+            <div className="dashboard-nav-section second">
+              SOCIAL MEDIA MANAGEMENT
+            </div>
+
+            <Link
+              to="/smm-timeline"
+              className={`dashboard-nav-item ${isActive("smm-timeline")}`}
+              onClick={closeMobileSidebar}
+            >
+              <span>09</span>
+              Timeline
+            </Link>
+
             {employeeRole === "Founder" && (
               <div className="dashboard-nav-section second">MANAGEMENT</div>
             )}
@@ -208,7 +221,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("employee")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>09</span>
+                <span>10</span>
                 Employee
               </Link>
             )}
@@ -219,7 +232,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("documents")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>10</span>
+                <span>11</span>
                 Documents
               </Link>
             )}

@@ -18,6 +18,7 @@ import Bookkeeping from "./pages/Bookkeeping";
 import Employee from "./pages/Employee";
 import Documents from "./pages/Documents";
 import SocialMedia from "./pages/SocialMedia";
+import SmmTimeline from "./pages/SmmTimeline";
 
 import GalleryManager from "./pages/GalleryManager";
 import ClientGallery from "./pages/ClientGallery";
@@ -209,6 +210,15 @@ function App() {
 
             </ProtectedRoute>
 
+          }
+        />
+
+        <Route
+          path="/smm-timeline"
+          element={
+            <ProtectedRoute allowedRoles={ALL_ROLES}>
+              <SmmTimeline />
+            </ProtectedRoute>
           }
         />
 
