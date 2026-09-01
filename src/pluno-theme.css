@@ -375,7 +375,7 @@ table td{
    V7 — FONT / MOTION / DESKTOP OVERFLOW SYSTEM
    ============================================================ */
 
-500;600&display=swap");
+
 
 :root{
   --font:"Manrope","Segoe UI Variable","Segoe UI",Arial,sans-serif;
@@ -1510,4 +1510,10 @@ textarea{
     min-height:88px!important;
     padding:12px 13px!important;
   }
+}
+
+
+/* V11 build-fix: local font stack only */
+:root{
+  --font:"Segoe UI Variable Text","Segoe UI Variable","Segoe UI","Helvetica Neue",Arial,sans-serif;
 }
