@@ -1,1106 +1,776 @@
-/* =========================================================
-   BOOKKEEPING PAGE
-========================================================= */
 
-* {
-  box-sizing: border-box;
+.bookkeeping-page{min-height:100vh;width:100%;color:var(--text);background:transparent}
+.bookkeeping-generator,.bookkeeping-overview,.bookkeeping-reports{
+  max-width:1460px;margin:0 auto 13px;background:var(--surface);border:1px solid var(--line-soft);
+  border-radius:var(--r-panel);box-shadow:var(--shadow-sm)
 }
-
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100%;
-}
-
-.bookkeeping-page {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  background: #111;
-  color: #eee;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 400;
-}
-
-/* =========================================================
-   MAIN
-========================================================= */
-
-.bookkeeping-main {
-  flex: 1;
-  width: 100%;
-  min-width: 0;
-  min-height: 100vh;
-  padding: 24px 28px;
-  background: #111;
-}
-
-/* =========================================================
-   GENERATOR
-========================================================= */
-
-.bookkeeping-generator {
-  width: 100%;
-  border: 1px solid #292929;
-  background: #181818;
-  margin-bottom: 16px;
-}
-
-.bookkeeping-generator-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 18px;
-  border-bottom: 1px solid #292929;
-}
-
-.bookkeeping-section-label {
-  color: #666;
-  font-size: 8px;
-  font-weight: 400;
-  letter-spacing: 2px;
-}
-
-/* =========================================================
-   SETTINGS BUTTON
-========================================================= */
-
-.bookkeeping-settings-button {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 1px solid #333;
-  background: #111;
-  color: #aaa;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
-
-.bookkeeping-settings-button:hover {
-  color: #fff;
-  border-color: #555;
-  background: #151515;
-}
-
-/* =========================================================
-   PERIOD GRID
-========================================================= */
-
-.bookkeeping-period-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 16px 18px;
-}
-
-.bookkeeping-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.bookkeeping-field label {
-  color: #666;
-  font-size: 8px;
-  font-weight: 400;
-  letter-spacing: 2px;
-}
-
-.bookkeeping-field input,
-.bookkeeping-field select {
-  width: 100%;
-  height: 34px;
-  padding: 6px 10px;
-  border: 1px solid #292929;
-  outline: none;
-  background: #111;
-  color: #eee;
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 400;
-  transition: border-color 0.2s ease;
-}
-
-.bookkeeping-field input::placeholder {
-  color: #555;
-}
-
-.bookkeeping-field input:focus,
-.bookkeeping-field select:focus {
-  border-color: #666;
-}
-
-.bookkeeping-field select option {
-  background: #181818;
-  color: #eee;
-}
-
-/* =========================================================
-   GENERATOR FOOTER
-========================================================= */
-
-.bookkeeping-generator-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 18px;
-  border-top: 1px solid #292929;
-}
-
-.bookkeeping-generator-footer > div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.bookkeeping-generator-footer span {
-  color: #555;
-  font-size: 7px;
-  letter-spacing: 1.5px;
-}
-
-.bookkeeping-generator-footer strong {
-  color: #aaa;
-  font-size: 9px;
-  font-weight: 400;
-}
-
-/* =========================================================
-   GENERATE BUTTON
-========================================================= */
-
-.bookkeeping-generate-button {
-  padding: 8px 14px;
-  border: 1px solid #eee;
-  background: #eee;
-  color: #111;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 9px;
-  font-weight: 400;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.bookkeeping-generate-button:hover {
-  background: #fff;
-  border-color: #fff;
-}
-
-.bookkeeping-generate-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* =========================================================
-   ERROR
-========================================================= */
-
-.bookkeeping-error {
-  margin-bottom: 16px;
-  padding: 10px 14px;
-  border: 1px solid #382525;
-  background: #241919;
-  color: #b87878;
-  font-size: 10px;
-}
-
-/* =========================================================
-   OVERVIEW GRID (RESPONSIVE AUTO-FIT)
-========================================================= */
-
-.bookkeeping-overview {
-  margin-bottom: 16px;
-}
-
-.bookkeeping-overview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.bookkeeping-overview-grid > div {
-  min-width: 0;
-  padding: 14px 16px;
-  border: 1px solid #292929;
-  background: #181818;
-}
-
-.bookkeeping-overview-grid span {
-  display: block;
-  margin-bottom: 6px;
-  color: #666;
-  font-size: 8px;
-  font-weight: 400;
-  letter-spacing: 1.5px;
-}
-
-.bookkeeping-overview-grid strong {
-  display: block;
-  color: #eee;
-  font-size: 15px;
-  line-height: 1.1;
-  font-weight: 400;
-}
-
-/* =========================================================
-   CARDS
-========================================================= */
-
-.bookkeeping-additional,
-.bookkeeping-reports {
-  width: 100%;
-  border: 1px solid #292929;
-  background: #181818;
-  overflow: hidden;
-  margin-bottom: 16px;
-}
-
-.bookkeeping-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 18px;
-  border-bottom: 1px solid #292929;
-}
-
-.bookkeeping-card-header span {
-  color: #666;
-  font-size: 8px;
-  font-weight: 400;
-  letter-spacing: 2px;
-}
-
-/* =========================================================
-   ADD BUTTON
-========================================================= */
-
-.bookkeeping-add-button {
-  padding: 6px 10px;
-  border: 1px solid #333;
-  background: #111;
-  color: #aaa;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 9px;
-  font-weight: 400;
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-.bookkeeping-add-button:hover {
-  color: #fff;
-  border-color: #555;
-}
-
-/* =========================================================
-   ADDITIONAL EXPENSE LIST
-========================================================= */
-
-.bookkeeping-empty-small {
-  padding: 16px 18px;
-  color: #555;
-  font-size: 9px;
-}
-
-.bookkeeping-additional-list {
-  width: 100%;
-}
-
-.bookkeeping-additional-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 18px;
-  border-bottom: 1px solid #292929;
-}
-
-.bookkeeping-additional-item:last-child {
-  border-bottom: 0;
-}
-
-.bookkeeping-additional-item > div:first-child {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.bookkeeping-additional-item strong {
-  color: #ccc;
-  font-size: 10px;
-  font-weight: 400;
-}
-
-.bookkeeping-additional-item span {
-  color: #555;
-  font-size: 8px;
-}
-
-.bookkeeping-additional-right {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.bookkeeping-additional-right strong {
-  color: #eee;
-  white-space: nowrap;
-}
-
-.bookkeeping-additional-right button {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #666;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 8px;
-}
-
-.bookkeeping-additional-right button:hover {
-  color: #fff;
-}
-
-/* =========================================================
-   REPORT LIST
-========================================================= */
-
-.bookkeeping-report-list {
-  width: 100%;
-}
-
-.bookkeeping-report-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  padding: 14px 18px;
-  border-bottom: 1px solid #292929;
-}
-
-.bookkeeping-report-item:last-child {
-  border-bottom: 0;
-}
-
-.bookkeeping-report-item > div:first-child {
-  min-width: 0;
-}
-
-.bookkeeping-report-item > div:first-child > span {
-  display: block;
-  margin-bottom: 4px;
-  color: #555;
-  font-size: 8px;
-}
-
-.bookkeeping-report-item h3 {
-  margin: 0;
-  color: #ccc;
-  font-size: 11px;
-  font-weight: 400;
-}
-
-.bookkeeping-report-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.bookkeeping-report-meta > div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  text-align: right;
-}
-
-.bookkeeping-report-meta > div span {
-  color: #555;
-  font-size: 7px;
-  letter-spacing: 1.5px;
-}
-
-.bookkeeping-report-meta > div strong {
-  color: #eee;
-  font-size: 10px;
-  font-weight: 400;
-  white-space: nowrap;
-}
-
-.bookkeeping-download-button {
-  padding: 6px 10px;
-  border: 1px solid #333;
-  background: transparent;
-  color: #aaa;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 8px;
-  font-weight: 400;
-  white-space: nowrap;
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-.bookkeeping-download-button:hover {
-  color: #fff;
-  border-color: #555;
-}
-
-.bookkeeping-empty {
-  padding: 30px 16px;
-  color: #555;
-  text-align: center;
-  font-size: 9px;
-}
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.bookkeeping-footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  padding: 14px 0;
-  border-top: 1px solid #292929;
-  color: #444;
-  font-size: 8px;
-  font-weight: 400;
-  letter-spacing: 1px;
+.bookkeeping-generator{overflow:hidden}
+.bookkeeping-generator-top{min-height:58px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line-soft)}
+.bookkeeping-period-grid{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.bookkeeping-field{display:grid;gap:7px}
+.bookkeeping-field label{color:#8d8f86;font-size:8.5px;font-weight:500;letter-spacing:.08em}
+.bookkeeping-generator-footer{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fbfaf6;border-top:1px solid var(--line-soft)}
+.bookkeeping-generator-footer span{display:block;color:#96988f;font-size:8px;letter-spacing:.07em}
+.bookkeeping-generator-footer strong{display:block;margin-top:5px;color:#52544c;font-size:10.5px;font-weight:500}
+.bookkeeping-overview{padding:16px}
+.bookkeeping-overview-grid{margin-top:12px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.bookkeeping-overview-grid>div{min-height:92px;padding:13px 14px;display:flex;flex-direction:column;justify-content:space-between;background:var(--surface-soft);border:1px solid var(--line-soft);border-radius:10px}
+.bookkeeping-overview-grid>div:first-child{color:#fff;background:var(--pluno-gradient);border-color:transparent}
+.bookkeeping-overview-grid span{color:#96988f;font-size:8px;letter-spacing:.08em}
+.bookkeeping-overview-grid strong{color:var(--text);font-size:17px;font-weight:500;letter-spacing:-.025em}
+.bookkeeping-overview-grid>div:first-child span{color:rgba(255,255,255,.67)}
+.bookkeeping-overview-grid>div:first-child strong{color:#fff}
+.bookkeeping-reports{overflow:hidden}
+.bookkeeping-card-header{min-height:58px;padding:13px 16px;border-bottom:1px solid var(--line-soft)}
+.bookkeeping-report-item{min-height:86px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line-soft)}
+.bookkeeping-report-item:last-child{border-bottom:0}
+.bookkeeping-modal{width:min(760px,100%);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;background:var(--surface);border:1px solid rgba(255,255,255,.8);border-radius:14px;box-shadow:var(--shadow-md)}
+.bookkeeping-modal-header{min-height:68px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line-soft)}
+.bookkeeping-modal-body{overflow-y:auto;padding:0 18px}
+.bookkeeping-settings-section{padding:17px 0;border-bottom:1px solid var(--line-soft)}
+.bookkeeping-distribution-row{display:grid;grid-template-columns:minmax(0,1fr) 130px 34px;gap:7px;align-items:center}
+.bookkeeping-modal-footer{min-height:62px;padding:11px 18px;display:flex;align-items:center;justify-content:flex-end;gap:8px;border-top:1px solid var(--line-soft)}
+.bookkeeping-page input[style],.bookkeeping-page select[style],.bookkeeping-page textarea[style]{
+  width:100%!important;height:40px!important;padding:0 12px!important;color:var(--text)!important;
+  background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:var(--r-input)!important;
+  font-family:var(--font)!important;font-size:11px!important;outline:none!important
 }
-
-/* =========================================================
-   MODAL OVERLAY & MODALS
-========================================================= */
-
-.bookkeeping-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.75);
-  overflow-y: auto;
-}
-
-.bookkeeping-modal {
-  width: 100%;
-  max-width: 680px;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid #333;
-  background: #181818;
-  color: #eee;
-}
-
-.bookkeeping-small-modal {
-  max-width: 500px;
-}
-
-.bookkeeping-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 18px 20px;
-  border-bottom: 1px solid #292929;
-}
-
-.bookkeeping-modal-header span {
-  color: #666;
-  font-size: 8px;
-  font-weight: 400;
-  letter-spacing: 2px;
-}
-
-.bookkeeping-modal-header h2 {
-  margin: 6px 0 0;
-  color: #eee;
-  font-size: 18px;
-  line-height: 1.2;
-  font-weight: 400;
-}
-
-.bookkeeping-close {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 1px solid #333;
-  background: #111;
-  color: #aaa;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1;
-}
-
-.bookkeeping-close:hover {
-  color: #fff;
-  border-color: #555;
-}
-
-.bookkeeping-modal-body {
-  padding: 20px;
-}
-
-.bookkeeping-settings-section {
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #292929;
-}
-
-.bookkeeping-settings-section:last-child {
-  padding-bottom: 0;
-  margin-bottom: 0;
-  border-bottom: 0;
-}
-
-.bookkeeping-settings-title {
-  margin-bottom: 14px;
-}
-
-.bookkeeping-settings-title span {
-  display: block;
-  color: #666;
-  font-size: 8px;
-  letter-spacing: 2px;
+@media(max-width:1100px){.bookkeeping-overview-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){
+  .bookkeeping-period-grid{grid-template-columns:1fr}.bookkeeping-generator-footer{align-items:flex-start;flex-direction:column}
+  .bookkeeping-overview-grid{grid-template-columns:1fr}.bookkeeping-report-item{align-items:flex-start;flex-direction:column}
+  .bookkeeping-distribution-row{grid-template-columns:1fr 100px 34px}
 }
 
-.bookkeeping-settings-title h3 {
-  margin: 4px 0 0;
-  color: #eee;
-  font-size: 14px;
-  font-weight: 400;
-}
-
-.bookkeeping-settings-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
 
-.bookkeeping-one-column {
-  grid-template-columns: 1fr;
+/* V5 report alignment */
+.bookkeeping-generator,
+.bookkeeping-overview,
+.bookkeeping-reports{
+  border-radius:11px!important;
 }
 
-.bookkeeping-input-suffix {
-  position: relative;
+.bookkeeping-overview-grid{
+  gap:8px!important;
 }
 
-.bookkeeping-input-suffix input {
-  padding-right: 35px;
+.bookkeeping-overview-grid>div{
+  min-height:86px!important;
+  border-radius:8px!important;
 }
 
-.bookkeeping-input-suffix > span {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  color: #666;
-  font-size: 10px;
-}
+.bookkeeping-report-item{
+  min-height:82px!important;
+  padding:13px 15px!important;
 
-.bookkeeping-distribution-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:18px!important;
 }
 
-.bookkeeping-distribution-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 100px 35px;
-  gap: 8px;
+.bookkeeping-report-item>div:first-child{
+  min-width:0;
+  flex:1;
 }
 
-.bookkeeping-distribution-row input {
-  width: 100%;
-  height: 34px;
-  padding: 6px 10px;
-  border: 1px solid #292929;
-  outline: none;
-  background: #111;
-  color: #eee;
-  font-family: inherit;
-  font-size: 10px;
-}
+.bookkeeping-report-item>div:first-child>span{
+  display:block!important;
 
-.bookkeeping-distribution-row input:focus {
-  border-color: #666;
-}
+  color:#8f9188!important;
 
-.bookkeeping-percentage-input {
-  position: relative;
+  font-size:9px!important;
+  line-height:1.35!important;
 }
 
-.bookkeeping-percentage-input input {
-  padding-right: 25px;
-}
+.bookkeeping-report-item h3{
+  margin:5px 0 0!important;
 
-.bookkeeping-percentage-input span {
-  position: absolute;
-  top: 50%;
-  right: 9px;
-  transform: translateY(-50%);
-  color: #555;
-  font-size: 9px;
-}
+  color:#2b2c26!important;
 
-.bookkeeping-distribution-row > button {
-  width: 35px;
-  height: 34px;
-  padding: 0;
-  border: 1px solid #292929;
-  background: #111;
-  color: #666;
-  cursor: pointer;
-  font-size: 15px;
+  font-size:12px!important;
+  font-weight:500!important;
 }
 
-.bookkeeping-distribution-row > button:hover {
-  color: #fff;
-  border-color: #555;
-}
+.bookkeeping-report-meta{
+  flex:0 0 auto!important;
 
-.bookkeeping-distribution-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
 }
 
-.bookkeeping-add-distribution {
-  padding: 6px 10px;
-  border: 1px solid #333;
-  background: transparent;
-  color: #aaa;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 8px;
-}
+.bookkeeping-report-meta>div{
+  min-width:112px!important;
+  margin-right:4px!important;
 
-.bookkeeping-add-distribution:hover {
-  color: #fff;
-  border-color: #555;
+  text-align:right!important;
 }
 
-.bookkeeping-distribution-footer > span {
-  font-size: 8px;
-  letter-spacing: 1px;
-}
+.bookkeeping-report-meta>div span{
+  display:block!important;
 
-.bookkeeping-distribution-footer > span.valid {
-  color: #999;
-}
+  color:#96988f!important;
 
-.bookkeeping-distribution-footer > span.invalid {
-  color: #b87878;
+  font-size:7.5px!important;
+  letter-spacing:.08em!important;
 }
 
-.bookkeeping-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 20px;
-  border-top: 1px solid #292929;
-}
+.bookkeeping-report-meta>div strong{
+  display:block!important;
+  margin-top:4px!important;
 
-.bookkeeping-cancel,
-.bookkeeping-save {
-  padding: 8px 14px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 9px;
-  font-weight: 400;
-}
+  color:#33342e!important;
 
-.bookkeeping-cancel {
-  border: 1px solid #333;
-  background: transparent;
-  color: #aaa;
-}
+  font-size:11.5px!important;
+  font-weight:500!important;
 
-.bookkeeping-cancel:hover {
-  border-color: #555;
-  color: #fff;
+  white-space:nowrap!important;
 }
 
-.bookkeeping-save {
-  border: 1px solid #eee;
-  background: #eee;
-  color: #111;
-}
+.bookkeeping-download-button{
+  min-height:31px!important;
+  padding:0 9px!important;
 
-.bookkeeping-save:hover {
-  background: #fff;
+  font-size:8.5px!important;
 }
-
-/* =========================================================
-   MOBILE RESPONSIVE ADJUSTMENTS
-========================================================= */
 
-@media (max-width: 700px) {
-  .bookkeeping-main {
-    padding: 20px 14px;
+@media(max-width:800px){
+  .bookkeeping-report-item{
+    align-items:flex-start!important;
+    flex-direction:column!important;
   }
 
-  .bookkeeping-period-grid {
-    grid-template-columns: 1fr;
-    padding: 14px;
+  .bookkeeping-report-meta{
+    width:100%!important;
+    flex-wrap:wrap!important;
   }
 
-  .bookkeeping-generator-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .bookkeeping-generate-button {
-    width: 100%;
-  }
-
-  .bookkeeping-overview-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .bookkeeping-report-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .bookkeeping-report-meta {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .bookkeeping-settings-grid {
-    grid-template-columns: 1fr;
+  .bookkeeping-report-meta>div{
+    margin-right:auto!important;
+    text-align:left!important;
   }
 }
 
-@media (max-width: 480px) {
-  .bookkeeping-overview-grid {
-    grid-template-columns: 1fr;
-  }
-}
-/* =========================================================
-   PHASE 3 — UI CONSISTENCY / 100% ZOOM
-========================================================= */
 
-.bookkeeping-main {
-  padding: 36px 42px 28px;
-}
+/* ============================================================
+   V6 — FINANCIAL REPORT ROW
+   ============================================================ */
 
-.bookkeeping-section-label,
-.bookkeeping-settings-title,
-.bookkeeping-modal-header span {
-  font-size: 9px;
-  letter-spacing: 1.8px;
+.bookkeeping-card-header{
+  min-height:58px!important;
+  padding:13px 16px!important;
+
+  display:flex!important;
+  align-items:center!important;
+
+  border-bottom:1px solid var(--line-soft)!important;
 }
 
-.bookkeeping-generator {
-  padding: 20px;
-  margin-bottom: 20px;
+.bookkeeping-card-header span{
+  color:#918f72!important;
+
+  font-size:var(--fs-micro)!important;
+  font-weight:500!important;
+  letter-spacing:.1em!important;
 }
 
-.bookkeeping-generator-top {
-  gap: 16px;
+.bookkeeping-report-list{
+  display:flex!important;
+  flex-direction:column!important;
 }
 
-.bookkeeping-field label {
-  font-size: 9px;
-  letter-spacing: 1.4px;
+.bookkeeping-report-item{
+  min-height:88px!important;
+  padding:14px 16px!important;
+
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:24px!important;
+
+  border-bottom:1px solid var(--line-soft)!important;
 }
 
-.bookkeeping-field input,
-.bookkeeping-field select {
-  min-height: 40px;
-  padding: 9px 11px;
-  font-size: 11px;
+.bookkeeping-report-item:last-child{
+  border-bottom:0!important;
 }
 
-.bookkeeping-generator-footer span {
-  font-size: 9px;
+.bookkeeping-report-item>div:first-child{
+  min-width:0!important;
 }
 
-.bookkeeping-generator-footer strong {
-  font-size: 11px;
+.bookkeeping-report-item>div:first-child>span{
+  display:block!important;
+
+  margin:0!important;
+
+  color:#8e9087!important;
+
+  font-size:var(--fs-micro)!important;
+  line-height:1.35!important;
 }
 
-.bookkeeping-generate-button,
-.bookkeeping-add-button,
+.bookkeeping-report-item h3{
+  margin:6px 0 0!important;
+
+  color:#2d2e28!important;
+
+  font-size:var(--fs-body-lg)!important;
+  line-height:1.3!important;
+  font-weight:500!important;
+}
+
+.bookkeeping-report-meta{
+  display:grid!important;
+  grid-template-columns:120px auto auto!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+
+.bookkeeping-report-meta>div{
+  min-width:0!important;
+  margin:0!important;
+
+  text-align:right!important;
+}
+
+.bookkeeping-report-meta>div span{
+  display:block!important;
+
+  color:#96988f!important;
+
+  font-size:var(--fs-micro)!important;
+  line-height:1.2!important;
+  letter-spacing:.08em!important;
+}
+
+.bookkeeping-report-meta>div strong{
+  display:block!important;
+  margin-top:5px!important;
+
+  color:#2f302a!important;
+
+  font-size:var(--fs-body)!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+
+  white-space:nowrap!important;
+}
+
 .bookkeeping-download-button,
-.bookkeeping-save,
-.bookkeeping-cancel,
-.bookkeeping-add-distribution {
-  min-height: 38px;
-  padding-left: 14px;
-  padding-right: 14px;
-  font-size: 10.5px;
+.bookkeeping-report-meta button{
+  min-height:34px!important;
+  padding:0 10px!important;
+
+  font-size:var(--fs-micro)!important;
 }
 
-.bookkeeping-settings-button {
-  width: 38px;
-  height: 38px;
-  font-size: 16px;
+.bookkeeping-overview-grid span{
+  font-size:var(--fs-micro)!important;
 }
 
-.bookkeeping-overview {
-  margin-bottom: 20px;
+.bookkeeping-overview-grid strong{
+  font-size:18px!important;
 }
 
-.bookkeeping-overview-grid {
-  gap: 12px;
+.bookkeeping-generator-footer span{
+  font-size:var(--fs-micro)!important;
 }
 
-.bookkeeping-overview-grid > div {
-  padding: 20px;
+.bookkeeping-generator-footer strong{
+  font-size:var(--fs-small)!important;
 }
 
-.bookkeeping-overview-grid span {
-  font-size: 9px;
-}
-
-.bookkeeping-overview-grid strong {
-  font-size: 23px;
-}
-
-.bookkeeping-card-header {
-  padding: 18px 20px;
-}
-
-.bookkeeping-card-header span {
-  font-size: 9px;
-}
-
-.bookkeeping-additional-item,
-.bookkeeping-report-item {
-  padding: 15px 18px;
-}
-
-.bookkeeping-additional-item,
-.bookkeeping-additional-item input,
-.bookkeeping-report-item h3 {
-  font-size: 11px;
-}
-
-.bookkeeping-report-item > div:first-child > span,
-.bookkeeping-report-meta > div span {
-  font-size: 9px;
-}
-
-.bookkeeping-report-meta > div strong {
-  font-size: 11px;
-}
-
-.bookkeeping-additional-right button {
-  font-size: 9.5px;
-}
-
-.bookkeeping-footer {
-  font-size: 8.5px;
-}
-
-.bookkeeping-modal {
-  max-width: 760px;
-}
-
-.bookkeeping-small-modal {
-  max-width: 460px;
-}
-
-.bookkeeping-modal-header {
-  padding: 21px 24px;
-}
-
-.bookkeeping-modal-header h2 {
-  font-size: 22px;
-}
-
-.bookkeeping-close {
-  width: 36px;
-  height: 36px;
-  font-size: 20px;
-}
-
-.bookkeeping-modal-body {
-  padding: 22px 24px;
-}
-
-.bookkeeping-settings-grid,
-.bookkeeping-period-grid,
-.bookkeeping-distribution-list {
-  gap: 16px;
-}
-
-.bookkeeping-distribution-row {
-  gap: 10px;
-}
-
-.bookkeeping-distribution-row input,
-.bookkeeping-percentage-input input {
-  min-height: 40px;
-  font-size: 11px;
-}
-
-.bookkeeping-modal-footer {
-  padding: 16px 24px;
-}
-
-@media (max-width: 900px) {
-  .bookkeeping-main {
-    padding: 32px 28px 26px;
-  }
-}
-
-@media (max-width: 700px) {
-  .bookkeeping-main {
-    width: 100%;
-    padding: 74px 16px 24px;
+@media(max-width:850px){
+  .bookkeeping-report-item{
+    grid-template-columns:1fr!important;
   }
 
-  .bookkeeping-generator-top,
-  .bookkeeping-generator-footer,
-  .bookkeeping-report-item {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 13px;
+  .bookkeeping-report-meta{
+    grid-template-columns:1fr auto auto!important;
   }
 
-  .bookkeeping-overview-grid,
-  .bookkeeping-period-grid,
-  .bookkeeping-settings-grid,
-  .bookkeeping-report-meta {
-    grid-template-columns: 1fr;
-  }
-
-  .bookkeeping-modal,
-  .bookkeeping-small-modal {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .bookkeeping-modal-header {
-    padding: 19px;
-  }
-
-  .bookkeeping-modal-body {
-    padding: 19px;
-  }
-
-  .bookkeeping-modal-footer {
-    padding: 15px 19px;
-  }
-}
-
-@media (max-width: 480px) {
-  .bookkeeping-main {
-    padding: 70px 14px 22px;
+  .bookkeeping-report-meta>div{
+    text-align:left!important;
   }
 }
 
 
-/* =========================================================
-   PHASE 3 — UNIFIED PAGE HEADER
-========================================================= */
-.bookkeeping-page-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 48px;
-  margin-bottom: 20px;
+/* ============================================================
+   V7 — BOOKKEEPING REFINEMENT
+   ============================================================ */
+
+/* Financial reports: directly show report rows, no duplicate section bar */
+.bookkeeping-reports>.bookkeeping-card-header{
+  display:none!important;
 }
 
-.bookkeeping-page-eyebrow {
-  margin: 0;
-  color: #666;
-  font-size: 9px;
-  line-height: 1.2;
-  font-weight: 400;
-  letter-spacing: 1.8px;
+.bookkeeping-reports{
+  overflow:hidden!important;
 }
 
-.bookkeeping-page-header h1 {
-  margin: 7px 0 0;
-  color: #eee;
-  font-size: 22px;
-  line-height: 1.2;
-  font-weight: 400;
-  letter-spacing: -0.2px;
+.bookkeeping-report-item{
+  min-height:82px!important;
+  padding:14px 16px!important;
+
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:24px!important;
 }
 
-@media (max-width: 700px) {
-  .bookkeeping-page-header {
-    min-height: 0;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 13px;
+.bookkeeping-report-item>div:first-child h3{
+  margin:0!important;
+
+  color:#292a24!important;
+
+  font-size:14px!important;
+  line-height:1.35!important;
+  font-weight:500!important;
+}
+
+.bookkeeping-report-meta{
+  display:grid!important;
+  grid-template-columns:142px 122px auto auto!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+
+.bookkeeping-report-generated,
+.bookkeeping-report-meta>div{
+  min-width:0!important;
+  margin:0!important;
+  text-align:right!important;
+}
+
+.bookkeeping-report-generated span,
+.bookkeeping-report-meta>div span{
+  display:block!important;
+
+  color:#96988f!important;
+
+  font-size:10px!important;
+  line-height:1.2!important;
+  letter-spacing:.07em!important;
+}
+
+.bookkeeping-report-generated strong,
+.bookkeeping-report-meta>div strong{
+  display:block!important;
+  margin-top:5px!important;
+
+  color:#31322c!important;
+
+  font-size:11px!important;
+  line-height:1.3!important;
+  font-weight:500!important;
+
+  white-space:nowrap!important;
+}
+
+.bookkeeping-download-button{
+  min-height:34px!important;
+  padding:0 10px!important;
+}
+
+/* Settings modal: less vertical, more structured */
+.bookkeeping-modal{
+  width:min(900px,calc(100vw - 42px))!important;
+  max-height:88vh!important;
+
+  border-radius:12px!important;
+}
+
+.bookkeeping-modal-header{
+  min-height:72px!important;
+  padding:15px 20px!important;
+}
+
+.bookkeeping-modal-header h2{
+  margin:7px 0 0!important;
+
+  font-size:21px!important;
+  font-weight:500!important;
+}
+
+.bookkeeping-modal-body{
+  padding:16px 20px 18px!important;
+
+  display:grid!important;
+  grid-template-columns:minmax(220px,.72fr) minmax(0,1.28fr)!important;
+  gap:14px 18px!important;
+
+  overflow-y:auto!important;
+}
+
+/* Additional expenses full width */
+.bookkeeping-modal-body>.bookkeeping-settings-section:nth-child(1){
+  grid-column:1 / -1!important;
+}
+
+/* BEP left */
+.bookkeeping-modal-body>.bookkeeping-settings-section:nth-child(2){
+  grid-column:1!important;
+}
+
+/* Distribution right */
+.bookkeeping-modal-body>.bookkeeping-settings-section:nth-child(3){
+  grid-column:2!important;
+}
+
+.bookkeeping-settings-section{
+  margin:0!important;
+  padding:16px!important;
+
+  background:#fbfaf6!important;
+
+  border:1px solid var(--line-soft)!important;
+  border-radius:9px!important;
+}
+
+.bookkeeping-settings-section+.bookkeeping-settings-section{
+  border-top:1px solid var(--line-soft)!important;
+}
+
+.bookkeeping-settings-title{
+  margin:0 0 14px!important;
+}
+
+.bookkeeping-settings-title>span{
+  display:block!important;
+
+  color:#96988f!important;
+
+  font-size:10px!important;
+  font-weight:500!important;
+  letter-spacing:.08em!important;
+}
+
+.bookkeeping-settings-title h3{
+  margin:6px 0 0!important;
+
+  color:#2d2e28!important;
+
+  font-size:15px!important;
+  line-height:1.25!important;
+  font-weight:500!important;
+}
+
+.bookkeeping-empty-small{
+  padding:13px!important;
+
+  color:#85877e!important;
+  background:#f4f3ed!important;
+
+  border:1px dashed #d9d7cd!important;
+  border-radius:8px!important;
+
+  font-size:11px!important;
+}
+
+/* Additional expense rows override legacy inline layout */
+.bookkeeping-settings-section:first-child
+.bookkeeping-settings-title+div{
+  margin-top:12px!important;
+}
+
+.bookkeeping-settings-section:first-child
+.bookkeeping-settings-title+div>div[style]{
+  grid-template-columns:minmax(0,1fr) 170px 34px!important;
+  gap:8px!important;
+}
+
+/* BEP compact field */
+.bookkeeping-modal-body>.bookkeeping-settings-section:nth-child(2)
+.bookkeeping-field{
+  max-width:160px!important;
+}
+
+.bookkeeping-input-suffix{
+  position:relative!important;
+}
+
+.bookkeeping-input-suffix input{
+  padding-right:30px!important;
+}
+
+.bookkeeping-input-suffix span{
+  position:absolute!important;
+  right:11px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+
+  color:#85877e!important;
+
+  font-size:11px!important;
+}
+
+/* Profit distribution uses proper columns */
+.bookkeeping-distribution-list{
+  margin-top:10px!important;
+  display:grid!important;
+  gap:8px!important;
+}
+
+.bookkeeping-distribution-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 118px 34px!important;
+  gap:8px!important;
+  align-items:center!important;
+}
+
+.bookkeeping-distribution-row input{
+  width:100%!important;
+}
+
+.bookkeeping-percentage-input{
+  position:relative!important;
+}
+
+.bookkeeping-percentage-input input{
+  padding-right:28px!important;
+}
+
+.bookkeeping-percentage-input span{
+  position:absolute!important;
+  right:10px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+
+  color:#85877e!important;
+
+  font-size:11px!important;
+}
+
+.bookkeeping-distribution-row>button{
+  width:34px!important;
+  min-width:34px!important;
+  height:38px!important;
+  min-height:38px!important;
+  padding:0!important;
+}
+
+.bookkeeping-distribution-footer{
+  margin-top:10px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+}
+
+.bookkeeping-modal-footer{
+  min-height:64px!important;
+  padding:10px 20px!important;
+
+  background:#fbfaf6!important;
+}
+
+@media(max-width:1024px){
+  .bookkeeping-report-meta{
+    grid-template-columns:120px 110px auto auto!important;
+  }
+}
+
+@media(max-width:760px){
+  .bookkeeping-modal{
+    width:min(100%,calc(100vw - 24px))!important;
+    max-height:92vh!important;
   }
 
-  .bookkeeping-page-header h1 { font-size: 20px; }
-  .bookkeeping-page-eyebrow { font-size: 8.5px; }
-}
-
-/* =========================================================
-   TARGETED E2E — COMPACT BOOKKEEPING CONTENT
-   Existing unified page header remains untouched.
-========================================================= */
-.bookkeeping-overview-grid > div {
-  padding: 14px 16px;
-}
-
-.bookkeeping-overview-grid span {
-  font-size: 9.5px;
-}
-
-.bookkeeping-overview-grid strong {
-  font-size: 19px;
-}
-
-.bookkeeping-additional-item,
-.bookkeeping-report-item {
-  font-size: 11.5px;
-}
-
-@media (max-width: 700px) {
-  .bookkeeping-overview-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
+  .bookkeeping-modal-body{
+    grid-template-columns:1fr!important;
+    padding:12px!important;
   }
 
-  .bookkeeping-overview-grid > div {
-    min-width: 0;
-    padding: 11px 9px;
+  .bookkeeping-modal-body>.bookkeeping-settings-section:nth-child(1),
+  .bookkeeping-modal-body>.bookkeeping-settings-section:nth-child(2),
+  .bookkeeping-modal-body>.bookkeeping-settings-section:nth-child(3){
+    grid-column:1!important;
   }
 
-  .bookkeeping-overview-grid span {
-    margin-bottom: 5px;
-    font-size: 7.5px;
-    letter-spacing: 0.8px;
+  .bookkeeping-report-item{
+    grid-template-columns:1fr!important;
   }
 
-  .bookkeeping-overview-grid strong {
-    font-size: clamp(10px, 3vw, 14px);
-    line-height: 1.25;
-    overflow-wrap: anywhere;
+  .bookkeeping-report-meta{
+    grid-template-columns:1fr 1fr!important;
   }
 
-  .bookkeeping-additional-item,
-  .bookkeeping-report-item {
-    padding: 12px 13px;
-    font-size: 10.5px;
+  .bookkeeping-report-generated,
+  .bookkeeping-report-meta>div{
+    text-align:left!important;
   }
+}
+
+
+/* ============================================================
+   V8 — FINANCIAL REPORT CLEANUP
+   ============================================================ */
+
+/*
+ JSX currently renders:
+ 01 Aug — 31 Aug (Generated ...)
+ Financial Report — 01 Aug ... to 31 Aug ...
+
+ The first line is redundant, so hide it completely.
+ No MutationObserver / DOM script is used.
+*/
+.bookkeeping-report-item>div:first-child>span{
+  display:none!important;
+}
+
+.bookkeeping-reports>.bookkeeping-card-header{
+  display:none!important;
+}
+
+.bookkeeping-report-item{
+  min-height:72px!important;
+  padding:14px 16px!important;
+
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:20px!important;
+}
+
+.bookkeeping-report-item>div:first-child{
+  min-width:0!important;
+}
+
+.bookkeeping-report-item h3{
+  margin:0!important;
+
+  color:#292a24!important;
+
+  font-size:13px!important;
+  line-height:1.35!important;
+  font-weight:500!important;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.bookkeeping-report-meta{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+}
+
+.bookkeeping-report-meta>div{
+  min-width:105px!important;
+  margin:0 4px 0 0!important;
+
+  text-align:right!important;
+}
+
+.bookkeeping-report-meta>div span{
+  display:block!important;
+
+  color:#95978e!important;
+
+  font-size:10px!important;
+  line-height:1.2!important;
+  letter-spacing:.07em!important;
+}
+
+.bookkeeping-report-meta>div strong{
+  display:block!important;
+  margin-top:4px!important;
+
+  color:#2f302a!important;
+
+  font-size:11px!important;
+  line-height:1.25!important;
+  font-weight:500!important;
+
+  white-space:nowrap!important;
+}
+
+.bookkeeping-download-button{
+  min-height:33px!important;
+  padding:0 10px!important;
+
+  font-size:10px!important;
+}
+
+/* Settings modal remains compact and consistent. */
+.bookkeeping-modal{
+  width:min(880px,calc(100vw - 40px))!important;
+  max-height:86vh!important;
+}
+
+.bookkeeping-modal-body{
+  padding:15px 18px!important;
+}
+
+.bookkeeping-settings-section{
+  padding:14px!important;
+}
+
+.bookkeeping-distribution-row{
+  grid-template-columns:minmax(0,1fr) 110px 36px!important;
+  gap:8px!important;
+}
+
+.bookkeeping-distribution-row>button{
+  width:36px!important;
+  min-width:36px!important;
+}
+
+/* No generated column is injected by JS anymore. */
+.bookkeeping-report-generated{
+  display:none!important;
+}
+
+@media(max-width:760px){
+  .bookkeeping-report-item{
+    grid-template-columns:1fr!important;
+  }
+
+  .bookkeeping-report-item h3{
+    white-space:normal;
+  }
+
+  .bookkeeping-report-meta{
+    width:100%!important;
+    justify-content:flex-start!important;
+    flex-wrap:wrap!important;
+  }
+
+  .bookkeeping-report-meta>div{
+    text-align:left!important;
+  }
+}
+
+
+/* V9 — common text alignment */
+table th{
+  vertical-align:middle!important;
+}
+
+table td{
+  vertical-align:middle!important;
+}
+
+table th,
+table td{
+  line-height:1.35!important;
+}
+
+
+/* V9 */
+.bookkeeping-report-item>div:first-child>span{
+  display:none!important;
+}
+
+.bookkeeping-settings-title h3{
+  font-size:15px!important;
+}
+
+.bookkeeping-modal-footer{
+  min-height:60px!important;
 }

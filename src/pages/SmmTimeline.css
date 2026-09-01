@@ -1,35 +1,721 @@
-* { box-sizing: border-box; }
-.smm-page { width: 100%; min-height: 100vh; display: flex; overflow-x: hidden; background: #111; color: #eee; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 400; }
-.smm-page > .dashboard-sidebar { position: fixed; top: 0; left: 0; height: 100vh; min-height: 0; }
-.smm-main { position: relative; z-index: 1; flex: 1; width: calc(100% - 250px); min-width: 0; min-height: 100vh; margin-left: 250px; padding: 36px 42px 28px; background: #111; color: #eee; }
-.smm-section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; margin-bottom: 20px; }
-.smm-section-label { margin: 0; color: #666; font-size: 9px; font-weight: 400; letter-spacing: 1.8px; }
-.smm-section-heading h2 { margin: 7px 0 0; color: #eee; font-size: 22px; line-height: 1.2; font-weight: 400; letter-spacing: 0; }
-.smm-period-filter { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.smm-period-filter select, .smm-table-tools select { appearance: none; height: 38px; padding: 7px 27px 7px 10px; border: 1px solid #292929; outline: none; background-color: #181818; background-image: linear-gradient(45deg, transparent 50%, #666 50%), linear-gradient(135deg, #666 50%, transparent 50%); background-position: calc(100% - 12px) 16px, calc(100% - 8px) 16px; background-size: 4px 4px, 4px 4px; background-repeat: no-repeat; color: #aaa; cursor: pointer; font: inherit; font-size: 10.5px; }
-.smm-period-filter select:first-child { min-width: 170px; }.smm-period-filter select:nth-child(2) { min-width: 110px; }.smm-period-filter select:nth-child(3) { min-width: 82px; }
-.smm-action-bar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 12px; padding: 15px 16px; border: 1px solid #292929; background: #181818; }
-.smm-action-copy { display: grid; gap: 6px; }.smm-action-copy span, .smm-summary span, .smm-modal label, .smm-modal header span { color: #666; font-size: 8px; letter-spacing: 1.5px; }.smm-action-copy strong { color: #bbb; font-size: 12px; font-weight: 400; }
-.smm-header-actions { display: flex; align-items: center; gap: 7px; }
-.smm-primary-button, .smm-secondary-button { height: 32px; min-height: 32px; padding: 0 13px; border-radius: 0; cursor: pointer; font: inherit; font-size: 8px; font-weight: 400; white-space: nowrap; }
-.smm-primary-button { border: 1px solid #eee; background: #eee; color: #111; }.smm-secondary-button { border: 1px solid #292929; background: #181818; color: #999; }.smm-primary-button:disabled, .smm-secondary-button:disabled { opacity: .4; cursor: not-allowed; }
-.smm-message { display: flex; justify-content: space-between; margin-bottom: 12px; padding: 10px 13px; border: 1px solid #333; font-size: 9px; }.smm-message.error { border-color: #382525; background: #241919; color: #b87878; }.smm-message.success { border-color: #29402e; background: #172119; color: #8ebc98; }.smm-message button { min-height: 0; padding: 0 4px; border: 0; background: none; color: inherit; font-size: 15px; cursor: pointer; }
-.smm-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 12px; border: 1px solid #292929; background: #181818; }
-.smm-summary > div { min-height: 82px; padding: 16px; border-right: 1px solid #292929; }.smm-summary > div:last-child { border-right: 0; }.smm-summary span { display: block; margin-bottom: 10px; }.smm-summary strong { color: #eee; font-size: 18px; font-weight: 400; }.smm-summary small { display: block; margin-top: 4px; color: #666; font-size: 8px; }.smm-summary select { appearance: none; width: 100%; height: 31px; padding: 0 27px 0 8px; border: 1px solid #303030; background-color: #111; background-image: linear-gradient(45deg, transparent 50%, #666 50%), linear-gradient(135deg, #666 50%, transparent 50%); background-position: calc(100% - 12px) 12px, calc(100% - 8px) 12px; background-size: 4px 4px, 4px 4px; background-repeat: no-repeat; color: #aaa; font: inherit; font-size: 9px; }
-.smm-table-card { min-width: 0; border: 1px solid #292929; background: #181818; }
-.smm-table-tools { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 11px 13px; border-bottom: 1px solid #292929; }.smm-table-tools > div { display: flex; gap: 6px; }.smm-table-tools select { min-width: 125px; }.smm-save-state { margin-left: auto; color: #666; font-size: 8px; letter-spacing: 1px; }
-.smm-table-wrap { width: 100%; overflow-x: auto; }.smm-table-wrap table { width: 100%; min-width: 1420px; border-collapse: collapse; table-layout: fixed; }
-.smm-table-wrap th { height: 37px; padding: 0 9px; border-right: 1px solid #292929; border-bottom: 1px solid #292929; background: #151515; color: #666; text-align: left; font-size: 8px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
-.smm-table-wrap td { height: 58px; padding: 5px; border-right: 1px solid #292929; border-bottom: 1px solid #292929; color: #888; font-size: 11.25px; vertical-align: top; }.smm-table-wrap tbody tr:hover { background: #1b1b1b; }
-.smm-table-wrap th:nth-child(1) { width: 42px; text-align: center; }.smm-table-wrap th:nth-child(2) { width: 190px; }.smm-table-wrap th:nth-child(3) { width: 180px; }.smm-table-wrap th:nth-child(4) { width: 150px; }.smm-table-wrap th:nth-child(5) { width: 180px; }.smm-table-wrap th:nth-child(6) { width: 200px; }.smm-table-wrap th:nth-child(7) { width: 140px; }.smm-table-wrap th:nth-child(8) { width: 135px; }.smm-table-wrap th:nth-child(9) { width: 180px; }.smm-table-wrap th:nth-child(10) { width: 130px; }
-.smm-table-wrap td:first-child { padding-top: 12px; text-align: center; }.smm-table-wrap input, .smm-table-wrap select, .smm-table-wrap textarea { width: 100%; min-height: 36px; padding: 7px; border: 1px solid transparent; border-radius: 0; outline: none; background: transparent; color: #bbb; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 11.25px; font-weight: 400; line-height: 1.35; resize: vertical; }.smm-table-wrap input:focus, .smm-table-wrap select:focus, .smm-table-wrap textarea:focus { border-color: #444; background: #111; }.smm-table-wrap input:disabled, .smm-table-wrap select:disabled, .smm-table-wrap textarea:disabled { opacity: 1; color: #888; -webkit-text-fill-color: #888; }.smm-table-wrap td a { display: block; padding: 2px 7px; color: #999; font-size: 10px; }
-.smm-row-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }.smm-row-actions button { min-height: 30px; padding: 0; border: 1px solid #333; background: #151515; color: #888; cursor: pointer; }.smm-row-actions button.danger { color: #bd7474; }.smm-row-actions button:disabled { opacity: .3; cursor: not-allowed; }
-.smm-multi-select { position: relative; width: 100%; }.smm-multi-trigger { position: relative; width: 100%; min-height: 36px; display: flex; align-items: center; padding: 5px 24px 5px 7px; border: 1px solid transparent; background: transparent; color: #aaa; cursor: pointer; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 11.25px; font-weight: 400; text-align: left; }.smm-multi-trigger::after { content: ""; position: absolute; top: 15px; right: 8px; border: 4px solid transparent; border-top-color: #777; }.smm-multi-trigger[aria-expanded="true"] { border-color: #444; background: #111; }.smm-multi-tags { display: flex; flex-wrap: wrap; gap: 3px; }.smm-multi-tags > span { color: #aaa; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 11.25px; line-height: 1.2; }.smm-multi-tags > span:not(:last-child)::after { content: ","; }.smm-multi-tags > span.placeholder { color: #666; }.smm-multi-menu { position: fixed; z-index: 4000; min-width: 160px; padding: 5px; border: 1px solid #3a3a3a; background: #151515; box-shadow: 0 10px 24px rgba(0,0,0,.5); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 400; }.smm-multi-menu label { display: flex; align-items: center; gap: 8px; padding: 8px 7px; color: #bbb; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 11.25px; cursor: pointer; }.smm-multi-menu label:hover { background: #222; }.smm-multi-menu input { width: 13px; min-height: 13px; margin: 0; accent-color: #aaa; }
-.smm-table-wrap select.smm-status { appearance: none; min-height: 36px; padding: 5px 24px 5px 7px; border: 1px solid transparent; border-radius: 0; background-color: transparent !important; background-image: linear-gradient(45deg, transparent 50%, #666 50%), linear-gradient(135deg, #666 50%, transparent 50%) !important; background-position: calc(100% - 10px) 16px, calc(100% - 6px) 16px; background-size: 4px 4px, 4px 4px; background-repeat: no-repeat; color: #aaa; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 11.25px; font-weight: 400; }
-.smm-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-height: 48px; padding: 8px 13px; border-top: 1px solid #292929; }.smm-pagination button { width: 32px; height: 32px; border: 1px solid #333; background: #151515; color: #aaa; cursor: pointer; }.smm-pagination button:disabled { opacity: .3; cursor: not-allowed; }.smm-pagination span { min-width: 42px; color: #666; text-align: center; font-size: 9px; }
-.smm-no-rows { height: 120px !important; text-align: center; vertical-align: middle !important; }.smm-empty { min-height: 300px; display: grid; place-content: center; gap: 8px; border: 1px solid #292929; background: #181818; color: #555; text-align: center; font-size: 9px; }.smm-empty strong { color: #aaa; font-size: 13px; font-weight: 400; }
-.smm-footer { display: flex; justify-content: space-between; margin-top: 16px; padding: 12px 0; border-top: 1px solid #292929; color: #444; font-size: 8px; letter-spacing: 1px; }
-.smm-overlay { position: fixed; inset: 0; z-index: var(--pluno-modal-layer, 3000); display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,.78); }.smm-modal { width: min(520px, 100%); border: 1px solid #333; background: #181818; }.smm-modal > header { display: flex; justify-content: space-between; padding: 20px 22px; border-bottom: 1px solid #292929; }.smm-modal h2 { margin: 7px 0 0; font-size: 21px; font-weight: 400; }.smm-modal header button { width: 34px; height: 34px; border: 1px solid #333; background: #181818; color: #aaa; font-size: 18px; cursor: pointer; }.smm-modal > label { display: grid; gap: 8px; margin: 22px; }.smm-modal input { width: 100%; min-height: 40px; padding: 10px; border: 1px solid #303030; background: #111; color: #eee; outline: none; }.smm-modal > footer { display: flex; justify-content: flex-end; gap: 7px; padding: 14px 22px; border-top: 1px solid #292929; }
-@media (max-width: 900px) { .smm-main { padding: 34px 24px 24px; }.smm-section-heading { align-items: stretch; flex-direction: column; gap: 16px; }.smm-period-filter select { flex: 1; }.smm-summary { grid-template-columns: 1fr 1fr; }.smm-summary > div:nth-child(2) { border-right: 0; }.smm-summary > div:nth-child(-n+2) { border-bottom: 1px solid #292929; } }
-@media (max-width: 700px) { .smm-page { display: block; }.smm-main { width: 100%; margin-left: 0; padding: 74px 16px 24px; }.smm-section-heading h2 { font-size: 20px; }.smm-period-filter { width: 100%; flex-wrap: wrap; }.smm-period-filter select:first-child { width: 100%; flex-basis: 100%; }.smm-action-bar { align-items: stretch; flex-direction: column; }.smm-header-actions { width: 100%; }.smm-header-actions button { flex: 1; }.smm-table-tools { align-items: stretch; flex-wrap: wrap; }.smm-table-tools > div { width: 100%; }.smm-table-tools select { min-width: 0; flex: 1; }.smm-save-state { margin-left: 0; }.smm-table-tools > button { margin-left: auto; } }
-@media (max-width: 480px) { .smm-main { padding: 70px 14px 22px; }.smm-summary { grid-template-columns: 1fr; }.smm-summary > div { border-right: 0; border-bottom: 1px solid #292929; }.smm-summary > div:last-child { border-bottom: 0; } }
+
+.smm-page{min-height:100vh;width:100%;color:var(--text);background:transparent}
+.smm-section-heading{max-width:1460px;margin:0 auto 14px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.smm-section-heading h2{margin:7px 0 0;font-size:25px;font-weight:500;letter-spacing:-.035em}
+.smm-summary{max-width:1460px;margin:0 auto 12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.smm-summary>div{min-height:88px;padding:13px 14px;display:flex;flex-direction:column;justify-content:space-between;background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;box-shadow:var(--shadow-sm)}
+.smm-summary>div:first-child{background:var(--pluno-gradient);border-color:transparent}
+.smm-summary span{color:#96988f;font-size:8px}.smm-summary strong{color:#2f302a;font-size:14px;font-weight:500}
+.smm-summary>div:first-child span,.smm-summary>div:first-child strong{color:#fff}
+.smm-table-card{max-width:1460px;margin:0 auto;background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r-panel);box-shadow:var(--shadow-sm)}
+.smm-table-wrap{overflow-x:auto}
+.smm-table-wrap table{width:100%;min-width:1480px;border-collapse:separate;border-spacing:0}
+.smm-table-wrap th{height:44px;padding:0 10px;color:#74765e;background:#f2f1eb;border:0;border-bottom:1px solid var(--line);text-align:left;font-size:8.5px;font-weight:500}
+.smm-table-wrap td{padding:9px 10px;color:#393a33;background:var(--surface);border:0;border-bottom:1px solid var(--line-soft);font-size:10.5px;vertical-align:top}
+.smm-table-wrap textarea{width:170px;min-height:72px;font-size:10.5px}
+.smm-modal{width:min(460px,100%);background:var(--surface);border:1px solid rgba(255,255,255,.8);border-radius:14px;box-shadow:var(--shadow-md)}
+
+
+/* V5 timeline alignment */
+.smm-section-heading{
+  margin-bottom:12px!important;
+}
+
+.smm-action-bar{
+  min-height:60px!important;
+  padding:11px 13px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+
+  border-radius:10px!important;
+}
+
+.smm-action-copy span{
+  font-size:8px!important;
+}
+
+.smm-action-copy strong{
+  font-size:11px!important;
+}
+
+.smm-header-actions{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  flex-wrap:wrap!important;
+}
+
+.smm-header-actions button{
+  min-height:34px!important;
+  font-size:9px!important;
+}
+
+.smm-summary{
+  gap:9px!important;
+}
+
+.smm-summary>div{
+  min-height:82px!important;
+  padding:12px 13px!important;
+  border-radius:9px!important;
+}
+
+.smm-summary select{
+  min-height:34px!important;
+  height:34px!important;
+}
+
+.smm-table-card{
+  border-radius:10px!important;
+}
+
+.smm-table-tools{
+  min-height:50px!important;
+  padding:7px 10px!important;
+}
+
+.smm-table-tools select{
+  min-width:100px!important;
+  min-height:33px!important;
+  height:33px!important;
+
+  font-size:9px!important;
+}
+
+.smm-table-wrap th{
+  height:42px!important;
+  font-size:8px!important;
+}
+
+.smm-table-wrap td{
+  padding:8px 9px!important;
+  font-size:10px!important;
+}
+
+.smm-table-wrap textarea{
+  min-height:62px!important;
+
+  border-radius:7px!important;
+
+  font-size:10px!important;
+  line-height:1.35!important;
+}
+
+.smm-table-wrap input[type="url"],
+.smm-table-wrap input[type="date"]{
+  min-height:34px!important;
+  height:34px!important;
+
+  border-radius:7px!important;
+
+  font-size:9px!important;
+}
+
+.smm-status{
+  min-height:34px!important;
+  height:34px!important;
+
+  font-size:9px!important;
+}
+
+.smm-multi-trigger{
+  min-height:34px!important;
+  border-radius:7px!important;
+
+  font-size:9px!important;
+}
+
+.smm-row-actions button{
+  width:27px!important;
+  height:27px!important;
+  min-height:27px!important;
+
+  border-radius:7px!important;
+}
+
+
+/* ============================================================
+   V6 — TIMELINE TYPOGRAPHY / LAYOUT
+   ============================================================ */
+
+.smm-section-heading{
+  margin-bottom:14px!important;
+}
+
+.smm-section-heading h2{
+  margin-top:7px!important;
+
+  font-size:25px!important;
+  font-weight:500!important;
+}
+
+.smm-period-filter{
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+}
+
+.smm-period-filter select{
+  min-width:116px!important;
+
+  font-size:var(--fs-small)!important;
+}
+
+/* Fix MONTHLY TIMELINEDJOEANDA spacing */
+.smm-action-bar{
+  min-height:64px!important;
+  padding:11px 13px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+}
+
+.smm-action-copy{
+  min-width:0!important;
+}
+
+.smm-action-copy span{
+  display:block!important;
+  margin:0!important;
+
+  font-size:var(--fs-micro)!important;
+}
+
+.smm-action-copy strong{
+  display:block!important;
+  margin-top:6px!important;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+
+  color:#34352f!important;
+
+  font-size:var(--fs-body)!important;
+  line-height:1.25!important;
+  font-weight:500!important;
+}
+
+.smm-header-actions{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:7px!important;
+}
+
+.smm-header-actions button{
+  min-height:35px!important;
+  padding:0 11px!important;
+
+  font-size:var(--fs-micro)!important;
+}
+
+/* Summary text */
+.smm-summary{
+  gap:10px!important;
+}
+
+.smm-summary>div{
+  min-height:90px!important;
+  padding:13px 14px!important;
+}
+
+.smm-summary span{
+  font-size:var(--fs-micro)!important;
+  line-height:1.2!important;
+}
+
+.smm-summary strong{
+  font-size:var(--fs-body-lg)!important;
+  line-height:1.3!important;
+  font-weight:500!important;
+}
+
+.smm-summary small{
+  font-size:var(--fs-micro)!important;
+  line-height:1.3!important;
+}
+
+/* Table toolbar */
+.smm-table-tools{
+  min-height:54px!important;
+  padding:8px 12px!important;
+
+  display:grid!important;
+  grid-template-columns:1fr auto auto!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+
+.smm-table-tools>div{
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+}
+
+.smm-table-tools select{
+  min-width:112px!important;
+  min-height:35px!important;
+  height:35px!important;
+
+  font-size:var(--fs-micro)!important;
+}
+
+.smm-save-state{
+  color:#8d8f86!important;
+
+  font-size:var(--fs-micro)!important;
+}
+
+.smm-table-tools .smm-primary-button{
+  min-height:35px!important;
+  padding:0 11px!important;
+
+  font-size:var(--fs-small)!important;
+}
+
+/* Timeline table text is now readable */
+.smm-table-wrap th{
+  height:44px!important;
+
+  font-size:var(--fs-micro)!important;
+  line-height:1.2!important;
+}
+
+.smm-table-wrap td{
+  padding:9px 10px!important;
+
+  font-size:var(--fs-small)!important;
+  line-height:1.35!important;
+}
+
+.smm-table-wrap textarea{
+  min-height:66px!important;
+
+  font-size:var(--fs-small)!important;
+  line-height:1.4!important;
+}
+
+.smm-table-wrap input[type="url"],
+.smm-table-wrap input[type="date"]{
+  min-height:36px!important;
+  height:36px!important;
+
+  font-size:var(--fs-micro)!important;
+}
+
+.smm-status{
+  min-height:36px!important;
+  height:36px!important;
+
+  font-size:var(--fs-micro)!important;
+}
+
+.smm-multi-trigger{
+  min-height:36px!important;
+
+  font-size:var(--fs-micro)!important;
+}
+
+.smm-row-actions{
+  min-width:128px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:4px!important;
+  flex-wrap:nowrap!important;
+}
+
+.smm-row-actions button{
+  width:29px!important;
+  min-width:29px!important;
+  height:29px!important;
+  min-height:29px!important;
+  padding:0!important;
+
+  font-size:var(--fs-micro)!important;
+}
+
+.smm-table-wrap th:last-child,
+.smm-table-wrap td:last-child{
+  min-width:145px!important;
+  width:145px!important;
+}
+
+@media(max-width:760px){
+  .smm-action-bar{
+    align-items:flex-start!important;
+    flex-direction:column!important;
+  }
+
+  .smm-header-actions{
+    width:100%!important;
+    justify-content:flex-start!important;
+  }
+
+  .smm-table-tools{
+    grid-template-columns:1fr!important;
+  }
+}
+
+
+/* ============================================================
+   V7 — TIMELINE DESKTOP FIT
+   ============================================================ */
+
+@media(min-width:1025px){
+  .smm-table-wrap{
+    overflow-x:hidden!important;
+  }
+
+  .smm-table-wrap table{
+    width:100%!important;
+    min-width:0!important;
+    table-layout:fixed!important;
+  }
+
+  .smm-table-wrap td,
+  .smm-table-wrap th{
+    min-width:0!important;
+  }
+
+  .smm-table-wrap textarea{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  .smm-table-wrap input,
+  .smm-table-wrap select,
+  .smm-multi-trigger{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  .smm-row-actions{
+    min-width:0!important;
+    width:100%!important;
+
+    justify-content:center!important;
+  }
+
+  .smm-row-actions button{
+    width:25px!important;
+    min-width:25px!important;
+    height:27px!important;
+    min-height:27px!important;
+  }
+}
+
+@media(max-width:1024px){
+  .smm-table-wrap table{
+    min-width:1480px!important;
+  }
+}
+
+
+/* ============================================================
+   V8 — TIMELINE SELECT / PORTAL MENU FIX
+   ============================================================ */
+
+.smm-page,
+.smm-main,
+.smm-table-card,
+.smm-table-wrap,
+.smm-table-wrap table,
+.smm-table-wrap td{
+  position:relative;
+}
+
+.smm-multi-select{
+  position:relative!important;
+  z-index:auto!important;
+  pointer-events:auto!important;
+}
+
+.smm-multi-trigger{
+  position:relative!important;
+  z-index:1!important;
+
+  pointer-events:auto!important;
+  cursor:pointer!important;
+
+  background:var(--surface)!important;
+}
+
+.smm-multi-trigger *{
+  pointer-events:none!important;
+}
+
+/*
+ MultiCheckbox is rendered with createPortal(document.body).
+ The menu needs fixed positioning for its inline left/top coordinates
+ to work correctly.
+*/
+.smm-multi-menu{
+  position:fixed!important;
+  z-index:10000!important;
+
+  min-width:160px!important;
+  padding:6px!important;
+
+  pointer-events:auto!important;
+
+  background:#fffefa!important;
+
+  border:1px solid var(--line)!important;
+  border-radius:8px!important;
+
+  box-shadow:0 12px 34px rgba(28,29,21,.13)!important;
+}
+
+.smm-multi-menu label{
+  min-height:34px!important;
+  padding:0 9px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+
+  cursor:pointer!important;
+
+  color:#46483f!important;
+  background:transparent!important;
+
+  border-radius:6px!important;
+
+  font-size:11px!important;
+}
+
+.smm-multi-menu label:hover{
+  background:#f1f0e9!important;
+}
+
+.smm-multi-menu input[type="checkbox"]{
+  width:14px!important;
+  min-width:14px!important;
+  height:14px!important;
+  min-height:14px!important;
+
+  margin:0!important;
+
+  accent-color:#525025;
+  pointer-events:auto!important;
+}
+
+.smm-multi-menu span{
+  pointer-events:none!important;
+}
+
+/* Native timeline selects remain interactive. */
+.smm-page select,
+.smm-page input,
+.smm-page textarea,
+.smm-page button{
+  pointer-events:auto!important;
+}
+
+/* Desktop fit */
+@media(min-width:1025px){
+  .smm-table-wrap{
+    overflow-x:clip!important;
+  }
+
+  .smm-table-wrap table{
+    table-layout:fixed!important;
+  }
+
+  .smm-table-wrap textarea,
+  .smm-table-wrap input[type="url"],
+  .smm-table-wrap input[type="date"],
+  .smm-table-wrap select,
+  .smm-multi-trigger{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+}
+
+
+/* ============================================================
+   V9 — SIMPLIFIED CONTENT TIMELINE
+   ============================================================ */
+
+/* Top header is just "Content Timeline" + period selectors. */
+.smm-section-heading{
+  margin-bottom:14px!important;
+}
+
+/* Redundant MONTHLY TIMELINE + client-month line is removed. */
+.smm-action-copy{
+  display:none!important;
+}
+
+/* Action bar becomes a clean utility row. */
+.smm-action-bar{
+  min-height:50px!important;
+  margin-bottom:11px!important;
+  padding:7px 0!important;
+
+  justify-content:flex-end!important;
+
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+.smm-header-actions{
+  width:auto!important;
+  margin-left:auto!important;
+
+  gap:7px!important;
+}
+
+/* Period is already shown in top selectors, remove duplicate PERIOD card. */
+.smm-summary>div:nth-child(2){
+  display:none!important;
+}
+
+.smm-summary{
+  grid-template-columns:1.05fr 1fr 1fr!important;
+  gap:10px!important;
+}
+
+.smm-summary>div{
+  min-height:82px!important;
+  padding:12px 14px!important;
+}
+
+.smm-summary span{
+  font-size:10px!important;
+  letter-spacing:.06em!important;
+}
+
+.smm-summary strong{
+  font-size:13px!important;
+}
+
+/* Make first summary less text-heavy. */
+.smm-summary>div:first-child strong{
+  font-size:13px!important;
+}
+
+/* Compact filter row */
+.smm-table-tools{
+  min-height:50px!important;
+  padding:7px 12px!important;
+
+  grid-template-columns:1fr auto!important;
+}
+
+.smm-table-tools>div:first-child{
+  gap:7px!important;
+}
+
+.smm-save-state{
+  display:none!important;
+}
+
+/* Keep only useful table labels, with smaller visual noise. */
+.smm-table-wrap th{
+  height:42px!important;
+  color:#76786f!important;
+  font-size:10px!important;
+  letter-spacing:.025em!important;
+  text-transform:none!important;
+}
+
+.smm-table-wrap td{
+  padding:8px 9px!important;
+}
+
+.smm-table-wrap textarea{
+  min-height:58px!important;
+}
+
+.smm-row-actions{
+  gap:3px!important;
+}
+
+/* No dropdown obstruction. */
+.smm-multi-menu{
+  z-index:12000!important;
+}
+
+/* Desktop: maintain fit. Tablet/mobile can scroll. */
+@media(min-width:1025px){
+  .smm-table-wrap table{
+    table-layout:fixed!important;
+  }
+}
+
+@media(max-width:760px){
+  .smm-action-bar{
+    padding:0!important;
+    align-items:flex-start!important;
+  }
+
+  .smm-header-actions{
+    width:100%!important;
+    justify-content:flex-start!important;
+    flex-wrap:wrap!important;
+  }
+
+  .smm-summary{
+    grid-template-columns:1fr!important;
+  }
+}
+
+
+/* ============================================================
+   V10 — TIMELINE RESPONSIVE COMPACT
+   ============================================================ */
+
+@media(max-width:1024px){
+  .smm-table-wrap{
+    overflow-x:auto!important;
+  }
+
+  .smm-table-wrap table{
+    min-width:1180px!important;
+    table-layout:fixed!important;
+  }
+
+  .smm-table-wrap textarea{
+    min-height:54px!important;
+  }
+}
+
+@media(max-width:640px){
+  .smm-period-filter{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:1.3fr 1fr .8fr!important;
+    gap:6px!important;
+  }
+
+  .smm-period-filter select{
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  .smm-header-actions{
+    gap:5px!important;
+  }
+
+  .smm-header-actions button{
+    min-height:32px!important;
+    padding:0 8px!important;
+    font-size:9.5px!important;
+  }
+
+  .smm-table-wrap table{
+    min-width:1040px!important;
+  }
+}

@@ -1,0 +1,1513 @@
+
+:root{
+  --pluno:#525025;
+  --pluno-dark:#41401f;
+  --pluno-mid:#696637;
+  --pluno-light:#89865a;
+  --pluno-gradient:linear-gradient(135deg,#41401f 0%,#525025 44%,#696637 74%,#89865a 100%);
+  --bg:#f3f2ed;
+  --surface:#fffefa;
+  --surface-soft:#f8f7f2;
+  --surface-muted:#efeee7;
+  --text:#20211c;
+  --text-2:#66685f;
+  --text-3:#96988f;
+  --line:#deddd5;
+  --line-soft:#e9e8e1;
+  --success:#3c573f;
+  --success-bg:#eaf0e9;
+  --warning:#75632f;
+  --warning-bg:#f3eedf;
+  --danger:#a34f47;
+  --danger-bg:#f7eae8;
+  --r-input:9px;
+  --r-button:9px;
+  --r-card:12px;
+  --r-panel:14px;
+  --shadow-sm:0 8px 25px rgba(29,30,22,.045);
+  --shadow-md:0 16px 40px rgba(29,30,22,.075);
+  --font:"Avenir Next",Avenir,"Segoe UI Variable","Segoe UI",Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body,#root{margin:0;padding:0;width:100%;min-height:100%}
+html{background:var(--bg)}
+body{
+  margin:0;
+  color:var(--text);
+  background:radial-gradient(circle at 80% 0%,rgba(82,80,37,.045),transparent 28%),var(--bg);
+  font-family:var(--font);
+  font-size:14px;
+  font-weight:400;
+  letter-spacing:-.005em;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button,input,select,textarea{font:inherit;font-weight:400}
+strong,b,h1,h2,h3,h4,h5,h6{font-weight:500}
+button{cursor:pointer}
+a{color:inherit}
+::selection{background:rgba(82,80,37,.16)}
+input,select,textarea{
+  color:var(--text);background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-input);outline:none;box-shadow:none;
+  transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;
+}
+input,select{min-height:40px}
+input,textarea{padding:0 12px}
+textarea{padding-top:10px;padding-bottom:10px;resize:vertical}
+select{padding:0 32px 0 12px}
+input::placeholder,textarea::placeholder{color:#a5a69e}
+input:focus,select:focus,textarea:focus{
+  background:#fff;border-color:#858252;box-shadow:0 0 0 3px rgba(82,80,37,.07)
+}
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{
+  -webkit-text-fill-color:var(--text)!important;
+  -webkit-box-shadow:0 0 0 1000px var(--surface) inset!important;
+}
+button,.btn,.button{
+  min-height:38px;padding:0 13px;color:#393a34;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-button);box-shadow:none;font-weight:450;
+  transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,transform .15s ease;
+}
+button:hover,.btn:hover,.button:hover{transform:translateY(-1px);background:#fff;box-shadow:0 6px 16px rgba(29,30,22,.05)}
+button:disabled{opacity:.48;cursor:not-allowed;transform:none;box-shadow:none}
+.primary,.btn-primary,.booking-add-button,.gallery-primary-button,.social-primary-button,
+.add-employee-button,.documents-add,.spending-add-button,.bookkeeping-generate-button,
+.bookkeeping-save,.employee-save,.customer-save,.spending-save,.smm-primary-button{
+  color:#fff!important;background:var(--pluno-gradient)!important;border-color:transparent!important;
+  box-shadow:0 8px 20px rgba(82,80,37,.15)!important;
+}
+.table-empty-cell{padding:0!important}
+.table-empty-viewport{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;min-height:120px!important;padding:24px 16px!important;
+  color:var(--text-3)!important;font-size:12px!important;white-space:normal!important;
+}
+.booking-overlay,.customer-overlay,.spending-overlay,.bookkeeping-overlay,.employee-overlay,
+.documents-overlay,.gallery-modal-overlay,.dashboard-schedule-overlay,.dashboard-note-overlay,
+.social-detail-overlay,.smm-overlay{
+  position:fixed!important;inset:0!important;z-index:4000!important;padding:22px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  background:rgba(26,27,21,.35)!important;backdrop-filter:none;
+}
+.dashboard-footer,.booking-footer,.customer-footer,.spending-footer,.transactions-footer,
+.bookkeeping-footer,.employee-footer,.documents-footer,.social-footer,.smm-footer{
+  display:none!important;
+}
+.booking-main,.gallery-manager-main,.social-main,.transactions-main,.customer-main,
+.spending-main,.bookkeeping-main,.employee-main,.documents-main,.smm-main{
+  min-height:100vh;margin-left:236px;padding:34px 38px 38px;background:transparent!important;
+}
+.booking-eyebrow,.gallery-manager-eyebrow,.social-eyebrow,.social-section-label,
+.transactions-section-label,.customer-section-label,.customer-eyebrow,.spending-section-label,
+.spending-card-kicker,.bookkeeping-section-label,.employee-section-label,.employee-eyebrow,
+.documents-eyebrow,.documents-section-label,.smm-section-label,.dashboard-section-label,
+.dashboard-card-kicker{
+  color:#918f72!important;font-size:9px!important;line-height:1.1!important;font-weight:500!important;
+  letter-spacing:.14em!important;text-transform:uppercase;
+}
+[class$="-stat-label"],[class$="-section-label"],[class$="-kicker"]{font-weight:500!important}
+.table-pagination{
+  min-height:52px;padding:8px 14px;display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  border-top:1px solid var(--line-soft);background:var(--surface);
+}
+.table-page-arrow{width:32px;min-width:32px;height:32px;min-height:32px;padding:0}
+.table-page-indicator{min-width:48px;color:#84867d;text-align:center;font-size:11px}
+.table-page-indicator span{padding:0 3px;color:#b1b2aa}
+*{scrollbar-width:thin;scrollbar-color:#bcbba9 transparent}
+*::-webkit-scrollbar{width:7px;height:7px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:#bcbba9;border-radius:99px}
+@media(max-width:760px){
+  .booking-main,.gallery-manager-main,.social-main,.transactions-main,.customer-main,
+  .spending-main,.bookkeeping-main,.employee-main,.documents-main,.smm-main{
+    margin-left:0;padding:70px 14px 28px
+  }
+}
+
+
+/* ============================================================
+   V5 — CONSISTENCY + MINIMAL CONTROLS
+   ============================================================ */
+
+:root{
+  --page-max:1400px;
+  --control-height:38px;
+  --section-heading-size:25px;
+}
+
+/* Keep every internal section on one horizontal rhythm */
+.dashboard-overview,
+.booking-page-header,.booking-list-section,.booking-error,
+.gallery-manager-header,.gallery-stats,.gallery-list-card,.gallery-alert,
+.social-page-header,.social-summary-grid,.social-inbox-section,.social-message,.social-setup-message,
+.transactions-section-heading,.transactions-summary,.transactions-card,.transactions-error,
+.customer-section-heading,.customer-stat-grid,.customer-list-section,.customer-error,
+.spending-section-heading,.spending-columns,.spending-error,
+.bookkeeping-generator,.bookkeeping-overview,.bookkeeping-reports,.bookkeeping-error,
+.employee-section-heading,.employee-stat-grid,.employee-list-section,.employee-error,
+.documents-page-header,.documents-content,.documents-message,
+.smm-section-heading,.smm-action-bar,.smm-summary,.smm-table-card,.smm-message,.smm-empty{
+  width:100%!important;
+  max-width:var(--page-max)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+
+/* Typography hierarchy */
+.dashboard-section-heading h2,
+.booking-page-header h1,
+.gallery-manager-header h1,
+.social-page-header h1,
+.transactions-section-heading h2,
+.customer-section-heading h2,
+.spending-section-heading h2,
+.employee-section-heading h2,
+.documents-page-header h1,
+.smm-section-heading h2{
+  font-size:var(--section-heading-size)!important;
+  line-height:1.08!important;
+  font-weight:500!important;
+  letter-spacing:-.035em!important;
+}
+
+/* Minimalist dropdown */
+select{
+  height:var(--control-height)!important;
+  min-height:var(--control-height)!important;
+  padding:0 34px 0 12px!important;
+
+  -webkit-appearance:none!important;
+  -moz-appearance:none!important;
+  appearance:none!important;
+
+  color:#4f5149!important;
+  background-color:rgba(255,254,250,.94)!important;
+
+  background-image:
+    linear-gradient(45deg,transparent 50%,#85877e 50%),
+    linear-gradient(135deg,#85877e 50%,transparent 50%)!important;
+
+  background-position:
+    calc(100% - 15px) 50%,
+    calc(100% - 11px) 50%!important;
+
+  background-size:4px 4px,4px 4px!important;
+  background-repeat:no-repeat!important;
+
+  border:1px solid #dfded6!important;
+  border-radius:8px!important;
+  box-shadow:none!important;
+
+  font-size:11px!important;
+  font-weight:400!important;
+}
+
+select:hover{
+  background-color:#fff!important;
+  border-color:#cfcdc2!important;
+}
+
+select:focus{
+  border-color:#8b8858!important;
+  box-shadow:0 0 0 3px rgba(82,80,37,.06)!important;
+}
+
+/* Same control geometry everywhere */
+input[type="date"],
+input[type="search"],
+input[type="text"],
+input[type="url"],
+input[type="number"],
+textarea,
+button,
+.btn,
+.button{
+  border-radius:8px!important;
+}
+
+/* Card geometry consistency */
+.dashboard-card,.dashboard-stat,
+.booking-list-section,
+.gallery-stat-card,.gallery-list-card,
+.social-summary-card,.social-inbox-section,
+.transactions-summary>div,.transactions-card,
+.customer-stat-card,.customer-list-section,
+.spending-card,
+.bookkeeping-generator,.bookkeeping-overview,.bookkeeping-reports,
+.employee-stat-card,.employee-list-section,
+.documents-content,.document-card,
+.smm-summary>div,.smm-table-card{
+  border-radius:11px!important;
+}
+
+/* Internal legacy footers */
+.dashboard-footer,.booking-footer,.customer-footer,.spending-footer,
+.transactions-footer,.bookkeeping-footer,.employee-footer,.documents-footer,
+.social-footer,.smm-footer{
+  display:none!important;
+}
+
+
+/* ============================================================
+   V6 — TYPOGRAPHY SYSTEM
+   Smallest meaningful UI text = 10px
+   ============================================================ */
+
+:root{
+  --fs-micro:10px;
+  --fs-small:11px;
+  --fs-body:12px;
+  --fs-body-lg:13px;
+  --fs-subtitle:15px;
+  --fs-card-title:17px;
+  --fs-page-title:25px;
+}
+
+/* General body readability */
+body{
+  font-size:var(--fs-body-lg)!important;
+  line-height:1.45;
+}
+
+/* Decorative / category labels */
+.dashboard-section-label,
+.dashboard-card-kicker,
+.booking-eyebrow,
+.booking-section-label,
+.booking-form-kicker,
+.gallery-manager-eyebrow,
+.social-eyebrow,
+.social-section-label,
+.transactions-section-label,
+.customer-section-label,
+.customer-eyebrow,
+.customer-form-kicker,
+.spending-section-label,
+.spending-card-kicker,
+.bookkeeping-section-label,
+.employee-section-label,
+.employee-eyebrow,
+.documents-eyebrow,
+.documents-section-label,
+.smm-section-label,
+.smm-action-copy span{
+  font-size:var(--fs-micro)!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+  letter-spacing:.11em!important;
+}
+
+/* Never allow core controls to become unreadably small */
+button,
+input,
+select,
+textarea{
+  font-size:var(--fs-small);
+}
+
+/* Standard table sizing */
+table th{
+  font-size:var(--fs-micro)!important;
+  line-height:1.25!important;
+  font-weight:500!important;
+}
+
+table td{
+  font-size:var(--fs-body)!important;
+  line-height:1.4!important;
+  font-weight:400!important;
+}
+
+/* Status / chip floor */
+[class*="status"],
+[class*="badge"],
+[class*="payment-type"],
+[class*="payment-badge"]{
+  font-size:var(--fs-micro)!important;
+}
+
+/* Secondary descriptions */
+.dashboard-note-main p,
+.social-page-header p,
+.booking-form-header p,
+.customer-form-header p,
+.spending-form-header p{
+  font-size:var(--fs-small)!important;
+}
+
+/* Sidebar remains compact but readable */
+.dashboard-nav-section{
+  font-size:var(--fs-micro)!important;
+}
+
+.dashboard-nav-item,
+.dashboard-nav-item:link,
+.dashboard-nav-item:visited{
+  font-size:var(--fs-body)!important;
+}
+
+.dashboard-nav-item>span:first-child{
+  font-size:var(--fs-micro)!important;
+}
+
+.dashboard-user-name{
+  font-size:var(--fs-small)!important;
+}
+
+.dashboard-user-role,
+.dashboard-logout{
+  font-size:var(--fs-micro)!important;
+}
+
+/* Unified small helper text */
+.dashboard-stat-note,
+.gallery-slug,
+.customer-contact,
+.booking-payment-remaining,
+.social-time,
+.smm-save-state{
+  font-size:var(--fs-micro)!important;
+}
+
+
+/* ============================================================
+   V7 — FONT / MOTION / DESKTOP OVERFLOW SYSTEM
+   ============================================================ */
+
+500;600&display=swap");
+
+:root{
+  --font:"Manrope","Segoe UI Variable","Segoe UI",Arial,sans-serif;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-soft:cubic-bezier(.2,.8,.2,1);
+}
+
+html,
+body,
+#root{
+  max-width:100%;
+  overflow-x:hidden!important;
+}
+
+body,
+button,
+input,
+select,
+textarea{
+  font-family:var(--font)!important;
+}
+
+body{
+  font-weight:400!important;
+  letter-spacing:-.012em!important;
+}
+
+/* Slightly softer heading character */
+h1,h2,h3,h4,h5,h6,strong,b{
+  font-family:var(--font)!important;
+  font-weight:500!important;
+}
+
+/* ============================================================
+   PAGE ENTER MOTION
+   ============================================================ */
+
+@keyframes plunoPageIn{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+    
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+    
+  }
+}
+
+.dashboard-main,
+.booking-main,
+.gallery-manager-main,
+.social-main,
+.transactions-main,
+.customer-main,
+.spending-main,
+.bookkeeping-main,
+.employee-main,
+.documents-main,
+.smm-main{
+  animation:plunoPageIn .34s var(--ease-out) both;
+}
+
+/* Sidebar active state feels connected instead of jumping */
+.dashboard-nav-item{
+  transition:
+    color .2s var(--ease-soft),
+    background .2s var(--ease-soft),
+    box-shadow .2s var(--ease-soft),
+    transform .2s var(--ease-soft)!important;
+}
+
+.dashboard-nav-item.active{
+  transform:translateX(2px);
+}
+
+/* ============================================================
+   MODAL / POPUP MOTION
+   ============================================================ */
+
+@keyframes plunoOverlayIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+@keyframes plunoModalIn{
+  from{
+    opacity:0;
+    transform:translateY(16px) scale(.975);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+.booking-overlay,
+.customer-overlay,
+.spending-overlay,
+.bookkeeping-overlay,
+.employee-overlay,
+.documents-overlay,
+.gallery-modal-overlay,
+.dashboard-schedule-overlay,
+.dashboard-note-overlay,
+.social-detail-overlay,
+.smm-overlay{
+  animation:plunoOverlayIn .2s ease-out both!important;
+}
+
+.booking-form-box,
+.booking-view-box,
+.booking-payment-modal,
+.customer-form-box,
+.customer-detail-box,
+.spending-form-box,
+.bookkeeping-modal,
+.employee-form-box,
+.employee-detail-box,
+.documents-modal,
+.gallery-modal,
+.dashboard-schedule-modal,
+.dashboard-note-modal,
+.smm-modal{
+  transform-origin:50% 45%;
+  animation:plunoModalIn .32s var(--ease-out) both!important;
+}
+
+/* Drawer motion */
+.social-detail-panel{
+  animation:plunoDrawerIn .32s var(--ease-out) both!important;
+}
+
+@keyframes plunoDrawerIn{
+  from{
+    opacity:.5;
+    transform:translateX(28px);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
+/* Hover motion remains subtle */
+button,
+.btn,
+.button{
+  transition:
+    background .18s var(--ease-soft),
+    border-color .18s var(--ease-soft),
+    box-shadow .18s var(--ease-soft),
+    transform .18s var(--ease-soft)!important;
+}
+
+/* ============================================================
+   NO HORIZONTAL SCROLL ON LAPTOP / DESKTOP
+   Horizontal scrolling is reserved for tablet / mobile only.
+   ============================================================ */
+
+@media(min-width:1025px){
+  .booking-table-scroll,
+  .gallery-table-scroll,
+  .social-table-wrap,
+  .transactions-table-scroll,
+  .customer-table-scroll,
+  .spending-table-scroll,
+  .employee-table-scroll,
+  .smm-table-wrap,
+  .shared-table-wrap{
+    overflow-x:hidden!important;
+    max-width:100%!important;
+  }
+
+  .booking-table,
+  .gallery-table,
+  .social-table,
+  .transactions-table,
+  .customer-table,
+  .spending-table,
+  .employee-table,
+  .smm-table-wrap table,
+  .shared-table-wrap table{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  .booking-table th,.booking-table td,
+  .gallery-table th,.gallery-table td,
+  .social-table th,.social-table td,
+  .transactions-table th,.transactions-table td,
+  .customer-table th,.customer-table td,
+  .spending-table th,.spending-table td,
+  .employee-table th,.employee-table td,
+  .smm-table-wrap th,.smm-table-wrap td{
+    overflow-wrap:anywhere;
+  }
+
+  /* Timeline is the densest table, so use explicit column proportions */
+  .smm-table-wrap table{
+    table-layout:fixed!important;
+  }
+
+  .smm-table-wrap th:nth-child(1),
+  .smm-table-wrap td:nth-child(1){width:3%!important}
+
+  .smm-table-wrap th:nth-child(2),
+  .smm-table-wrap td:nth-child(2){width:15%!important}
+
+  .smm-table-wrap th:nth-child(3),
+  .smm-table-wrap td:nth-child(3){width:15%!important}
+
+  .smm-table-wrap th:nth-child(4),
+  .smm-table-wrap td:nth-child(4){width:10%!important}
+
+  .smm-table-wrap th:nth-child(5),
+  .smm-table-wrap td:nth-child(5){width:7%!important}
+
+  .smm-table-wrap th:nth-child(6),
+  .smm-table-wrap td:nth-child(6){width:7%!important}
+
+  .smm-table-wrap th:nth-child(7),
+  .smm-table-wrap td:nth-child(7){width:9%!important}
+
+  .smm-table-wrap th:nth-child(8),
+  .smm-table-wrap td:nth-child(8){width:11%!important}
+
+  .smm-table-wrap th:nth-child(9),
+  .smm-table-wrap td:nth-child(9){width:14%!important}
+
+  .smm-table-wrap th:nth-child(10),
+  .smm-table-wrap td:nth-child(10){width:9%!important}
+
+  .smm-table-wrap textarea,
+  .smm-table-wrap input[type="url"],
+  .smm-table-wrap input[type="date"],
+  .smm-table-wrap select,
+  .smm-multi-trigger{
+    width:100%!important;
+    max-width:100%!important;
+  }
+}
+
+@media(max-width:1024px){
+  .booking-table-scroll,
+  .gallery-table-scroll,
+  .social-table-wrap,
+  .transactions-table-scroll,
+  .customer-table-scroll,
+  .spending-table-scroll,
+  .employee-table-scroll,
+  .smm-table-wrap,
+  .shared-table-wrap{
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+/* Respect reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+
+
+/* ============================================================
+   V8 — PERFORMANCE CLEANUP
+   ============================================================ */
+
+:root{
+  --font:"Segoe UI Variable Text","Segoe UI Variable","Segoe UI",
+         "Helvetica Neue",Arial,sans-serif;
+  --motion-fast:160ms;
+  --motion-page:220ms;
+  --ease-ui:cubic-bezier(.22,.75,.2,1);
+}
+
+html,
+body,
+#root{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden!important;
+}
+
+body,
+button,
+input,
+select,
+textarea{
+  font-family:var(--font)!important;
+}
+
+/* No remote font request, no expensive blur filter. */
+@keyframes plunoPageInV8{
+  from{
+    opacity:0;
+    transform:translateY(5px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes plunoModalInV8{
+  from{
+    opacity:0;
+    transform:translateY(10px) scale(.985);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+.dashboard-main,
+.booking-main,
+.gallery-manager-main,
+.social-main,
+.transactions-main,
+.customer-main,
+.spending-main,
+.bookkeeping-main,
+.employee-main,
+.documents-main,
+.smm-main{
+  animation:plunoPageInV8 var(--motion-page) var(--ease-ui) both!important;
+  will-change:auto!important;
+}
+
+.booking-form-box,
+.booking-view-box,
+.booking-payment-modal,
+.customer-form-box,
+.customer-detail-box,
+.spending-form-box,
+.bookkeeping-modal,
+.employee-form-box,
+.employee-detail-box,
+.documents-modal,
+.gallery-modal,
+.dashboard-schedule-modal,
+.dashboard-note-modal,
+.smm-modal{
+  animation:plunoModalInV8 210ms var(--ease-ui) both!important;
+  will-change:auto!important;
+}
+
+/* Overlay is intentionally cheap. */
+.booking-overlay,
+.customer-overlay,
+.spending-overlay,
+.bookkeeping-overlay,
+.employee-overlay,
+.documents-overlay,
+.gallery-modal-overlay,
+.dashboard-schedule-overlay,
+.dashboard-note-overlay,
+.smm-overlay{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  background:rgba(30,31,24,.32)!important;
+}
+
+/* Social drawer can remain a simple transform. */
+.social-detail-overlay{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+/* Avoid animating shadows on hundreds of controls. */
+button,
+.btn,
+.button,
+input,
+select,
+textarea{
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease!important;
+}
+
+/* ============================================================
+   DESKTOP: NO HORIZONTAL SCROLL CONTAINER
+   TABLET / MOBILE: HORIZONTAL SCROLL ALLOWED
+   ============================================================ */
+
+@media(min-width:1025px){
+  .booking-table-scroll,
+  .gallery-table-scroll,
+  .social-table-wrap,
+  .transactions-table-scroll,
+  .customer-table-scroll,
+  .spending-table-scroll,
+  .employee-table-scroll,
+  .smm-table-wrap,
+  .shared-table-wrap{
+    overflow-x:clip!important;
+    overflow-y:visible!important;
+    max-width:100%!important;
+    scroll-behavior:auto!important;
+  }
+
+  .booking-table,
+  .gallery-table,
+  .social-table,
+  .transactions-table,
+  .customer-table,
+  .spending-table,
+  .employee-table,
+  .smm-table-wrap table{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+}
+
+@media(max-width:1024px){
+  .booking-table-scroll,
+  .gallery-table-scroll,
+  .social-table-wrap,
+  .transactions-table-scroll,
+  .customer-table-scroll,
+  .spending-table-scroll,
+  .employee-table-scroll,
+  .smm-table-wrap,
+  .shared-table-wrap{
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+/* Keep accessibility preference. */
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation:none!important;
+    transition:none!important;
+    scroll-behavior:auto!important;
+  }
+}
+
+
+/* ============================================================
+   V9 — QUIET UI / CONSISTENT HEADER / PERFORMANCE
+   ============================================================ */
+
+:root{
+  --page-max:1400px;
+  --page-pad-x:38px;
+  --page-pad-top:28px;
+  --header-title-size:23px;
+}
+
+/* No page motion. No modal scale motion.
+   Only overlay gets a tiny opacity fade. */
+.dashboard-main,
+.booking-main,
+.gallery-manager-main,
+.social-main,
+.transactions-main,
+.customer-main,
+.spending-main,
+.bookkeeping-main,
+.employee-main,
+.documents-main,
+.smm-main,
+.booking-form-box,
+.booking-view-box,
+.booking-payment-modal,
+.customer-form-box,
+.customer-detail-box,
+.spending-form-box,
+.bookkeeping-modal,
+.employee-form-box,
+.employee-detail-box,
+.documents-modal,
+.gallery-modal,
+.dashboard-schedule-modal,
+.dashboard-note-modal,
+.smm-modal,
+.social-detail-panel{
+  animation:none!important;
+  transform:none!important;
+  filter:none!important;
+}
+
+@keyframes plunoOverlayOnly{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+.booking-overlay,
+.customer-overlay,
+.spending-overlay,
+.bookkeeping-overlay,
+.employee-overlay,
+.documents-overlay,
+.gallery-modal-overlay,
+.dashboard-schedule-overlay,
+.dashboard-note-overlay,
+.smm-overlay,
+.social-detail-overlay{
+  animation:plunoOverlayOnly 120ms ease-out both!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+/* Navigation should feel immediate. */
+.dashboard-nav-item{
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease!important;
+}
+
+.dashboard-nav-item.active{
+  transform:none!important;
+}
+
+/* ============================================================
+   ONE HEADER SYSTEM FOR ALL PAGES
+   Remove decorative breadcrumbs/eyebrows.
+   ============================================================ */
+
+.dashboard-section-label,
+.booking-eyebrow,
+.gallery-manager-eyebrow,
+.social-eyebrow,
+.transactions-section-label,
+.customer-section-label,
+.customer-eyebrow,
+.spending-section-label,
+.employee-section-label,
+.employee-eyebrow,
+.documents-eyebrow,
+.smm-section-label{
+  display:none!important;
+}
+
+.dashboard-section-heading,
+.booking-page-header,
+.gallery-manager-header,
+.social-page-header,
+.transactions-section-heading,
+.customer-section-heading,
+.spending-section-heading,
+.employee-section-heading,
+.documents-page-header,
+.smm-section-heading{
+  min-height:44px!important;
+  margin-bottom:16px!important;
+  align-items:center!important;
+}
+
+.dashboard-section-heading h2,
+.booking-page-header h1,
+.gallery-manager-header h1,
+.social-page-header h1,
+.transactions-section-heading h2,
+.customer-section-heading h2,
+.spending-section-heading h2,
+.employee-section-heading h2,
+.documents-page-header h1,
+.smm-section-heading h2{
+  margin:0!important;
+  color:#24251f!important;
+  font-size:var(--header-title-size)!important;
+  line-height:1.15!important;
+  font-weight:500!important;
+  letter-spacing:-.025em!important;
+}
+
+/* All page mains start on exactly the same baseline. */
+.dashboard-main,
+.booking-main,
+.gallery-manager-main,
+.social-main,
+.transactions-main,
+.customer-main,
+.spending-main,
+.bookkeeping-main,
+.employee-main,
+.documents-main,
+.smm-main{
+  padding-top:var(--page-pad-top)!important;
+  padding-left:var(--page-pad-x)!important;
+  padding-right:var(--page-pad-x)!important;
+}
+
+/* Form system */
+.booking-field,
+.customer-field,
+.spending-field,
+.bookkeeping-field,
+.employee-field,
+.documents-form-grid label{
+  gap:7px!important;
+}
+
+.booking-field label,
+.customer-field label,
+.spending-field label,
+.bookkeeping-field label,
+.employee-field label,
+.documents-form-grid label{
+  display:block!important;
+  margin:0!important;
+  color:#8d8f86!important;
+  font-size:10px!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+  letter-spacing:.07em!important;
+}
+
+.booking-field input,
+.booking-field select,
+.customer-field input,
+.customer-field select,
+.spending-field input,
+.spending-field select,
+.bookkeeping-field input,
+.bookkeeping-field select,
+.employee-field input,
+.employee-field select{
+  width:100%!important;
+}
+
+/* Mobile / tablet can keep their own responsive header stack. */
+@media(max-width:760px){
+  :root{
+    --page-pad-x:14px;
+    --page-pad-top:70px;
+    --header-title-size:22px;
+  }
+
+  .dashboard-section-heading,
+  .booking-page-header,
+  .gallery-manager-header,
+  .social-page-header,
+  .transactions-section-heading,
+  .customer-section-heading,
+  .spending-section-heading,
+  .employee-section-heading,
+  .documents-page-header,
+  .smm-section-heading{
+    align-items:flex-start!important;
+  }
+}
+
+
+/* ============================================================
+   V10 — GLOBAL PANEL / RESPONSIVE CONSISTENCY
+   ============================================================ */
+
+:root{
+  --panel-radius:10px;
+  --panel-header-h:64px;
+  --toolbar-h:48px;
+  --table-head-h:42px;
+  --table-row-h:54px;
+
+  --desktop-title:23px;
+  --desktop-card-title:17px;
+  --desktop-body:12px;
+  --desktop-small:10px;
+
+  --tablet-body:11px;
+  --tablet-small:9.5px;
+
+  --mobile-body:10.5px;
+  --mobile-small:9px;
+}
+
+/* ============================================================
+   DATABASE / LIST PANEL — SAME SHELL ON EVERY PAGE
+   ============================================================ */
+
+.booking-list-section,
+.gallery-list-card,
+.social-inbox-section,
+.transactions-card,
+.customer-list-section,
+.spending-card,
+.employee-list-section,
+.documents-content,
+.smm-table-card{
+  width:100%!important;
+  max-width:var(--page-max)!important;
+
+  overflow:hidden!important;
+
+  background:var(--surface)!important;
+  border:1px solid var(--line-soft)!important;
+  border-radius:var(--panel-radius)!important;
+  box-shadow:var(--shadow-sm)!important;
+}
+
+/* Main panel headers */
+.booking-list-header,
+.gallery-list-header,
+.social-inbox-header,
+.transactions-card-header,
+.customer-list-header,
+.spending-card-header,
+.employee-list-header,
+.documents-list-header{
+  min-height:var(--panel-header-h)!important;
+  padding:13px 15px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+
+  background:var(--surface)!important;
+  border-bottom:1px solid var(--line-soft)!important;
+}
+
+/* Same title visual hierarchy */
+.booking-list-header h2,
+.gallery-list-header h2,
+.social-inbox-header h2,
+.transactions-card-header h2,
+.customer-list-header h2,
+.spending-card-title h2,
+.employee-list-header h2,
+.documents-list-header h2{
+  margin:0!important;
+
+  color:#292a24!important;
+
+  font-size:var(--desktop-card-title)!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+  letter-spacing:-.018em!important;
+}
+
+/* Secondary labels in inner cards are intentionally subtle */
+.booking-section-label,
+.gallery-manager-eyebrow,
+.social-section-label,
+.transactions-card-header>div:first-child>span,
+.customer-eyebrow,
+.spending-card-kicker,
+.documents-section-label{
+  display:none!important;
+}
+
+/* Toolbars directly under panel header */
+.social-filter-row,
+.spending-toolbar,
+.smm-table-tools{
+  min-height:var(--toolbar-h)!important;
+  padding:7px 13px!important;
+
+  background:#faf9f5!important;
+  border-bottom:1px solid var(--line-soft)!important;
+}
+
+/* Search controls use the same geometry */
+.booking-search input,
+.gallery-search-box input,
+.social-search input,
+.search-box input,
+.employee-search-box input,
+.documents-list-tools input{
+  min-height:36px!important;
+  height:36px!important;
+
+  background:#faf9f5!important;
+
+  border-radius:7px!important;
+
+  font-size:11px!important;
+}
+
+/* ============================================================
+   TABLE SYSTEM — SAME RHYTHM ACROSS ALL DATA PAGES
+   ============================================================ */
+
+.booking-table,
+.gallery-table,
+.social-table,
+.transactions-table,
+.customer-table,
+.spending-table,
+.employee-table,
+.smm-table-wrap table{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+
+  background:var(--surface)!important;
+}
+
+.booking-table th,
+.gallery-table th,
+.social-table th,
+.transactions-table th,
+.customer-table th,
+.spending-table th,
+.employee-table th,
+.smm-table-wrap th{
+  height:var(--table-head-h)!important;
+  padding:0 12px!important;
+
+  color:#74766d!important;
+  background:#f1f0ea!important;
+
+  border:0!important;
+  border-bottom:1px solid var(--line)!important;
+
+  vertical-align:middle!important;
+  text-align:left!important;
+
+  font-size:10px!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+  letter-spacing:.025em!important;
+
+  white-space:nowrap;
+}
+
+.booking-table td,
+.gallery-table td,
+.social-table td,
+.transactions-table td,
+.customer-table td,
+.spending-table td,
+.employee-table td,
+.smm-table-wrap td{
+  min-height:var(--table-row-h)!important;
+  height:var(--table-row-h)!important;
+
+  padding:10px 12px!important;
+
+  color:#383a33!important;
+  background:var(--surface)!important;
+
+  border:0!important;
+  border-bottom:1px solid var(--line-soft)!important;
+
+  vertical-align:middle!important;
+
+  font-size:var(--desktop-body)!important;
+  line-height:1.35!important;
+  font-weight:400!important;
+}
+
+.booking-table tbody tr:last-child td,
+.gallery-table tbody tr:last-child td,
+.social-table tbody tr:last-child td,
+.transactions-table tbody tr:last-child td,
+.customer-table tbody tr:last-child td,
+.spending-table tbody tr:last-child td,
+.employee-table tbody tr:last-child td,
+.smm-table-wrap tbody tr:last-child td{
+  border-bottom:0!important;
+}
+
+/* Same light hover everywhere */
+@media(hover:hover){
+  .booking-table tbody tr:hover td,
+  .gallery-table tbody tr:hover td,
+  .social-table tbody tr:hover td,
+  .transactions-table tbody tr:hover td,
+  .customer-table tbody tr:hover td,
+  .spending-table tbody tr:hover td,
+  .employee-table tbody tr:hover td,
+  .smm-table-wrap tbody tr:hover td{
+    background:#faf9f5!important;
+  }
+}
+
+/* ============================================================
+   SUMMARY / KPI CARDS — SAME SIZE + GAP
+   ============================================================ */
+
+.dashboard-stats,
+.gallery-stats,
+.social-summary-grid,
+.transactions-summary,
+.customer-stat-grid,
+.employee-stat-grid,
+.smm-summary{
+  gap:10px!important;
+}
+
+.dashboard-stat,
+.gallery-stat-card,
+.social-summary-card,
+.transactions-summary>div,
+.customer-stat-card,
+.employee-stat-card,
+.smm-summary>div{
+  min-height:104px!important;
+  padding:15px 16px!important;
+
+  border-radius:10px!important;
+}
+
+/* ============================================================
+   TABLET BREAKPOINT
+   Critical fix: sidebar no longer consumes 236px at ~768–1024px.
+   ============================================================ */
+
+@media(max-width:1024px){
+  .dashboard-main,
+  .booking-main,
+  .gallery-manager-main,
+  .social-main,
+  .transactions-main,
+  .customer-main,
+  .spending-main,
+  .bookkeeping-main,
+  .employee-main,
+  .documents-main,
+  .smm-main{
+    margin-left:0!important;
+    padding:70px 18px 28px!important;
+  }
+
+  .dashboard-mobile-trigger{
+    position:fixed!important;
+    top:14px!important;
+    left:14px!important;
+    z-index:2300!important;
+
+    width:40px!important;
+    height:40px!important;
+    padding:0!important;
+
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex-direction:column!important;
+    gap:4px!important;
+
+    background:var(--surface)!important;
+
+    border:1px solid var(--line)!important;
+    border-radius:9px!important;
+  }
+
+  .dashboard-mobile-trigger span{
+    width:14px!important;
+    height:1px!important;
+    background:#66685f!important;
+  }
+
+  .dashboard-sidebar{
+    width:min(286px,86vw)!important;
+
+    transform:translateX(-102%)!important;
+    transition:transform 160ms ease!important;
+  }
+
+  .dashboard-sidebar.mobile-open{
+    transform:translateX(0)!important;
+  }
+
+  .dashboard-mobile-overlay{
+    position:fixed!important;
+    inset:0!important;
+    z-index:1100!important;
+
+    display:block!important;
+
+    background:rgba(26,27,21,.28)!important;
+  }
+
+  /* Tablet typography */
+  .booking-table td,
+  .gallery-table td,
+  .social-table td,
+  .transactions-table td,
+  .customer-table td,
+  .spending-table td,
+  .employee-table td,
+  .smm-table-wrap td{
+    font-size:var(--tablet-body)!important;
+  }
+
+  .booking-table th,
+  .gallery-table th,
+  .social-table th,
+  .transactions-table th,
+  .customer-table th,
+  .spending-table th,
+  .employee-table th,
+  .smm-table-wrap th{
+    font-size:var(--tablet-small)!important;
+  }
+
+  .dashboard-section-heading h2,
+  .booking-page-header h1,
+  .gallery-manager-header h1,
+  .social-page-header h1,
+  .transactions-section-heading h2,
+  .customer-section-heading h2,
+  .spending-section-heading h2,
+  .employee-section-heading h2,
+  .documents-page-header h1,
+  .smm-section-heading h2{
+    font-size:22px!important;
+  }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media(max-width:640px){
+  .dashboard-main,
+  .booking-main,
+  .gallery-manager-main,
+  .social-main,
+  .transactions-main,
+  .customer-main,
+  .spending-main,
+  .bookkeeping-main,
+  .employee-main,
+  .documents-main,
+  .smm-main{
+    padding:68px 10px 22px!important;
+  }
+
+  .booking-list-section,
+  .gallery-list-card,
+  .social-inbox-section,
+  .transactions-card,
+  .customer-list-section,
+  .spending-card,
+  .employee-list-section,
+  .documents-content,
+  .smm-table-card{
+    border-radius:8px!important;
+  }
+
+  .booking-list-header,
+  .gallery-list-header,
+  .social-inbox-header,
+  .transactions-card-header,
+  .customer-list-header,
+  .spending-card-header,
+  .employee-list-header,
+  .documents-list-header{
+    min-height:auto!important;
+    padding:11px 12px!important;
+
+    align-items:flex-start!important;
+    flex-direction:column!important;
+    gap:9px!important;
+  }
+
+  .booking-list-header h2,
+  .gallery-list-header h2,
+  .social-inbox-header h2,
+  .transactions-card-header h2,
+  .customer-list-header h2,
+  .spending-card-title h2,
+  .employee-list-header h2,
+  .documents-list-header h2{
+    font-size:15px!important;
+  }
+
+  .booking-table th,
+  .gallery-table th,
+  .social-table th,
+  .transactions-table th,
+  .customer-table th,
+  .spending-table th,
+  .employee-table th,
+  .smm-table-wrap th{
+    height:38px!important;
+    padding:0 9px!important;
+
+    font-size:var(--mobile-small)!important;
+  }
+
+  .booking-table td,
+  .gallery-table td,
+  .social-table td,
+  .transactions-table td,
+  .customer-table td,
+  .spending-table td,
+  .employee-table td,
+  .smm-table-wrap td{
+    height:48px!important;
+    padding:8px 9px!important;
+
+    font-size:var(--mobile-body)!important;
+  }
+
+  input,
+  select,
+  textarea,
+  button{
+    font-size:10.5px!important;
+  }
+
+  .dashboard-stats,
+  .gallery-stats,
+  .social-summary-grid,
+  .transactions-summary,
+  .customer-stat-grid,
+  .employee-stat-grid,
+  .smm-summary{
+    gap:8px!important;
+  }
+
+  .dashboard-stat,
+  .gallery-stat-card,
+  .social-summary-card,
+  .transactions-summary>div,
+  .customer-stat-card,
+  .employee-stat-card,
+  .smm-summary>div{
+    min-height:88px!important;
+    padding:12px 13px!important;
+  }
+}

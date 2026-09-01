@@ -1,2283 +1,765 @@
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100%;
-}
-
-body {
-  background: #111;
-}
-
-/* =========================================================
-   DASHBOARD PAGE
-========================================================= */
-
-.dashboard-page {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  background: #111;
-  color: #eee;
-  font-family:
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    sans-serif;
-}
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-.dashboard-sidebar {
-  width: 250px;
-  min-height: 100vh;
-  background: #0b0b0b;
-  padding: 30px 22px;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
-  z-index: 1100;
-}
-
-/* =========================================================
-   BRAND
-========================================================= */
-
-.dashboard-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 50px;
-}
-
-.dashboard-brand-mark {
-  width: 38px;
-  height: 38px;
-  background: #eee;
-  color: #111;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.dashboard-brand-name {
-  font-size: 15px;
-  letter-spacing: 2px;
-}
-
-.dashboard-brand-subtitle {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #666;
-  margin-top: 3px;
-}
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-.dashboard-navigation {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.dashboard-nav-section {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #555;
-  margin-bottom: 10px;
-}
-
-.dashboard-nav-section.second {
-  margin-top: 35px;
-}
-
-.dashboard-nav-item,
-.dashboard-nav-item:link,
-.dashboard-nav-item:visited {
-  text-decoration: none;
-  color: #777;
-  padding: 12px 10px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 12px;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.dashboard-nav-item span {
-  font-size: 9px;
-  color: #444;
-}
-
-.dashboard-nav-item:hover {
-  background: #181818;
-  color: #fff;
-}
-
-.dashboard-nav-item.active {
-  background: #1d1d1d;
-  color: #fff;
-}
-
-.dashboard-nav-item.active span {
-  color: #fff;
-}
-
-/* =========================================================
-   USER
-========================================================= */
-
-.dashboard-sidebar-bottom {
-  margin-top: auto;
-}
-
-.dashboard-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 20px;
-}
-
-.dashboard-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #333;
-  color: #eee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.dashboard-user-name {
-  font-size: 11px;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dashboard-user-role {
-  font-size: 9px;
-  color: #666;
-  margin-top: 3px;
-}
-
-.dashboard-logout {
-  width: 100%;
-  background: transparent;
-  border: 1px solid #292929;
-  color: #777;
-  padding: 10px;
-  cursor: pointer;
-  font-size: 10px;
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease;
-}
-
-.dashboard-logout:hover {
-  color: white;
-  border-color: #555;
-  background: #151515;
-}
-
-/* =========================================================
-   MOBILE RAIL / BUTTON
-========================================================= */
-
-.dashboard-mobile-rail,
-.dashboard-mobile-trigger,
-.dashboard-mobile-overlay {
-  display: none;
-}
-
-/* =========================================================
-   MAIN
-========================================================= */
-
-.dashboard-main {
-  flex: 1;
-  min-width: 0;
-  min-height: 100vh;
-  padding: 30px 45px;
-  background: #111;
-}
-
-/* =========================================================
-   TOPBAR
-   Hidden — dashboard langsung ke overview
-========================================================= */
-
-.dashboard-topbar {
-  display: none;
-}
-
-/* =========================================================
-   SECTION HEADING
-========================================================= */
-
-.dashboard-section-heading {
-  margin-bottom: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 20px;
-}
-
-.dashboard-section-label {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #666;
-}
-
-.dashboard-section-heading h2 {
-  margin: 6px 0 0;
-  font-size: 20px;
-  font-weight: 400;
-}
-
-/* =========================================================
-   PERFORMANCE FILTER
-========================================================= */
-
-.dashboard-performance-filter {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.dashboard-performance-filter select {
-  appearance: none;
-  background: #181818;
-  border: 1px solid #292929;
-  color: #aaa;
-  padding: 8px 28px 8px 10px;
-  font-family: inherit;
-  font-size: 9px;
-  cursor: pointer;
-  outline: none;
-
-  background-image:
-    linear-gradient(
-      45deg,
-      transparent 50%,
-      #666 50%
-    ),
-    linear-gradient(
-      135deg,
-      #666 50%,
-      transparent 50%
-    );
-
-  background-position:
-    calc(100% - 11px) 11px,
-    calc(100% - 7px) 11px;
-
-  background-size:
-    4px 4px,
-    4px 4px;
-
-  background-repeat: no-repeat;
-}
-
-.dashboard-performance-filter select:hover {
-  border-color: #444;
-  color: #fff;
-}
-
-.dashboard-performance-filter select:focus {
-  border-color: #555;
-}
-
-/* =========================================================
-   STATS
-========================================================= */
-
-.dashboard-stats {
-  display: grid;
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.dashboard-stat {
-  background: #181818;
-  border: 1px solid #292929;
-  padding: 17px 20px;
-  min-width: 0;
-}
-
-.dashboard-stat.featured {
-  background: #202020;
-}
-
-.dashboard-stat-label {
-  font-size: 8px;
-  letter-spacing: 1.7px;
-  color: #777;
-  margin-bottom: 8px;
-}
-
-.dashboard-stat-value {
-  font-size: 26px;
-  font-weight: 400;
-  letter-spacing: -0.5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dashboard-stat-note {
-  margin-top: 7px;
-  font-size: 8px;
-  color: #555;
-}
-
-/* =========================================================
-   CONTENT GRID
-========================================================= */
-
-.dashboard-content-grid {
-  display: grid;
-  grid-template-columns:
-    1fr 1.35fr;
-
-  gap: 10px;
-  align-items: stretch;
-}
-
-/* =========================================================
-   CARD
-========================================================= */
-
-.dashboard-card {
-  background: #181818;
-  border: 1px solid #292929;
-  min-width: 0;
-}
-
-.dashboard-card-header {
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px solid #292929;
-}
-
-.dashboard-card-kicker {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #666;
-  margin-bottom: 6px;
-}
-
-.dashboard-card-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 400;
-}
-
-.dashboard-card-header > span {
-  font-size: 9px;
-  color: #555;
-}
 
-.dashboard-view-all {
-  color: #888;
-  text-decoration: none;
-  font-size: 9px;
-  transition: color 0.2s ease;
+.dashboard-page{
+  min-height:100vh;
+  width:100%;
+  color:var(--text);
+  background:transparent;
 }
 
-.dashboard-view-all:hover {
-  color: white;
+.dashboard-main{
+  min-height:100vh;
+  margin-left:236px;
+  padding:34px 38px 38px;
 }
 
-/* =========================================================
-   MONTHLY REVENUE
-========================================================= */
-
-.revenue-card {
-  min-height: 0;
-  height: 100%;
-}
-
-.dashboard-revenue-hidden {
-  width: 100%;
-  min-height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #555;
-  font-size: 9px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-
-.revenue-chart {
-  height: 360px;
-  padding: 20px 20px 15px;
-  display: flex;
-  gap: 8px;
-}
-
-.revenue-column {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.revenue-bar-area {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  border-bottom: 1px solid #292929;
-}
-
-.revenue-bar {
-  width: 55%;
-  min-height: 3px;
-  background: #777;
-  transition:
-    height 0.25s ease,
-    background 0.2s ease;
-}
-
-.revenue-bar:hover {
-  background: #aaa;
-}
-
-.revenue-column:last-child .revenue-bar {
-  background: #eee;
-}
-
-.revenue-column:last-child .revenue-bar:hover {
-  background: #fff;
-}
-
-.revenue-month {
-  height: 22px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-top: 7px;
-  text-align: center;
-  color: #555;
-  font-size: 7px;
-}
-
-/* =========================================================
-   BOOKING CALENDAR
-========================================================= */
-
-.booking-calendar-card {
-  overflow: hidden;
-  min-height: 0;
-  height: 100%;
-}
-
-/* =========================================================
-   CALENDAR HEADER
-========================================================= */
-
-.calendar-header {
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 15px;
-  border-bottom: 1px solid #292929;
+.dashboard-topbar{
+  display:none!important;
 }
 
-.calendar-header strong {
-  font-size: 10px;
-  font-weight: 400;
+.dashboard-overview{
+  max-width:var(--page-max);
+  margin:0 auto;
 }
 
-.calendar-header button {
-  width: 25px;
-  height: 25px;
-  border: 1px solid #292929;
-  background: #111;
-  color: #aaa;
-  cursor: pointer;
-  font-size: 15px;
-  line-height: 1;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+.dashboard-section-heading{
+  margin:0 0 14px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
 }
 
-.calendar-header button:hover {
-  background: #252525;
-  color: white;
-  border-color: #444;
+.dashboard-section-heading h2{
+  margin:7px 0 0;
+  color:var(--text);
 }
 
-/* =========================================================
-   CALENDAR WEEK
-========================================================= */
-
-.calendar-week {
-  display: grid;
-  grid-template-columns:
-    repeat(7, 1fr);
-
-  border-bottom: 1px solid #292929;
-}
-
-.calendar-week div {
-  padding: 7px 4px;
-  text-align: center;
-  font-size: 6px;
-  letter-spacing: 1px;
-  color: #555;
-}
-
-/* =========================================================
-   CALENDAR GRID
-========================================================= */
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns:
-    repeat(7, 1fr);
-
-  grid-auto-rows: 60px;
-  min-height: 0;
-}
-
-/* =========================================================
-   CALENDAR DAY
-========================================================= */
-
-.calendar-day {
-  height: 60px;
-  min-height: 60px;
-  padding: 6px;
-
-  border-right: 1px solid #292929;
-  border-bottom: 1px solid #292929;
-
-  background: #181818;
-  overflow: hidden;
-}
-
-.calendar-day:nth-child(7n) {
-  border-right: none;
-}
-
-/* =========================================================
-   CALENDAR DATE
-========================================================= */
-
-.calendar-date {
-  font-size: 8px;
-  color: #777;
-  margin-bottom: 4px;
-}
-
-.calendar-day.today {
-  background: #222;
-}
-
-.calendar-day.today .calendar-date {
-  color: white;
+.dashboard-performance-filter{
+  display:flex;
+  align-items:center;
+  gap:7px;
 }
-
-.calendar-day.has-booking {
-  background: #1d1d1d;
-}
-
-/* =========================================================
-   BOOKING
-========================================================= */
 
-.calendar-booking {
-  background: #303030;
-  color: #bbb;
-
-  padding: 3px 4px;
-  margin-bottom: 2px;
-
-  font-size: 6px;
-  line-height: 1.2;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  border-left: 2px solid #777;
+.dashboard-performance-filter select{
+  min-width:116px;
 }
 
-/* =========================================================
-   MORE BOOKINGS
-========================================================= */
-
-.calendar-more {
-  color: #666;
-  font-size: 6px;
-  line-height: 1.2;
+/* KPI */
+.dashboard-stats{
+  margin-bottom:13px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:11px;
 }
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.dashboard-footer {
-  display: flex;
-  justify-content: space-between;
 
-  margin-top: 16px;
-  padding: 12px 0;
+.dashboard-stat{
+  min-height:118px;
+  padding:17px 18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 
-  border-top: 1px solid #292929;
-
-  color: #444;
-  font-size: 7px;
-  letter-spacing: 1px;
+  background:var(--surface);
+  border:1px solid var(--line-soft);
+  box-shadow:var(--shadow-sm);
 }
-
-/* =========================================================
-   MOBILE SIDEBAR
-========================================================= */
-
-@media (max-width: 700px) {
 
-  /* -------------------------------------------------------
-     SIDEBAR
-  ------------------------------------------------------- */
-
-  .dashboard-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-
-    width: 270px;
-    height: 100vh;
-    min-height: 100vh;
-
-    padding: 30px 22px;
-
-    transform:
-      translateX(-100%);
-
-    transition:
-      transform
-      0.3s
-      cubic-bezier(
-        0.22,
-        1,
-        0.36,
-        1
-      );
-
-    box-shadow:
-      18px 0 40px
-      rgba(
-        0,
-        0,
-        0,
-        0.35
-      );
-
-    overflow-y: auto;
-    z-index: 2000;
-  }
-
-  .dashboard-sidebar.mobile-open {
-    transform:
-      translateX(0);
-  }
-
-  /* -------------------------------------------------------
-     BLACK LEFT RAIL
-  ------------------------------------------------------- */
-
-  .dashboard-mobile-rail {
-    display: block;
-
-    position: fixed;
-    top: 0;
-    left: 0;
-
-    width: 4px;
-    height: 100vh;
-
-    background: #070707;
-
-    z-index: 1400;
-    pointer-events: none;
-  }
-
-  /* -------------------------------------------------------
-     BUTTON
-  ------------------------------------------------------- */
-
-  .dashboard-mobile-trigger {
-    position: fixed;
-
-    top: 12px;
-    left: 8px;
-
-    width: 32px;
-    height: 32px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-
-    border:
-      1px solid #2d2d2d;
-
-    background:
-      #181818;
-
-    cursor: pointer;
-    z-index: 2200;
-
-    transition:
-      left
-      0.3s
-      cubic-bezier(
-        0.22,
-        1,
-        0.36,
-        1
-      ),
-      background
-      0.2s ease,
-      border-color
-      0.2s ease;
-  }
-
-  .dashboard-mobile-trigger:hover {
-    background: #222;
-    border-color: #444;
-  }
-
-  /* -------------------------------------------------------
-     HAMBURGER
-  ------------------------------------------------------- */
-
-  .dashboard-mobile-trigger span {
-    position: absolute;
-
-    width: 13px;
-    height: 1px;
-
-    background: #aaa;
-
-    transition:
-      transform
-      0.25s ease,
-      opacity
-      0.2s ease;
-  }
-
-  .dashboard-mobile-trigger span:first-child {
-    transform:
-      translateY(-4px);
-  }
-
-  .dashboard-mobile-trigger span:nth-child(2) {
-    transform:
-      translateY(0);
-  }
-
-  .dashboard-mobile-trigger span:last-child {
-    transform:
-      translateY(4px);
-  }
-
-  /* -------------------------------------------------------
-     OPEN BUTTON
-  ------------------------------------------------------- */
-
-  .dashboard-mobile-trigger.open {
-    left: 220px;
-    background:
-      #181818;
-    border-color:
-      #303030;
-  }
-
-  .dashboard-mobile-trigger.open
-  span:first-child {
-    transform:
-      rotate(45deg);
-  }
-
-  .dashboard-mobile-trigger.open
-  span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .dashboard-mobile-trigger.open
-  span:last-child {
-    transform:
-      rotate(-45deg);
-  }
-
-  /* -------------------------------------------------------
-     OVERLAY
-  ------------------------------------------------------- */
-
-  .dashboard-mobile-overlay {
-    display: block;
-
-    position: fixed;
-    inset: 0;
-
-    background:
-      rgba(
-        0,
-        0,
-        0,
-        0.64
-      );
-
-    backdrop-filter:
-      blur(2px);
-
-    z-index:
-      1900;
-  }
-
-  /* -------------------------------------------------------
-     MAIN
-  ------------------------------------------------------- */
-
-  .dashboard-main {
-    width: 100%;
-
-    padding:
-      56px 14px 18px;
-  }
-
-  /* -------------------------------------------------------
-     SECTION HEADING
-  ------------------------------------------------------- */
-
-  .dashboard-section-heading {
-    margin-bottom: 10px;
-
-    align-items:
-      center;
-
-    flex-direction:
-      row;
-
-    gap: 8px;
-  }
-
-  .dashboard-section-label {
-    font-size: 7px;
-  }
-
-  .dashboard-section-heading h2 {
-    margin-top: 5px;
-    font-size: 17px;
-  }
-
-  /* -------------------------------------------------------
-     FILTER
-  ------------------------------------------------------- */
-
-  .dashboard-performance-filter {
-    width:
-      auto;
-
-    gap: 4px;
-  }
-
-  .dashboard-performance-filter select {
-    padding:
-      7px 25px 7px 8px;
-
-    font-size:
-      8px;
-  }
-
-  /* -------------------------------------------------------
-     STATS
-  ------------------------------------------------------- */
-
-  .dashboard-stats {
-    grid-template-columns:
-      repeat(3, 1fr);
-
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-
-  .dashboard-stat {
-    padding:
-      12px 10px;
-  }
-
-  .dashboard-stat-label {
-    font-size: 6px;
-    letter-spacing: 1px;
-
-    margin-bottom:
-      7px;
-  }
-
-  .dashboard-stat-value {
-    font-size:
-      17px;
-
-    letter-spacing:
-      -0.3px;
-  }
-
-  .dashboard-stat-note {
-    margin-top:
-      5px;
-
-    font-size:
-      6px;
-  }
-
-  /* -------------------------------------------------------
-     CONTENT
-  ------------------------------------------------------- */
-
-  .dashboard-content-grid {
-    grid-template-columns:
-      1fr;
-
-    gap:
-      8px;
-  }
-
-  /* -------------------------------------------------------
-     CARD
-  ------------------------------------------------------- */
-
-  .dashboard-card-header {
-    padding:
-      12px 14px;
-  }
-
-  .dashboard-card-kicker {
-    font-size:
-      6px;
-
-    margin-bottom:
-      5px;
-  }
-
-  .dashboard-card-header h3 {
-    font-size:
-      14px;
-  }
-
-  .dashboard-card-header > span {
-    font-size:
-      8px;
-  }
-
-  .dashboard-view-all {
-    font-size:
-      8px;
-  }
-
-  /* -------------------------------------------------------
-     REVENUE
-  ------------------------------------------------------- */
-
-  .revenue-card {
-    min-height:
-      0;
-  }
-
-  .revenue-chart {
-    height:
-      230px;
-
-    padding:
-      14px 12px 10px;
-
-    gap:
-      4px;
-  }
-
-  .revenue-month {
-    height:
-      18px;
-
-    padding-top:
-      5px;
-
-    font-size:
-      6px;
-  }
-
-  /* -------------------------------------------------------
-     CALENDAR
-  ------------------------------------------------------- */
-
-  .booking-calendar-card {
-    min-height:
-      0;
-  }
-
-  .calendar-header {
-    height:
-      38px;
-
-    padding:
-      0 10px;
-  }
-
-  .calendar-header strong {
-    font-size:
-      9px;
-  }
-
-  .calendar-header button {
-    width:
-      23px;
-
-    height:
-      23px;
-
-    font-size:
-      14px;
-  }
-
-  .calendar-week div {
-    padding:
-      6px 2px;
-
-    font-size:
-      5px;
-
-    letter-spacing:
-      0.5px;
-  }
-
-  .calendar-grid {
-    grid-auto-rows:
-      46px;
-
-    min-height:
-      0;
-  }
-
-  .calendar-day {
-    height:
-      46px;
-
-    min-height:
-      46px;
-
-    padding:
-      4px;
-  }
-
-  .calendar-date {
-    font-size:
-      7px;
-
-    margin-bottom:
-      3px;
-  }
-
-  .calendar-booking {
-    font-size:
-      5px;
-
-    padding:
-      2px 3px;
-
-    margin-bottom:
-      2px;
-
-    border-left-width:
-      1px;
-  }
-
-  .calendar-more {
-    font-size:
-      5px;
-  }
-
-  /* -------------------------------------------------------
-     FOOTER
-  ------------------------------------------------------- */
-
-  .dashboard-footer {
-    margin-top:
-      10px;
-
-    padding:
-      9px 0;
-
-    font-size:
-      6px;
-  }
+.dashboard-stat.featured{
+  color:#fff;
+  background:var(--pluno-gradient);
+  border-color:transparent;
+  box-shadow:0 13px 28px rgba(82,80,37,.15);
 }
 
-/* =========================================================
-   MOBILE — 480PX
-========================================================= */
-
-@media (max-width: 480px) {
-
-  .dashboard-mobile-trigger {
-    top:
-      10px;
-
-    left:
-      7px;
-
-    width:
-      30px;
-
-    height:
-      30px;
-  }
-
-  .dashboard-mobile-trigger.open {
-    left:
-      208px;
-  }
-
-  .dashboard-sidebar {
-    width:
-      250px;
-  }
-
-  .dashboard-main {
-    padding:
-      52px 10px 15px;
-  }
-
-  /* -------------------------------------------------------
-     SECTION
-  ------------------------------------------------------- */
-
-  .dashboard-section-heading {
-    gap:
-      5px;
-  }
-
-  .dashboard-section-heading h2 {
-    font-size:
-      15px;
-  }
-
-  .dashboard-section-label {
-    font-size:
-      6px;
-  }
-
-  /* -------------------------------------------------------
-     FILTER
-  ------------------------------------------------------- */
-
-  .dashboard-performance-filter {
-    gap:
-      3px;
-  }
-
-  .dashboard-performance-filter select {
-    padding:
-      6px 22px 6px 7px;
-
-    font-size:
-      7px;
-  }
-
-  /* -------------------------------------------------------
-     STATS
-  ------------------------------------------------------- */
-
-  .dashboard-stats {
-    gap:
-      5px;
-
-    margin-bottom:
-      8px;
-  }
-
-  .dashboard-stat {
-    padding:
-      10px 8px;
-  }
-
-  .dashboard-stat-label {
-    font-size:
-      5px;
-
-    letter-spacing:
-      0.8px;
-
-    margin-bottom:
-      6px;
-  }
-
-  .dashboard-stat-value {
-    font-size:
-      15px;
-  }
-
-  .dashboard-stat-note {
-    font-size:
-      5px;
-
-    margin-top:
-      4px;
-  }
-
-  /* -------------------------------------------------------
-     CARD
-  ------------------------------------------------------- */
-
-  .dashboard-card-header {
-    padding:
-      11px 12px;
-  }
-
-  .dashboard-card-kicker {
-    font-size:
-      5px;
-
-    letter-spacing:
-      1.5px;
-  }
-
-  .dashboard-card-header h3 {
-    font-size:
-      13px;
-  }
-
-  /* -------------------------------------------------------
-     REVENUE
-  ------------------------------------------------------- */
-
-  .revenue-chart {
-    height:
-      205px;
-
-    padding:
-      12px 10px 8px;
-
-    gap:
-      3px;
-  }
-
-  .revenue-month {
-    height:
-      16px;
-
-    font-size:
-      5px;
-  }
-
-  /* -------------------------------------------------------
-     CALENDAR
-  ------------------------------------------------------- */
-
-  .calendar-header {
-    height:
-      36px;
-
-    padding:
-      0 8px;
-  }
-
-  .calendar-header strong {
-    font-size:
-      8px;
-  }
-
-  .calendar-header button {
-    width:
-      21px;
-
-    height:
-      21px;
-
-    font-size:
-      13px;
-  }
-
-  .calendar-week div {
-    padding:
-      5px 1px;
-
-    font-size:
-      5px;
-  }
-
-  .calendar-grid {
-    grid-auto-rows:
-      42px;
-  }
-
-  .calendar-day {
-    height:
-      42px;
-
-    min-height:
-      42px;
-
-    padding:
-      3px;
-  }
-
-  .calendar-date {
-    font-size:
-      6px;
-
-    margin-bottom:
-      2px;
-  }
-
-  .calendar-booking {
-    font-size:
-      4.5px;
-
-    padding:
-      2px;
-  }
-
-  .calendar-more {
-    font-size:
-      4.5px;
-  }
-
-  /* -------------------------------------------------------
-     FOOTER
-  ------------------------------------------------------- */
-
-  .dashboard-footer {
-    font-size:
-      5.5px;
-
-    margin-top:
-      8px;
-
-    padding:
-      7px 0;
-  }
+.dashboard-stat-label{
+  color:#96988f;
+  font-size:8px;
+  font-weight:500;
+  letter-spacing:.115em;
 }
 
-/* =========================================================
-   TABLET / SMALL DESKTOP — 1100PX
-========================================================= */
-
-@media (min-width: 701px) and (max-width: 1100px) {
-
-  .dashboard-sidebar {
-    width:
-      220px;
-  }
-
-  .dashboard-main {
-    padding:
-      25px 25px;
-  }
-
-  .dashboard-content-grid {
-    grid-template-columns:
-      1fr;
-  }
-
-  .revenue-chart {
-    height:
-      300px;
-  }
-
-  .calendar-grid {
-    grid-auto-rows:
-      55px;
-  }
-
-  .calendar-day {
-    height:
-      55px;
-
-    min-height:
-      55px;
-  }
+.dashboard-stat-value{
+  margin:9px 0 0;
+  color:var(--text);
+  font-size:26px;
+  line-height:1;
+  font-weight:500;
+  letter-spacing:-.04em;
 }
 
-/* =========================================================
-   SMALL TABLET — 800PX
-========================================================= */
-
-@media (min-width: 701px) and (max-width: 800px) {
-
-  .dashboard-stats {
-    grid-template-columns:
-      repeat(3, 1fr);
-  }
-
-  .dashboard-stat {
-    padding:
-      14px 15px;
-  }
-
-  .dashboard-stat-value {
-    font-size:
-      22px;
-  }
-
-  .dashboard-section-heading {
-    align-items:
-      center;
-  }
+.dashboard-stat-note{
+  color:#9a9c93;
+  font-size:9px;
 }
-/* =========================================================
-   PHASE 3 — UI CONSISTENCY / 100% ZOOM
-========================================================= */
-
-.dashboard-main {
-  padding: 36px 42px 28px;
-}
 
-.dashboard-section-heading {
-  margin-bottom: 20px;
+.dashboard-stat.featured .dashboard-stat-label,
+.dashboard-stat.featured .dashboard-stat-note{
+  color:rgba(255,255,255,.68);
 }
 
-.dashboard-section-label,
-.dashboard-card-kicker {
-  font-size: 9px;
-  letter-spacing: 1.8px;
+.dashboard-stat.featured .dashboard-stat-value{
+  color:#fff;
 }
 
-.dashboard-section-heading h2 {
-  margin-top: 7px;
-  font-size: 22px;
-  line-height: 1.2;
+/* Booking becomes dominant */
+.dashboard-content-grid{
+  display:grid;
+  grid-template-columns:minmax(360px,.78fr) minmax(610px,1.35fr);
+  gap:13px;
+  align-items:start;
 }
 
-.dashboard-performance-filter select {
-  min-width: 118px;
-  height: 38px;
-  padding-top: 0;
-  padding-bottom: 0;
-  font-size: 10.5px;
+.dashboard-left-stack{
+  min-width:0;
+  display:grid;
+  gap:13px;
 }
 
-.dashboard-stats {
-  gap: 12px;
-  margin-bottom: 20px;
+.dashboard-card{
+  overflow:hidden;
+  background:var(--surface);
+  border:1px solid var(--line-soft);
+  box-shadow:var(--shadow-sm);
 }
 
-.dashboard-stat {
-  padding: 20px;
-}
+.dashboard-card-header{
+  min-height:59px;
+  padding:13px 16px;
 
-.dashboard-stat-label {
-  font-size: 9px;
-  letter-spacing: 1.6px;
-}
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
 
-.dashboard-stat-value {
-  font-size: 24px;
-  line-height: 1.1;
+  border-bottom:1px solid var(--line-soft);
 }
 
-.dashboard-stat-note {
-  font-size: 10.5px;
-  line-height: 1.45;
+.dashboard-card-header h3{
+  margin:5px 0 0;
+  color:var(--text);
+  font-size:16px;
+  line-height:1.1;
+  font-weight:500;
 }
 
-.dashboard-content-grid {
-  gap: 12px;
+.dashboard-card-header>span,
+.dashboard-view-all{
+  color:#81837a;
+  font-size:9px;
+  text-decoration:none;
 }
 
-.dashboard-card,
-.revenue-card,
-.booking-calendar-card {
-  border-color: #2d2d2d;
+/* Notes smaller */
+.dashboard-note-add{
+  min-height:31px;
+  padding:0 10px;
 }
 
-.dashboard-card-header,
-.calendar-header {
-  padding: 18px 20px;
-}
+.dashboard-note-item{
+  min-height:66px;
+  padding:10px 14px;
 
-.dashboard-card-header h2,
-.calendar-header h2 {
-  font-size: 18px;
-  line-height: 1.25;
-}
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:13px;
 
-.dashboard-view-all,
-.calendar-more {
-  font-size: 9.5px;
+  border-bottom:1px solid var(--line-soft);
 }
 
-.calendar-week,
-.revenue-month {
-  font-size: 9px;
+.dashboard-note-item:last-child{
+  border-bottom:0;
 }
 
-.calendar-day,
-.calendar-date,
-.calendar-booking {
-  font-size: 10.5px;
+.dashboard-note-main{
+  min-width:0;
 }
 
-.dashboard-footer {
-  font-size: 8.5px;
+.dashboard-note-main strong{
+  display:block;
+  color:#282922;
+  font-size:11px;
+  font-weight:500;
 }
 
-/* Shared sidebar styles are repeated here because Dashboard.css
-   also contains sidebar declarations. */
-.dashboard-brand-name { font-size: 16px; }
-.dashboard-brand-subtitle { font-size: 9px; }
-.dashboard-nav-section { font-size: 9px; }
-.dashboard-nav-item { padding: 13px 11px; font-size: 13px; }
-.dashboard-nav-item span { font-size: 10px; }
-.dashboard-user-name { font-size: 12px; }
-.dashboard-user-role { font-size: 10px; }
-.dashboard-logout { min-height: 38px; font-size: 10.5px; }
-
-@media (max-width: 900px) {
-  .dashboard-main {
-    padding: 32px 28px 26px;
-  }
-}
+.dashboard-note-main p{
+  margin:4px 0;
 
-@media (max-width: 700px) {
-  .dashboard-main {
-    width: 100%;
-    padding: 74px 16px 24px;
-  }
-
-  .dashboard-section-heading {
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .dashboard-section-heading h2 {
-    font-size: 20px;
-  }
-
-  .dashboard-section-label,
-  .dashboard-card-kicker {
-    font-size: 8.5px;
-  }
-
-  .dashboard-stats,
-  .dashboard-content-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-stat {
-    padding: 18px;
-  }
-
-  .dashboard-stat-value {
-    font-size: 23px;
-  }
-
-  .dashboard-performance-filter {
-    width: 100%;
-  }
-
-  .dashboard-performance-filter select {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .dashboard-card-header,
-  .calendar-header {
-    padding: 17px;
-  }
-}
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
 
-@media (max-width: 480px) {
-  .dashboard-main {
-    padding: 70px 14px 22px;
-  }
+  color:var(--text-2);
+  font-size:9.5px;
+  line-height:1.35;
 }
 
-
-/* =========================================================
-   PHASE 3 — UNIFIED PAGE HEADER
-========================================================= */
-.dashboard-section-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 48px;
-  margin-bottom: 20px;
+.dashboard-note-main span{
+  color:#9a9c93;
+  font-size:8px;
 }
 
-.dashboard-section-heading > div:first-child {
-  min-width: 0;
-}
+.dashboard-note-delete{
+  min-height:27px;
+  padding:0 8px;
 
-.dashboard-section-label {
-  margin: 0;
-  color: #666;
-  font-size: 9px;
-  line-height: 1.2;
-  font-weight: 400;
-  letter-spacing: 1.8px;
-}
+  color:var(--danger);
+  background:transparent;
+  border-color:#e2c7c3;
 
-.dashboard-section-heading h2 {
-  margin: 7px 0 0;
-  color: #eee;
-  font-size: 22px;
-  line-height: 1.2;
-  font-weight: 400;
-  letter-spacing: -0.2px;
+  font-size:8px;
 }
 
-.dashboard-heading-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.dashboard-notes-empty{
+  min-height:86px;
+  display:grid;
+  place-items:center;
 
-.dashboard-status {
-  min-height: 38px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border: 1px solid #292929;
-  background: #181818;
-  color: #888;
-  font-size: 9.5px;
-  white-space: nowrap;
+  color:var(--text-3);
+  font-size:10px;
 }
 
-.dashboard-status span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #777;
-}
+/* Revenue intentionally compact */
+.revenue-chart{
+  height:202px;
+  padding:18px 14px 12px;
 
-@media (max-width: 700px) {
-  .dashboard-section-heading {
-    min-height: 0;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 13px;
-  }
-
-  .dashboard-section-heading h2 { font-size: 20px; }
-  .dashboard-section-label { font-size: 8.5px; }
-  .dashboard-heading-actions { width: 100%; justify-content: flex-start; }
-  .dashboard-performance-filter { flex: 1; min-width: 220px; }
-}
+  display:flex;
+  align-items:stretch;
+  gap:6px;
 
-/* =========================================================
-   DASHBOARD REMINDER NOTES
-   Founder / Administrator manage, Staff read-only
-========================================================= */
-
-.dashboard-left-stack {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 12px;
-  min-width: 0;
-  min-height: 0;
+  background:linear-gradient(180deg,#fffefa,#fbfaf6);
 }
 
-.dashboard-left-stack .revenue-card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-}
+.revenue-column{
+  flex:1;
+  min-width:0;
 
-.dashboard-left-stack .revenue-chart {
-  flex: 1;
-  height: auto;
-  min-height: 220px;
-}
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
 
-.dashboard-notes-card {
-  overflow: hidden;
-  min-height: 150px;
+  gap:6px;
 }
 
-.dashboard-note-add {
-  min-width: 58px;
-  height: 34px;
-  padding: 0 14px;
-  border: 1px solid #3a3a3a;
-  background: #eee;
-  color: #111;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 500;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
-}
+.revenue-bar-area{
+  width:100%;
+  height:148px;
 
-.dashboard-note-add:hover {
-  background: #d9d9d9;
-  border-color: #d9d9d9;
-}
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
 
-.dashboard-notes-list {
-  min-height: 82px;
-  max-height: 150px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #3a3a3a transparent;
+  border-bottom:1px solid #e8e7df;
 }
 
-.dashboard-notes-list::-webkit-scrollbar {
-  width: 5px;
-}
+.revenue-bar{
+  width:min(22px,50%);
+  min-height:4px;
 
-.dashboard-notes-list::-webkit-scrollbar-thumb {
-  background: #3a3a3a;
+  border-radius:4px 4px 1px 1px;
+  background:linear-gradient(180deg,#8b8859,#525025);
 }
 
-.dashboard-note-item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 14px 18px;
-  border-bottom: 1px solid #292929;
+.revenue-month{
+  color:#83857c;
+  font-size:7px;
+  font-weight:500;
 }
 
-.dashboard-note-item:last-child {
-  border-bottom: 0;
+/* Large Booking Schedule */
+.booking-calendar-card{
+  position:sticky;
+  top:22px;
+  min-height:485px;
 }
 
-.dashboard-note-main {
-  min-width: 0;
-  flex: 1;
+.booking-calendar-card .dashboard-card-header{
+  min-height:63px;
 }
 
-.dashboard-note-main strong {
-  display: block;
-  margin: 0;
-  color: #eee;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
+.booking-calendar-card .dashboard-card-header h3{
+  font-size:17px;
 }
 
-.dashboard-note-main p {
-  margin: 5px 0 7px;
-  color: #929292;
-  font-size: 10.5px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
+.calendar-header{
+  min-height:52px;
+  padding:9px 15px;
 
-.dashboard-note-main span {
-  display: block;
-  color: #555;
-  font-size: 8.5px;
-  letter-spacing: 0.3px;
-}
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 
-.dashboard-note-delete {
-  flex-shrink: 0;
-  padding: 2px 0;
-  border: 0;
-  background: transparent;
-  color: #666;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 8.5px;
-  transition: color 0.15s ease;
+  background:#fbfaf6;
+  border-bottom:1px solid var(--line-soft);
 }
 
-.dashboard-note-delete:hover {
-  color: #d2a0a0;
+.calendar-header strong{
+  color:#565850;
+  font-size:10px;
+  font-weight:500;
 }
 
-.dashboard-notes-empty {
-  min-height: 82px;
-  display: flex;
-  align-items: center;
-  padding: 16px 18px;
-  color: #5f5f5f;
-  font-size: 10px;
+.calendar-header button{
+  width:32px;
+  min-width:32px;
+  height:32px;
+  min-height:32px;
+  padding:0;
 }
 
-.dashboard-note-inline-error {
-  padding: 9px 18px;
-  border-top: 1px solid #453030;
-  background: #241b1b;
-  color: #c99595;
-  font-size: 9.5px;
-  line-height: 1.45;
-}
+.calendar-week{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
 
-/* =========================================================
-   REMINDER NOTE MODAL
-========================================================= */
-
-.dashboard-note-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 5000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(3px);
+  background:#f2f1eb;
+  border-bottom:1px solid var(--line);
 }
 
-.dashboard-note-modal {
-  width: min(460px, 100%);
-  max-height: calc(100vh - 48px);
-  overflow-y: auto;
-  background: #181818;
-  border: 1px solid #303030;
-  color: #eee;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
-}
+.calendar-week>div{
+  padding:9px 2px;
 
-.dashboard-note-modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 20px;
-  border-bottom: 1px solid #2d2d2d;
-}
+  color:#77796f;
 
-.dashboard-note-modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1.25;
-}
+  text-align:center;
 
-.dashboard-note-close {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  padding: 0;
-  border: 1px solid #303030;
-  background: #151515;
-  color: #888;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 20px;
-  line-height: 1;
+  font-size:7.5px;
+  font-weight:500;
 }
 
-.dashboard-note-close:hover {
-  color: #fff;
-  border-color: #4a4a4a;
-}
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
 
-.dashboard-note-modal form {
-  padding: 20px;
+  background:var(--surface);
 }
 
-.dashboard-note-field {
-  margin-bottom: 14px;
-}
+.calendar-day{
+  min-width:0;
+  min-height:100px;
+  padding:7px;
 
-.dashboard-note-field label {
-  display: block;
-  margin-bottom: 7px;
-  color: #777;
-  font-size: 8.5px;
-  letter-spacing: 1.5px;
-}
+  color:#686a61;
+  background:#fffefa;
 
-.dashboard-note-field input,
-.dashboard-note-field textarea {
-  width: 100%;
-  border: 1px solid #303030;
-  border-radius: 0;
-  outline: 0;
-  background: #202020;
-  color: #eee;
-  font-family: inherit;
-  font-size: 11px;
-  line-height: 1.5;
-  transition:
-    border-color 0.15s ease,
-    background 0.15s ease;
+  border-right:1px solid var(--line-soft);
+  border-bottom:1px solid var(--line-soft);
 }
 
-.dashboard-note-field input {
-  height: 42px;
-  padding: 0 13px;
+.calendar-day:nth-child(7n){
+  border-right:0;
 }
 
-.dashboard-note-field textarea {
-  min-height: 130px;
-  padding: 12px 13px;
-  resize: vertical;
+.calendar-day.today{
+  background:rgba(82,80,37,.055);
 }
 
-.dashboard-note-field input:focus,
-.dashboard-note-field textarea:focus {
-  border-color: #555;
-  background: #222;
+.calendar-day.has-booking{
+  background:#fdfcf7;
 }
 
-.dashboard-note-field input::placeholder,
-.dashboard-note-field textarea::placeholder {
-  color: #666;
+.calendar-date{
+  font-size:9px;
 }
 
-.dashboard-note-form-error {
-  margin-bottom: 14px;
-  padding: 10px 12px;
-  border: 1px solid #453030;
-  background: #241b1b;
-  color: #c99595;
-  font-size: 9.5px;
-  line-height: 1.45;
-}
+.calendar-booking{
+  margin-top:6px;
+  padding:6px 7px;
 
-.dashboard-note-form-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 9px;
-  padding-top: 4px;
-}
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
 
-.dashboard-note-cancel,
-.dashboard-note-save {
-  min-width: 105px;
-  height: 38px;
-  padding: 0 15px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 10px;
-}
+  color:#484827;
+  background:#ebe9dc;
 
-.dashboard-note-cancel {
-  border: 1px solid #303030;
-  background: transparent;
-  color: #888;
-}
+  border-left:2px solid var(--pluno);
+  border-radius:4px;
 
-.dashboard-note-save {
-  border: 1px solid #eee;
-  background: #eee;
-  color: #111;
-  font-weight: 500;
+  font-size:8px;
 }
 
-.dashboard-note-cancel:hover {
-  color: #fff;
-  border-color: #4a4a4a;
+.calendar-more{
+  margin-top:4px;
+  color:#8b8d84;
+  font-size:7px;
 }
 
-.dashboard-note-save:hover {
-  background: #d9d9d9;
-  border-color: #d9d9d9;
-}
+/* Schedule modal */
+.dashboard-schedule-modal{
+  width:min(640px,100%);
+  max-height:86vh;
+  overflow:hidden;
 
-.dashboard-note-cancel:disabled,
-.dashboard-note-save:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+  background:var(--surface);
 
-@media (max-width: 700px) {
-  .dashboard-left-stack {
-    grid-template-rows: auto auto;
-    gap: 10px;
-  }
-
-  .dashboard-left-stack .revenue-card {
-    height: auto;
-  }
-
-  .dashboard-left-stack .revenue-chart {
-    min-height: 230px;
-  }
-
-  .dashboard-notes-list {
-    max-height: 230px;
-  }
-
-  .dashboard-note-item {
-    padding: 14px 16px;
-  }
-
-  .dashboard-note-main strong {
-    font-size: 12px;
-  }
-
-  .dashboard-note-main p {
-    font-size: 10.5px;
-  }
-
-  .dashboard-note-overlay {
-    align-items: flex-end;
-    padding: 14px;
-  }
-
-  .dashboard-note-modal {
-    width: 100%;
-    max-height: calc(100vh - 28px);
-  }
-
-  .dashboard-note-modal-header,
-  .dashboard-note-modal form {
-    padding: 17px;
-  }
-
-  .dashboard-note-form-footer {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .dashboard-note-cancel,
-  .dashboard-note-save {
-    width: 100%;
-    min-width: 0;
-  }
-}
+  border:1px solid rgba(255,255,255,.8);
+  border-radius:12px;
 
-/* =========================================================
-   TARGETED E2E — CLICKABLE BOOKING SCHEDULE
-========================================================= */
-.calendar-day-clickable {
-  cursor: pointer;
+  box-shadow:var(--shadow-md);
 }
 
-.calendar-day-clickable:hover,
-.calendar-day-clickable:focus-visible {
-  background: #1d1d1d;
-  outline: 1px solid #3b3b3b;
-  outline-offset: -1px;
-}
+.dashboard-schedule-modal-header{
+  min-height:65px;
+  padding:15px 17px;
 
-.dashboard-schedule-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.78);
-}
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
 
-.dashboard-schedule-modal {
-  width: min(560px, 100%);
-  max-height: calc(100dvh - 48px);
-  overflow-y: auto;
-  background: #181818;
-  border: 1px solid #333;
+  border-bottom:1px solid var(--line-soft);
 }
 
-.dashboard-schedule-modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 20px 22px;
-  border-bottom: 1px solid #292929;
+.dashboard-schedule-modal-header h3{
+  margin:5px 0 0;
+  font-size:18px;
+  font-weight:500;
 }
 
-.dashboard-schedule-modal-header h3 {
-  margin: 7px 0 0;
-  color: #eee;
-  font-size: 18px;
-  line-height: 1.25;
-  font-weight: 400;
+.dashboard-schedule-close{
+  width:32px;
+  height:32px;
+  min-height:32px;
+  padding:0;
 }
 
-.dashboard-schedule-close {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  border: 1px solid #333;
-  background: transparent;
-  color: #aaa;
-  font-family: inherit;
-  font-size: 17px;
-  cursor: pointer;
+.dashboard-schedule-list{
+  max-height:62vh;
+  overflow-y:auto;
+  padding:7px 0;
 }
 
-.dashboard-schedule-list {
-  padding: 8px 22px 22px;
-}
+.dashboard-schedule-row{
+  min-height:64px;
+  padding:11px 17px;
 
-.dashboard-schedule-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  min-width: 0;
-  padding: 14px 0;
-  border-bottom: 1px solid #292929;
-}
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
 
-.dashboard-schedule-copy {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  border-bottom:1px solid var(--line-soft);
 }
 
-.dashboard-schedule-copy strong,
-.dashboard-schedule-copy span {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.dashboard-schedule-row:last-child{
+  border-bottom:0;
 }
 
-.dashboard-schedule-copy strong {
-  color: #eee;
-  font-size: 12px;
-  font-weight: 400;
+.dashboard-schedule-copy strong{
+  display:block;
+  color:#2b2c26;
+  font-size:12px;
+  font-weight:500;
 }
 
-.dashboard-schedule-copy span {
-  color: #777;
-  font-size: 10px;
-}
+.dashboard-schedule-copy span{
+  display:block;
+  margin-top:4px;
 
-.dashboard-schedule-row button,
-.dashboard-schedule-detail-footer button {
-  min-height: 32px;
-  padding: 0 11px;
-  border: 1px solid #3a3a3a;
-  background: transparent;
-  color: #aaa;
-  font-family: inherit;
-  font-size: 10px;
-  cursor: pointer;
+  color:#8e9087;
+  font-size:10px;
 }
 
-.dashboard-schedule-empty {
-  padding: 30px 0 10px;
-  color: #666;
-  font-size: 11px;
-  text-align: center;
+.dashboard-schedule-detail{
+  padding:17px;
 }
 
-.dashboard-schedule-detail {
-  padding: 18px 22px 22px;
+.dashboard-schedule-detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
 }
 
-.dashboard-schedule-detail-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  padding: 1px;
-  background: #292929;
-}
+.dashboard-schedule-detail-grid>div{
+  min-height:72px;
+  padding:12px 13px;
 
-.dashboard-schedule-detail-grid > div,
-.dashboard-schedule-notes {
-  min-width: 0;
-  padding: 14px;
-  background: #151515;
+  background:var(--surface-soft);
+  border:1px solid var(--line-soft);
+  border-radius:8px;
 }
 
 .dashboard-schedule-detail-grid span,
-.dashboard-schedule-notes span {
-  display: block;
-  margin-bottom: 7px;
-  color: #666;
-  font-size: 8px;
-  letter-spacing: 1.3px;
+.dashboard-schedule-notes>span{
+  display:block;
+
+  color:#96988f;
+
+  font-size:8px;
+  font-weight:500;
+  letter-spacing:.1em;
 }
 
-.dashboard-schedule-detail-grid strong {
-  color: #eee;
-  font-size: 11px;
-  font-weight: 400;
-  overflow-wrap: anywhere;
+.dashboard-schedule-detail-grid strong{
+  display:block;
+  margin-top:6px;
+
+  color:#2c2d27;
+
+  font-size:12px;
+  font-weight:500;
 }
 
-.dashboard-schedule-notes {
-  margin-top: 12px;
-  border: 1px solid #292929;
+.dashboard-schedule-notes{
+  margin-top:9px;
+  padding:12px 13px;
+
+  background:#fbfaf6;
+  border:1px solid var(--line-soft);
+  border-radius:8px;
 }
 
-.dashboard-schedule-notes p {
-  margin: 0;
-  color: #aaa;
-  font-size: 11px;
-  line-height: 1.55;
-  white-space: pre-wrap;
+.dashboard-schedule-notes p{
+  margin:6px 0 0;
+
+  color:var(--text-2);
+
+  font-size:10.5px;
+  line-height:1.5;
 }
 
-.dashboard-schedule-detail-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 14px;
+.dashboard-schedule-detail-footer{
+  margin-top:12px;
+  display:flex;
+  justify-content:flex-end;
 }
 
-@media (max-width: 700px) {
-  .dashboard-schedule-overlay {
-    align-items: flex-end;
-    padding: 12px;
+.dashboard-footer{
+  display:none!important;
+}
+
+@media(max-width:1250px){
+  .dashboard-content-grid{
+    grid-template-columns:minmax(330px,.82fr) minmax(540px,1.25fr);
   }
 
-  .dashboard-schedule-modal {
-    width: 100%;
-    max-height: calc(100dvh - 24px);
+  .calendar-day{
+    min-height:90px;
+  }
+}
+
+@media(max-width:1080px){
+  .dashboard-content-grid{
+    grid-template-columns:1fr;
   }
 
-  .dashboard-schedule-modal-header,
-  .dashboard-schedule-detail {
-    padding: 17px;
+  .booking-calendar-card{
+    position:static;
+    order:-1;
   }
 
-  .dashboard-schedule-list {
-    padding: 6px 17px 17px;
+  .dashboard-left-stack{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:820px){
+  .dashboard-stats{
+    grid-template-columns:1fr;
   }
 
-  .dashboard-schedule-detail-grid {
-    grid-template-columns: 1fr 1fr;
+  .dashboard-left-stack{
+    grid-template-columns:1fr;
   }
+}
+
+@media(max-width:760px){
+  .dashboard-main{
+    margin-left:0;
+    padding:70px 14px 28px;
+  }
+
+  .dashboard-section-heading{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .dashboard-performance-filter{
+    width:100%;
+  }
+
+  .dashboard-performance-filter select{
+    flex:1;
+    min-width:0;
+  }
+
+  .calendar-day{
+    min-height:75px;
+  }
+
+  .dashboard-schedule-detail-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* V6 typography floor */
+.dashboard-stat-label{
+  font-size:var(--fs-micro)!important;
+}
+
+.dashboard-stat-note{
+  font-size:var(--fs-micro)!important;
+}
+
+.dashboard-note-main strong{
+  font-size:var(--fs-small)!important;
+}
+
+.dashboard-note-main p{
+  font-size:var(--fs-micro)!important;
+}
+
+.dashboard-note-main span{
+  font-size:var(--fs-micro)!important;
+}
+
+.revenue-month{
+  font-size:var(--fs-micro)!important;
+}
+
+.calendar-week>div{
+  font-size:var(--fs-micro)!important;
+}
+
+.calendar-date{
+  font-size:var(--fs-micro)!important;
+}
+
+.calendar-booking{
+  font-size:var(--fs-micro)!important;
+}
+
+
+/* ============================================================
+   V9 — ADD NOTE MODAL
+   The previous package had no complete styling for this modal.
+   ============================================================ */
+
+.dashboard-note-overlay{
+  align-items:center!important;
+  justify-content:center!important;
+  padding:20px!important;
+}
+
+/* Support both the expected class and the current direct child. */
+.dashboard-note-modal,
+.dashboard-note-overlay>div{
+  width:min(520px,calc(100vw - 40px))!important;
+  max-height:calc(100vh - 40px)!important;
+  overflow-y:auto!important;
+
+  color:var(--text)!important;
+  background:var(--surface)!important;
+
+  border:1px solid rgba(255,255,255,.86)!important;
+  border-radius:12px!important;
+
+  box-shadow:0 20px 54px rgba(26,27,20,.14)!important;
+}
+
+.dashboard-note-modal-header,
+.dashboard-note-overlay>div>header{
+  min-height:68px!important;
+  padding:15px 17px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+
+  border-bottom:1px solid var(--line-soft)!important;
+}
+
+.dashboard-note-modal-header h3,
+.dashboard-note-overlay>div>header h3,
+.dashboard-note-overlay>div>header h2{
+  margin:0!important;
+
+  color:#292a24!important;
+
+  font-size:18px!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+}
+
+.dashboard-note-close,
+.dashboard-note-overlay>div>header button{
+  width:34px!important;
+  min-width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  padding:0!important;
+
+  flex:0 0 34px!important;
+}
+
+.dashboard-note-modal form,
+.dashboard-note-overlay>div>form{
+  padding:17px!important;
+
+  display:grid!important;
+  gap:14px!important;
+}
+
+.dashboard-note-field,
+.dashboard-note-overlay>div>form>label{
+  margin:0!important;
+
+  display:grid!important;
+  gap:7px!important;
+}
+
+.dashboard-note-field label,
+.dashboard-note-overlay>div>form>label{
+  color:#898b82!important;
+
+  font-size:10px!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+  letter-spacing:.07em!important;
+}
+
+.dashboard-note-field input,
+.dashboard-note-overlay>div>form input{
+  width:100%!important;
+  min-height:42px!important;
+}
+
+.dashboard-note-field textarea,
+.dashboard-note-overlay>div>form textarea{
+  width:100%!important;
+  min-height:118px!important;
+  max-height:210px!important;
+
+  line-height:1.5!important;
+}
+
+.dashboard-note-form-footer,
+.dashboard-note-overlay>div>form>footer{
+  margin-top:2px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+}
+
+.dashboard-note-form-footer button,
+.dashboard-note-overlay>div>form>footer button{
+  min-height:36px!important;
+  padding:0 12px!important;
+}
+
+.dashboard-note-save{
+  color:#fff!important;
+  background:var(--pluno-gradient)!important;
+  border-color:transparent!important;
+}
+
+/* Dashboard header should simply read Studio Performance. */
+.dashboard-section-heading{
+  margin-bottom:14px!important;
 }
