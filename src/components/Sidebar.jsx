@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../supabase";
 import { getSocialSummary, isSocialApiConfigured } from "../lib/socialApi";
+import PortalIcon from "./PortalIcon";
 import "./Sidebar.css";
 
 function Sidebar({ activePage }) {
@@ -95,10 +96,11 @@ function Sidebar({ activePage }) {
       >
         <div className="dashboard-sidebar-top">
           <div className="dashboard-brand">
-            <div>
+            <div className="dashboard-brand-copy">
               <div className="dashboard-brand-name">PLUNO STUDIO</div>
               <div className="dashboard-brand-subtitle">INTERNAL PORTAL</div>
             </div>
+            <span className="dashboard-brand-chevron" aria-hidden="true">⌄</span>
           </div>
 
           <nav className="dashboard-navigation">
@@ -109,7 +111,7 @@ function Sidebar({ activePage }) {
               className={`dashboard-nav-item ${isActive("dashboard")}`}
               onClick={closeMobileSidebar}
             >
-              <span>01</span>
+              <PortalIcon name="dashboard" />
               Dashboard
             </Link>
 
@@ -118,7 +120,7 @@ function Sidebar({ activePage }) {
               className={`dashboard-nav-item ${isActive("booking")}`}
               onClick={closeMobileSidebar}
             >
-              <span>02</span>
+              <PortalIcon name="booking" />
               Booking List
             </Link>
 
@@ -127,7 +129,7 @@ function Sidebar({ activePage }) {
               className={`dashboard-nav-item ${isActive("galleries")}`}
               onClick={closeMobileSidebar}
             >
-              <span>03</span>
+              <PortalIcon name="gallery" />
               Client Gallery
             </Link>
 
@@ -137,7 +139,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("social-media")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>04</span>
+                <PortalIcon name="social" />
                 <span className="dashboard-nav-label">Social Media</span>
                 {socialBadge > 0 && (
                   <span
@@ -160,7 +162,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("transactions")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>05</span>
+                <PortalIcon name="transactions" />
                 Transactions
               </Link>
             )}
@@ -171,7 +173,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("customer")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>06</span>
+                <PortalIcon name="customer" />
                 Customer Data
               </Link>
             )}
@@ -182,7 +184,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("spending")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>07</span>
+                <PortalIcon name="spending" />
                 Spending
               </Link>
             )}
@@ -193,7 +195,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("bookkeeping")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>08</span>
+                <PortalIcon name="bookkeeping" />
                 Bookkeeping
               </Link>
             )}
@@ -210,7 +212,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("smm-timeline")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>09</span>
+                <PortalIcon name="timeline" />
                 Timeline
               </Link>
             )}
@@ -225,7 +227,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("employee")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>10</span>
+                <PortalIcon name="employee" />
                 Employee
               </Link>
             )}
@@ -236,7 +238,7 @@ function Sidebar({ activePage }) {
                 className={`dashboard-nav-item ${isActive("documents")}`}
                 onClick={closeMobileSidebar}
               >
-                <span>11</span>
+                <PortalIcon name="documents" />
                 Documents
               </Link>
             )}

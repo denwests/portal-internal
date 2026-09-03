@@ -8,9 +8,11 @@
     "build": "vite build",
     "lint": "eslint .",
     "test:revenue": "node --test tests/revenue-period.test.mjs",
+    "test": "node --test tests/*.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
     "@supabase/supabase-js": "^2.112.4",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",

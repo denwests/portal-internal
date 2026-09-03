@@ -1,0 +1,1205 @@
+/* ============================================================
+   PLUNO NIGHT — unified internal and public experience
+   Loaded after the legacy theme so existing behavior stays intact.
+   ============================================================ */
+
+:root {
+  color-scheme: dark;
+  --pluno: #b9b577;
+  --pluno-dark: #777447;
+  --pluno-mid: #aaa66d;
+  --pluno-light: #d0cc94;
+  --pluno-gradient: linear-gradient(135deg, #777447 0%, #aaa66d 55%, #cbc78c 100%);
+  --bg: #0b0c0e;
+  --bg-elevated: #0f1012;
+  --surface: #131416;
+  --surface-soft: #18191c;
+  --surface-muted: #1e1f22;
+  --surface-hover: #222326;
+  --text: #f1f1ee;
+  --text-2: #a0a2a8;
+  --text-3: #70737a;
+  --line: #2b2d31;
+  --line-soft: #222428;
+  --success: #8cc69c;
+  --success-bg: rgba(78, 132, 92, .14);
+  --warning: #d2bd72;
+  --warning-bg: rgba(154, 126, 45, .14);
+  --danger: #e5928c;
+  --danger-bg: rgba(171, 65, 58, .14);
+  --r-input: 8px;
+  --r-button: 8px;
+  --r-card: 11px;
+  --r-panel: 14px;
+  --shadow-sm: 0 10px 30px rgba(0, 0, 0, .16);
+  --shadow-md: 0 24px 70px rgba(0, 0, 0, .32);
+  --font: "Segoe UI Variable Text", "Segoe UI Variable", Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+html { background: var(--bg) !important; }
+
+body {
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 82% -10%, rgba(185, 181, 119, .07), transparent 27%),
+    radial-gradient(circle at 16% 105%, rgba(185, 181, 119, .035), transparent 24%),
+    var(--bg) !important;
+}
+
+body, button, input, select, textarea { font-family: var(--font) !important; }
+a { color: inherit; }
+::selection { color: #11120f; background: #c5c18a; }
+
+* { scrollbar-color: #414349 transparent; }
+*::-webkit-scrollbar-thumb { background: #414349; }
+
+input, select, textarea {
+  color: var(--text) !important;
+  background-color: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .015) !important;
+}
+
+input::placeholder, textarea::placeholder { color: #64676d !important; }
+input:focus, select:focus, textarea:focus {
+  color: #fff !important;
+  background-color: #1c1d20 !important;
+  border-color: #858257 !important;
+  box-shadow: 0 0 0 3px rgba(185, 181, 119, .08) !important;
+}
+
+select {
+  color: #c8c9c6 !important;
+  background-color: var(--surface-soft) !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #777a80 50%),
+    linear-gradient(135deg, #777a80 50%, transparent 50%) !important;
+  border-color: var(--line) !important;
+}
+select option { color: var(--text); background: #17181b; }
+
+button, .btn, .button {
+  color: #c9cac7 !important;
+  background: var(--surface-muted) !important;
+  border-color: #34363b !important;
+  box-shadow: none !important;
+}
+button:hover, .btn:hover, .button:hover {
+  color: #f5f5f2 !important;
+  background: #26272b !important;
+  border-color: #44464c !important;
+  box-shadow: none !important;
+}
+
+.primary, .btn-primary, .booking-add-button, .gallery-primary-button,
+.social-primary-button, .add-employee-button, .documents-add,
+.spending-add-button, .bookkeeping-generate-button, .bookkeeping-save,
+.employee-save, .customer-save, .spending-save, .smm-primary-button,
+.reset-password-primary, .login-box button[type="submit"] {
+  color: #11120f !important;
+  background: linear-gradient(135deg, #a7a36a, #cac68d) !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 24px rgba(134, 130, 76, .18) !important;
+}
+
+.danger, .delete, .delete-button, .transactions-delete,
+.employee-delete-button, .dashboard-note-delete {
+  color: #e5928c !important;
+  background: rgba(162, 66, 59, .09) !important;
+  border-color: rgba(229, 146, 140, .16) !important;
+}
+
+
+/* Sidebar */
+.dashboard-sidebar {
+  width: 248px !important;
+  padding: 16px 14px 14px !important;
+  color: var(--text) !important;
+  background: rgba(11, 12, 14, .985) !important;
+  border-right: 1px solid #202226 !important;
+  box-shadow: 12px 0 36px rgba(0, 0, 0, .13) !important;
+}
+.dashboard-brand {
+  min-height: 58px;
+  margin: 0 0 24px !important;
+  padding: 8px !important;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: #151618;
+  border: 1px solid #27292d;
+  border-radius: 10px;
+}
+.dashboard-brand-copy { min-width: 0; flex: 1; }
+.dashboard-brand-name { color: #f0f0ed !important; font-size: 12px !important; letter-spacing: .09em !important; }
+.dashboard-brand-subtitle { margin-top: 5px !important; color: #74777d !important; font-size: 7.5px !important; }
+.dashboard-brand-chevron { color: #64676d; font-size: 15px; transform: translateY(-2px); }
+.dashboard-navigation { gap: 2px !important; }
+.dashboard-nav-section { margin: 18px 10px 7px !important; color: #55585f !important; font-size: 8px !important; letter-spacing: .14em !important; }
+.dashboard-nav-section:first-child { margin-top: 0 !important; }
+.dashboard-nav-item, .dashboard-nav-item:link, .dashboard-nav-item:visited {
+  min-height: 38px !important;
+  padding: 0 10px !important;
+  gap: 10px !important;
+  color: #85888f !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  font-size: 11.5px !important;
+}
+.dashboard-nav-item:hover { color: #d4d5d1 !important; background: #161719 !important; border-color: #222428 !important; }
+.dashboard-nav-item.active {
+  color: #f2f2ef !important;
+  background: linear-gradient(180deg, #202124, #1b1c1f) !important;
+  border-color: #33353a !important;
+  box-shadow: inset 3px 0 0 #aaa66d, inset 0 1px 0 rgba(255,255,255,.025) !important;
+  transform: none !important;
+}
+.portal-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .86;
+}
+.dashboard-nav-item.active .portal-icon { color: #c8c48a; opacity: 1; }
+.dashboard-nav-label { min-width: 0; flex: 1; }
+.dashboard-nav-badge { margin-left: auto; color: #d7d49e !important; background: rgba(185,181,119,.12) !important; border-color: rgba(185,181,119,.2) !important; }
+.dashboard-sidebar-bottom { border-top-color: #222428 !important; }
+.dashboard-user-name { color: #dadbd7 !important; }
+.dashboard-user-role { color: #666970 !important; }
+.dashboard-avatar { color: #141511 !important; background: #aaa66d !important; box-shadow: none !important; }
+.dashboard-logout { color: #777a81 !important; background: transparent !important; border-color: #292b30 !important; }
+.dashboard-logout:hover { color: #e6e6e2 !important; background: #18191c !important; }
+
+/* Internal page shells */
+.dashboard-page, .booking-page, .gallery-manager-page, .social-page,
+.transactions-page, .customer-page, .spending-page, .bookkeeping-page,
+.employee-page, .documents-page, .smm-page {
+  min-height: 100vh;
+  color: var(--text) !important;
+  background: transparent !important;
+}
+
+.dashboard-main, .booking-main, .gallery-manager-main, .social-main,
+.transactions-main, .customer-main, .spending-main, .bookkeeping-main,
+.employee-main, .documents-main, .smm-main {
+  min-height: 100vh !important;
+  margin-left: 248px !important;
+  padding: 30px 32px 44px !important;
+  color: var(--text) !important;
+  background: transparent !important;
+}
+
+.dashboard-topbar, .booking-page-header, .gallery-manager-header,
+.social-page-header, .transactions-section-heading, .customer-section-heading,
+.spending-section-heading, .employee-section-heading, .documents-page-header,
+.smm-section-heading {
+  color: var(--text) !important;
+}
+
+.dashboard-topbar {
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+  max-width: 1440px !important;
+  min-height: auto !important;
+  margin: 0 auto 28px !important;
+  padding: 0 2px 22px !important;
+  border-bottom: 1px solid var(--line-soft) !important;
+}
+.dashboard-topbar h1, .dashboard-section-heading h2,
+.booking-page-header h1, .gallery-manager-header h1,
+.social-page-header h1, .transactions-section-heading h2,
+.customer-section-heading h2, .spending-section-heading h2,
+.employee-section-heading h2, .documents-page-header h1,
+.smm-section-heading h2 {
+  color: #f5f5f2 !important;
+  font-size: clamp(23px, 2vw, 30px) !important;
+  font-weight: 520 !important;
+  letter-spacing: -.035em !important;
+}
+.dashboard-topbar p, .booking-page-header p, .gallery-manager-header p,
+.social-page-header p, .documents-page-header p { color: #74777d !important; }
+.dashboard-eyebrow, .dashboard-section-label, .dashboard-card-kicker,
+.booking-eyebrow, .booking-section-label, .booking-form-kicker,
+.gallery-manager-eyebrow, .social-eyebrow, .social-section-label,
+.transactions-section-label, .customer-section-label, .customer-eyebrow,
+.customer-form-kicker, .spending-section-label, .spending-card-kicker,
+.bookkeeping-section-label, .employee-section-label, .employee-eyebrow,
+.documents-eyebrow, .documents-section-label, .smm-section-label {
+  color: #858257 !important;
+}
+.dashboard-status { color: #8cbe98 !important; background: rgba(82,132,94,.08) !important; border-color: rgba(123,178,136,.14) !important; }
+.dashboard-status span { background: #7eb88c !important; box-shadow: 0 0 0 4px rgba(126,184,140,.08) !important; }
+
+/* Cards and panels */
+.dashboard-stat, .dashboard-card, .booking-list-section, .gallery-stat-card,
+.gallery-list-card, .social-summary-card, .social-inbox-section,
+.transactions-summary > div, .transactions-card, .customer-stat-card,
+.customer-list-section, .spending-card, .bookkeeping-generator,
+.bookkeeping-overview, .bookkeeping-reports, .employee-stat-card,
+.employee-list-section, .documents-content, .document-card,
+.smm-summary > div, .smm-action-bar, .smm-table-card {
+  color: var(--text) !important;
+  background: linear-gradient(180deg, #161719 0%, #131416 100%) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 11px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.018) !important;
+}
+.dashboard-stat.featured, .social-summary-card.emphasis,
+.customer-stat-card.revenue.net {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(185,181,119,.10), transparent 42%),
+    linear-gradient(180deg, #1a1b1c, #151618) !important;
+  border-color: #3b3a30 !important;
+}
+.dashboard-stat-label, .customer-stat-label, .employee-stat-label,
+.gallery-stat-card span, .social-summary-title { color: #85878d !important; }
+.dashboard-stat-value, .customer-stat-value, .employee-stat-value,
+.gallery-stat-card strong, .social-summary-card strong {
+  color: #f3f3f0 !important;
+  font-weight: 480 !important;
+  letter-spacing: -.04em !important;
+}
+.dashboard-stat-note, .customer-stat-note, .employee-stat-note,
+.gallery-slug, .social-time, .smm-save-state { color: #63666d !important; }
+.dashboard-card-header, .booking-list-header, .gallery-list-header,
+.social-inbox-header, .transactions-card-header, .customer-list-header,
+.spending-card-header, .bookkeeping-card-header, .employee-list-header {
+  border-bottom-color: var(--line-soft) !important;
+}
+.dashboard-card-header h3, .spending-card-title,
+.bookkeeping-card-header h3, .transactions-card-header h3,
+.booking-list-header h2, .gallery-list-header h2,
+.social-inbox-header h2, .customer-list-header h2,
+.employee-list-header h2 {
+  color: #e9e9e5 !important;
+}
+
+/* Tables */
+.booking-table-scroll, .gallery-table-scroll, .social-table-wrap,
+.transactions-table-scroll, .customer-table-scroll, .spending-table-scroll,
+.employee-table-scroll, .smm-table-wrap, .shared-table-wrap {
+  background: transparent !important;
+}
+table { color: #c6c7c4 !important; background: transparent !important; }
+table thead, table th {
+  color: #73767d !important;
+  background: #111214 !important;
+  border-color: var(--line-soft) !important;
+}
+.booking-table th, .gallery-table th, .social-table th,
+.transactions-table th, .customer-table th, .spending-table th,
+.employee-table th, .smm-table-wrap th, .shared-table-wrap th {
+  color: #73767d !important;
+  background: #111214 !important;
+  border-color: var(--line-soft) !important;
+}
+table td {
+  color: #b7b9b6 !important;
+  background: transparent !important;
+  border-color: var(--line-soft) !important;
+}
+.booking-table td, .gallery-table td, .social-table td,
+.transactions-table td, .customer-table td, .spending-table td,
+.employee-table td, .smm-table-wrap td, .shared-table-wrap td {
+  color: #b7b9b6 !important;
+  background: transparent !important;
+  border-color: var(--line-soft) !important;
+}
+table tbody tr { background: transparent !important; }
+table tbody tr:hover { background: rgba(255,255,255,.018) !important; }
+table strong, .booking-customer-name, .customer-name, .employee-name,
+.gallery-client-name, .social-username { color: #e2e3df !important; }
+.booking-package, .customer-contact, .employee-email, .employee-username,
+.spending-description, .social-comment-copy, .social-post-copy { color: #81848a !important; }
+.table-pagination, .booking-pagination, .social-pagination,
+.smm-pagination, .spending-table-navigation {
+  color: #777a80 !important;
+  background: #121315 !important;
+  border-color: var(--line-soft) !important;
+}
+.table-empty-viewport, .booking-empty, .gallery-empty, .social-empty,
+.transactions-empty, .customer-empty, .spending-empty, .employee-empty,
+.smm-empty { color: #65686f !important; }
+
+/* Dashboard details */
+.dashboard-content-grid { grid-template-columns: minmax(350px, .78fr) minmax(570px, 1.35fr) !important; }
+.dashboard-left-stack { gap: 14px !important; }
+.dashboard-note-item, .dashboard-schedule-row {
+  background: transparent !important;
+  border-color: var(--line-soft) !important;
+}
+.dashboard-note-item:hover, .dashboard-schedule-row:hover { background: rgba(255,255,255,.015) !important; }
+.dashboard-note-main strong, .dashboard-schedule-copy strong { color: #d9dad6 !important; }
+.dashboard-note-main p, .dashboard-schedule-copy span { color: #777a80 !important; }
+.dashboard-note-main span { color: #565960 !important; }
+.calendar-header { background: #151618 !important; border-color: var(--line-soft) !important; }
+.calendar-header strong { color: #bfc0bd !important; }
+.calendar-week { background: #111214 !important; border-color: var(--line-soft) !important; }
+.calendar-header button { color: #9b9da2 !important; }
+.calendar-week > div { color: #62656c !important; }
+.calendar-day { color: #8f9197 !important; background: #111214 !important; border-color: #232529 !important; }
+.calendar-day:hover { background: #17181b !important; }
+.calendar-date { color: #777a80 !important; }
+.calendar-booking { color: #d4d1a0 !important; background: rgba(185,181,119,.09) !important; border-color: rgba(185,181,119,.14) !important; }
+.calendar-more { color: #7b7e84 !important; }
+
+/* Revenue trend chart */
+.revenue-card { min-width: 0; overflow: visible !important; }
+.trend-chart-shell { position: relative; padding: 2px 0 0; }
+.trend-chart-legend { display: flex; justify-content: flex-end; gap: 18px; margin: -7px 12px 3px; color: #767980; font-size: 9px; }
+.trend-chart-legend span, .trend-tooltip span { display: flex; align-items: center; gap: 6px; }
+.legend-current, .legend-comparison { width: 13px; height: 2px; display: inline-block; border-radius: 2px; background: #c3c08a; }
+.legend-comparison { height: 0; background: none; border-top: 1px dashed #60636a; }
+.trend-chart-canvas { position: relative; min-width: 0; }
+.trend-chart-canvas svg { width: 100%; height: auto; min-height: 248px; display: block; overflow: visible; }
+.trend-grid-line { stroke: #292b2f; stroke-width: 1; }
+.trend-axis-label, .trend-month-label { fill: #62656c; font-family: var(--font); font-size: 10px; }
+.trend-line-current { fill: none; stroke: #d0cd9c; stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 4px 7px rgba(185,181,119,.12)); }
+.trend-line-comparison { fill: none; stroke: #5d6067; stroke-width: 2; stroke-dasharray: 7 7; stroke-linecap: round; }
+.trend-hit-area { fill: transparent; outline: none; cursor: crosshair; }
+.trend-focus line { stroke: #3e4046; stroke-dasharray: 3 4; }
+.trend-current-dot { fill: #d0cd9c; stroke: #131416; stroke-width: 3; }
+.trend-comparison-dot { fill: #73767d; stroke: #131416; stroke-width: 3; }
+.trend-tooltip {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  min-width: 178px;
+  padding: 11px 12px;
+  transform: translateX(-50%);
+  color: #bfc0bd;
+  background: rgba(20,21,23,.97);
+  border: 1px solid #36383d;
+  border-radius: 9px;
+  box-shadow: 0 16px 38px rgba(0,0,0,.34);
+  pointer-events: none;
+}
+.trend-tooltip strong { display: block; margin-bottom: 8px; color: #eee; font-size: 10px; }
+.trend-tooltip span { margin-top: 5px; font-size: 9px; }
+.trend-tooltip b { margin-left: auto; color: #d7d7d3; font-size: 9px; font-weight: 500; }
+
+/* Filters, tabs and toolbars */
+.booking-list-tools, .gallery-manager-header-actions, .gallery-search-box,
+.social-filter-row, .social-platform-tabs, .transactions-header-actions,
+.customer-list-right, .spending-toolbar, .spending-section-actions,
+.employee-list-right, .smm-header-actions, .smm-table-tools,
+.dashboard-performance-filter, .customer-performance-filter,
+.transactions-performance-filter, .spending-performance-filter,
+.booking-period-filter, .smm-period-filter {
+  color: #888b91 !important;
+}
+.booking-search, .gallery-search-box input, .social-search,
+.search-box, .employee-search-box, .smm-table-tools input {
+  color: #d5d6d2 !important;
+  background: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+}
+.booking-list-tools .booking-search, .gallery-search-box input,
+.social-filter-row .social-search, .customer-list-right .search-box,
+.employee-list-right .employee-search-box {
+  color: #d5d6d2 !important;
+  background: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+}
+.social-platform-tabs button.active, .smm-status.active {
+  color: #deddda !important;
+  background: #25262a !important;
+  border-color: #3a3c41 !important;
+}
+
+/* Modals and drawers */
+.booking-overlay, .customer-overlay, .spending-overlay, .bookkeeping-overlay,
+.employee-overlay, .documents-overlay, .gallery-modal-overlay,
+.dashboard-schedule-overlay, .dashboard-note-overlay,
+.social-detail-overlay, .smm-overlay {
+  background: rgba(0,0,0,.68) !important;
+  backdrop-filter: blur(4px) !important;
+}
+.booking-form-box, .booking-view-box, .booking-payment-modal,
+.customer-form-box, .customer-detail-box, .spending-form-box,
+.bookkeeping-modal, .employee-form-box, .employee-detail-box,
+.documents-modal, .gallery-modal, .dashboard-schedule-modal,
+.dashboard-note-modal, .dashboard-note-overlay > div, .social-detail-panel,
+.smm-modal {
+  color: var(--text) !important;
+  background: #151618 !important;
+  border: 1px solid #34363a !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.booking-form-header, .customer-form-header, .spending-form-header,
+.bookkeeping-modal-header, .employee-form-header, .gallery-modal-header,
+.dashboard-schedule-modal-header, .dashboard-note-modal-header,
+.dashboard-note-overlay > div > header {
+  background: #17181b !important;
+  border-color: var(--line) !important;
+}
+.booking-form-header h2, .customer-form-header h2, .spending-form-header h2,
+.bookkeeping-modal-header h3, .employee-form-header h2,
+.gallery-modal-header h2, .dashboard-schedule-modal-header h3,
+.dashboard-note-modal-header h3, .dashboard-note-overlay > div > header h3,
+.social-detail-panel h2, .smm-modal h3 { color: #efefec !important; }
+.booking-field label, .customer-field label, .spending-field label,
+.bookkeeping-field label, .employee-field label, .dashboard-note-field label,
+.dashboard-note-overlay > div > form > label { color: #84878d !important; }
+.booking-detail-item, .customer-detail-item, .employee-detail-item,
+.dashboard-schedule-detail-grid > div, .dashboard-schedule-notes,
+.addon-section, .bookkeeping-settings-section, .social-detail-block {
+  color: #b6b7b4 !important;
+  background: #1a1b1e !important;
+  border-color: #292b2f !important;
+}
+.booking-form-footer, .customer-form-footer, .spending-form-footer,
+.bookkeeping-modal-footer, .employee-form-footer, .gallery-modal-actions,
+.dashboard-note-form-footer { border-color: var(--line) !important; }
+
+/* Status and finance colors */
+.money-in, .paid, .customer-net-value { color: #8fc79c !important; }
+.money-out, .remaining, .total-expense-value { color: #e29690 !important; }
+.final { color: #d7d49e !important; }
+[class*="status"], [class*="badge"], [class*="payment-type"], [class*="payment-badge"] {
+  border-color: rgba(255,255,255,.08) !important;
+}
+
+/* Login and account pages */
+.login-page, .reset-password-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 110%, rgba(185,181,119,.10), transparent 32%),
+    radial-gradient(circle at 85% 15%, rgba(185,181,119,.055), transparent 28%),
+    #090a0c !important;
+}
+.login-box, .reset-password-box {
+  width: min(430px, 100%) !important;
+  padding: 26px !important;
+  gap: 12px !important;
+  color: var(--text) !important;
+  background: rgba(18,19,21,.96) !important;
+  border: 1px solid #2b2d31 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 34px 100px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+.login-brand { display: flex; align-items: center; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid #25272b; }
+.login-brand strong { display: block; color: #ecece9; font-size: 12px; letter-spacing: .1em; }
+.login-brand span { display: block; margin-top: 5px; color: #64676d; font-size: 7.5px; letter-spacing: .18em; }
+.login-heading { padding: 12px 0 5px; }
+.login-heading > span, .reset-password-kicker { color: #88855b !important; font-size: 8px !important; letter-spacing: .15em !important; }
+.login-heading h1 { margin: 8px 0 0; color: #f3f3f0; font-size: 28px; line-height: 1.1; font-weight: 520; letter-spacing: -.04em; }
+.login-heading p, .reset-password-description { margin: 9px 0 0; color: #75787e !important; font-size: 10.5px; line-height: 1.55; }
+.login-box input { min-height: 47px !important; color: #eee !important; background: #17181b !important; border-color: #2c2e33 !important; }
+.login-box button[type="submit"] { min-height: 46px !important; margin-top: 3px !important; }
+.reset-password-link { color: #777a80 !important; background: transparent !important; border: 0 !important; }
+.reset-password-link:hover { color: #c9c7a2 !important; background: #18191b !important; }
+.login-error, .reset-password-error { color: var(--danger) !important; background: var(--danger-bg) !important; border-color: rgba(229,146,140,.14) !important; }
+.login-success, .reset-password-success { color: var(--success) !important; background: var(--success-bg) !important; border-color: rgba(140,198,156,.14) !important; }
+
+/* Public pages and copied-link destinations */
+.privacy-page, .shared-timeline-page, .client-gallery-page {
+  min-height: 100vh;
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(185,181,119,.055), transparent 28%),
+    var(--bg) !important;
+}
+.privacy-container, .shared-timeline-page > *, .client-gallery-shell { color: var(--text) !important; }
+.privacy-container {
+  width: min(760px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+.privacy-header {
+  margin-bottom: 12px;
+  padding: 26px 28px !important;
+  border-radius: 12px;
+}
+.privacy-brand { font-size: 11px; font-weight: 600; letter-spacing: .12em; }
+.privacy-kicker { margin-top: 24px; font-size: 8px; letter-spacing: .14em; }
+.privacy-header h1 { margin: 8px 0 0; font-size: clamp(30px, 6vw, 46px); font-weight: 500; letter-spacing: -.05em; }
+.privacy-updated { margin: 10px 0 0; }
+.privacy-section { margin-top: 12px; padding: 23px 28px !important; border-radius: 12px; }
+.privacy-section h2 { margin: 0 0 12px; font-size: 17px; font-weight: 500; letter-spacing: -.02em; }
+.privacy-section p, .privacy-section li { font-size: 12px; line-height: 1.7; }
+.privacy-section ul { margin: 10px 0; padding-left: 20px; }
+.privacy-code { margin: 14px 0; padding: 12px 14px; overflow-wrap: anywhere; border: 1px solid; border-radius: 8px; font: 11px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.privacy-footer { padding: 24px 2px 0; text-align: center; font-size: 9px; letter-spacing: .1em; }
+
+.shared-timeline-page {
+  width: min(1480px, calc(100% - 36px));
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+.shared-timeline-page > header {
+  min-height: 66px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111214;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+}
+.shared-brand { font-size: 11px; font-weight: 600; letter-spacing: .12em; }
+.shared-label { color: #777a80 !important; font-size: 8px; letter-spacing: .12em; }
+.shared-heading { margin-top: 12px; padding: 18px !important; display: grid; grid-template-columns: 1fr auto auto; align-items: end; gap: 28px; border-radius: 11px; }
+.shared-heading span { display: block; margin-bottom: 6px; color: #858257; font-size: 8px; letter-spacing: .12em; }
+.shared-heading h1 { margin: 0; font-size: 23px; font-weight: 500; }
+.shared-heading strong { color: #d6d7d3; font-size: 11px; font-weight: 500; }
+.shared-table-wrap { margin-top: 12px; overflow: auto; border-radius: 11px; }
+.shared-table-wrap table { min-width: 980px; width: 100%; border-collapse: collapse; }
+.shared-table-wrap th, .shared-table-wrap td { padding: 11px 12px; text-align: left; }
+.shared-timeline-page > footer { padding: 22px 0 0; color: #55585e !important; text-align: center; font-size: 8px; letter-spacing: .14em; }
+.privacy-header, .privacy-section, .shared-heading, .shared-table-wrap,
+.shared-state, .client-gallery-header, .client-gallery-state-card,
+.client-gallery-activity-panel, .client-gallery-download-box,
+.client-gallery-lightbox-panel, .client-gallery-comments {
+  color: var(--text) !important;
+  background: #131416 !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+.privacy-brand, .shared-brand, .client-gallery-brand { color: #dadad6 !important; }
+.privacy-kicker, .shared-label, .client-gallery-hero > span { color: #858257 !important; }
+.privacy-header h1, .privacy-section h2, .shared-heading h1,
+.client-gallery-hero h1, .client-gallery-lightbox-title { color: #f1f1ed !important; }
+.privacy-header p, .privacy-section p, .privacy-section li,
+.privacy-footer, .privacy-updated, .shared-heading p,
+.client-gallery-meta, .client-gallery-preview-note { color: #85888e !important; }
+.privacy-code { color: #c8c6a2 !important; background: #1a1b1e !important; border-color: #2d2f34 !important; }
+.client-gallery-page {
+  --gallery-bg: #0b0c0e;
+  --gallery-surface: #131416;
+  --gallery-surface-soft: #18191c;
+  --gallery-text: #efefec;
+  --gallery-muted: #85888e;
+  --gallery-olive: #b9b577;
+  --gallery-olive-soft: rgba(185,181,119,.10);
+  --gallery-line: #2b2d31;
+}
+.client-gallery-photo-button { background: #151618 !important; border-color: #292b30 !important; }
+.client-gallery-item-footer { color: #9a9ca1 !important; background: #141517 !important; border-color: #292b30 !important; }
+.client-gallery-selection-bar { color: #ddd !important; background: rgba(18,19,21,.96) !important; border-color: #34363b !important; }
+.client-gallery-lightbox, .client-gallery-download-overlay,
+.client-gallery-activity-backdrop { background: rgba(0,0,0,.82) !important; }
+
+.customer-print-template { display: none !important; }
+
+/* Messages */
+.booking-error, .transactions-error, .customer-error, .spending-error,
+.bookkeeping-error, .employee-error, .gallery-alert.error,
+.social-message.error, .smm-message.error, .social-detail-message.error {
+  color: var(--danger) !important;
+  background: var(--danger-bg) !important;
+  border-color: rgba(229,146,140,.16) !important;
+}
+.gallery-alert.success, .social-message.success, .smm-message.success,
+.social-detail-message.success {
+  color: var(--success) !important;
+  background: var(--success-bg) !important;
+  border-color: rgba(140,198,156,.16) !important;
+}
+
+@media (max-width: 1240px) {
+  .dashboard-content-grid { grid-template-columns: 1fr !important; }
+  .dashboard-left-stack { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-main, .booking-main, .gallery-manager-main, .social-main,
+  .transactions-main, .customer-main, .spending-main, .bookkeeping-main,
+  .employee-main, .documents-main, .smm-main {
+    margin-left: 0 !important;
+    padding: 78px 20px 34px !important;
+  }
+  .dashboard-mobile-trigger {
+    top: 17px !important;
+    left: 17px !important;
+    color: #aaa !important;
+    background: rgba(19,20,22,.96) !important;
+    border-color: #32343a !important;
+  }
+  .dashboard-mobile-trigger span { background: #a4a6aa !important; }
+  .dashboard-mobile-overlay { background: rgba(0,0,0,.7) !important; backdrop-filter: blur(4px) !important; }
+}
+
+@media (max-width: 760px) {
+  .dashboard-main, .booking-main, .gallery-manager-main, .social-main,
+  .transactions-main, .customer-main, .spending-main, .bookkeeping-main,
+  .employee-main, .documents-main, .smm-main { padding: 72px 13px 28px !important; }
+  .dashboard-topbar { margin-bottom: 22px !important; padding-bottom: 18px !important; }
+  .dashboard-stats, .customer-stat-grid, .employee-stat-grid, .gallery-stats,
+  .social-summary-grid, .transactions-summary, .smm-summary { grid-template-columns: 1fr 1fr !important; }
+  .dashboard-left-stack { grid-template-columns: 1fr !important; }
+  .trend-chart-canvas { overflow: hidden; }
+  .trend-chart-canvas svg { width: 100%; max-width: 100%; min-height: 210px; }
+  .trend-chart-legend { justify-content: flex-start; margin: 0 8px 6px; }
+  .trend-tooltip { display: none; }
+  .login-box, .reset-password-box { padding: 20px !important; }
+  .login-heading h1 { font-size: 25px; }
+  .client-gallery-shell { width: min(100% - 24px, 1480px) !important; }
+  .privacy-container { width: min(100% - 24px, 760px); padding: 20px 0 36px; }
+  .privacy-header, .privacy-section { padding: 20px !important; }
+  .shared-timeline-page { width: min(100% - 24px, 1480px); padding-top: 12px; }
+  .shared-timeline-page > header { align-items: flex-start; flex-direction: column; justify-content: center; gap: 6px; }
+  .shared-heading { grid-template-columns: 1fr 1fr; }
+  .shared-heading > div:first-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 480px) {
+  .dashboard-stats, .customer-stat-grid, .employee-stat-grid, .gallery-stats,
+  .social-summary-grid, .transactions-summary, .smm-summary { grid-template-columns: 1fr !important; }
+}
+
+/* PDF/print equivalents remain ink-friendly while using PLUNO typography. */
+@media print {
+  :root { color-scheme: light; }
+  body, .customer-print-template {
+    color: #20211e !important;
+    background: #fff !important;
+  }
+  .customer-print-template { display: block !important; }
+  .print-header { color: #f7f7f2 !important; background: #1a1b1d !important; }
+  .print-brand, .print-title { color: #1f201c !important; }
+  .print-rule { border-color: #777447 !important; }
+  .print-table th { color: #fff !important; background: #2b2c2e !important; }
+  .print-table td { color: #2b2c28 !important; background: #fff !important; border-color: #d7d7d2 !important; }
+}
+
+/* ============================================================
+   PLUNO MONOCHROME V2
+   The reference is used for structure, rhythm, and palette only.
+   ============================================================ */
+
+:root {
+  --pluno: #a4a4a8;
+  --pluno-dark: #626267;
+  --pluno-mid: #8b8b90;
+  --pluno-light: #c8c8cb;
+  --pluno-gradient: #242427;
+  --bg: #0b0b0c;
+  --bg-elevated: #101011;
+  --surface: #151517;
+  --surface-soft: #1a1a1d;
+  --surface-muted: #202023;
+  --surface-hover: #27272a;
+  --text: #f1f1f2;
+  --text-2: #b4b4b8;
+  --text-3: #8a8a90;
+  --line: #343438;
+  --line-soft: #29292d;
+  --warning: #b9b9bd;
+  --warning-bg: rgba(185,185,189,.1);
+  --r-input: 7px;
+  --r-button: 7px;
+  --r-card: 8px;
+  --r-panel: 10px;
+  --font: Inter, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --fs-micro: 11px;
+  --fs-small: 12px;
+  --fs-body: 13px;
+  --fs-body-lg: 14px;
+}
+
+html, body { background: var(--bg) !important; }
+body { font-size: var(--fs-body) !important; }
+::selection { color: #fff; background: #55555a; }
+
+input, select, textarea {
+  font-size: var(--fs-small) !important;
+  color: #e7e7e9 !important;
+  background-color: #1a1a1d !important;
+  border-color: #39393d !important;
+}
+input::placeholder, textarea::placeholder { color: #85858b !important; }
+input:focus, select:focus, textarea:focus {
+  color: #fff !important;
+  background-color: #202023 !important;
+  border-color: #66666b !important;
+  box-shadow: 0 0 0 2px rgba(180,180,184,.09) !important;
+}
+select {
+  background-image: none !important;
+}
+
+button, .btn, .button,
+.primary, .btn-primary, .booking-add-button, .gallery-primary-button,
+.social-primary-button, .add-employee-button, .documents-add,
+.spending-add-button, .bookkeeping-generate-button, .bookkeeping-save,
+.employee-save, .customer-save, .spending-save, .smm-primary-button,
+.reset-password-primary, .login-box button[type="submit"] {
+  color: #f1f1f2 !important;
+  background: #252528 !important;
+  border-color: #3b3b3f !important;
+  box-shadow: none !important;
+}
+button:hover, .btn:hover, .button:hover,
+.primary:hover, .btn-primary:hover { color: #fff !important; background: #303034 !important; border-color: #4a4a4f !important; }
+
+.dashboard-sidebar { background: #0d0d0e !important; border-color: #252528 !important; }
+.dashboard-brand { min-height: 52px !important; background: #171719 !important; border-radius: 8px !important; }
+.dashboard-brand-name { font-size: 13px !important; }
+.dashboard-brand-subtitle { font-size: 10px !important; color: #929298 !important; }
+.dashboard-nav-section { color: #77777e !important; font-size: 10px !important; }
+.dashboard-nav-item, .dashboard-nav-item:link, .dashboard-nav-item:visited {
+  min-height: 39px !important;
+  color: #9b9ba1 !important;
+  font-size: 12.5px !important;
+  border-radius: 7px !important;
+}
+.dashboard-nav-item:hover { color: #dedee0 !important; background: #18181a !important; border-color: #29292d !important; }
+.dashboard-nav-item.active,
+.dashboard-nav-item[aria-current="page"] {
+  color: #f5f5f6 !important;
+  background: #222225 !important;
+  border-color: #3a3a3e !important;
+  box-shadow: none !important;
+}
+.dashboard-nav-item.active .portal-icon { color: #f0f0f1 !important; }
+.dashboard-nav-badge { color: #e0e0e2 !important; background: #29292d !important; border-color: #3d3d42 !important; }
+.dashboard-avatar { color: #f3f3f4 !important; background: #2a2a2d !important; }
+.login-box, .reset-password-box { border-radius: 10px !important; }
+.login-brand strong { font-size: 13px !important; }
+.login-brand span { font-size: 10px !important; color: #929298 !important; }
+.login-heading > span, .reset-password-kicker { font-size: 10px !important; }
+.login-heading p, .reset-password-description { font-size: 12px !important; color: #aaaab0 !important; }
+.login-box input { font-size: 13px !important; }
+.login-box button { font-size: 12px !important; }
+.final, .login-heading > span, .reset-password-kicker,
+.privacy-kicker, .shared-label, .shared-heading span,
+.client-gallery-hero > span { color: #a2a2a7 !important; }
+.privacy-code { color: #d0d0d3 !important; }
+.client-gallery-page {
+  --gallery-olive: #a4a4a8;
+  --gallery-olive-soft: rgba(164,164,168,.1);
+}
+.calendar-booking { color: #d4d4d7 !important; background: #242427 !important; border-color: #3b3b40 !important; }
+.legend-current, .legend-comparison { background: #c7c7cb !important; }
+.legend-comparison { background: none !important; border-color: #69696f !important; }
+.trend-line-current { stroke: #d0d0d3 !important; filter: none !important; }
+.trend-line-comparison { stroke: #68686e !important; }
+.trend-current-dot { fill: #d0d0d3 !important; }
+
+.dashboard-page, .booking-page, .gallery-manager-page, .social-page,
+.transactions-page, .customer-page, .spending-page, .bookkeeping-page,
+.employee-page, .documents-page, .smm-page,
+.login-page, .reset-password-page, .privacy-page, .client-gallery-page,
+.shared-timeline-page { background: #0b0b0c !important; }
+
+.dashboard-card, .dashboard-stat, .booking-list-section, .gallery-stat-card,
+.gallery-list-card, .social-summary-card, .social-inbox-section,
+.transactions-summary > div, .transactions-card, .customer-stat-card,
+.customer-list-section, .spending-card, .bookkeeping-generator,
+.bookkeeping-overview, .bookkeeping-reports, .employee-stat-card,
+.employee-list-section, .documents-content, .document-card,
+.smm-summary > div, .smm-action-bar, .smm-table-card,
+.dashboard-stat.featured, .social-summary-card.emphasis,
+.customer-stat-card.revenue.net {
+  color: var(--text) !important;
+  background: #161618 !important;
+  border-color: #343438 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.dashboard-eyebrow, .dashboard-section-label, .dashboard-card-kicker,
+.booking-eyebrow, .booking-section-label, .booking-form-kicker,
+.gallery-manager-eyebrow, .social-eyebrow, .social-section-label,
+.transactions-section-label, .customer-section-label, .customer-eyebrow,
+.customer-form-kicker, .spending-section-label, .spending-card-kicker,
+.bookkeeping-section-label, .employee-section-label, .employee-eyebrow,
+.documents-eyebrow, .documents-section-label, .smm-section-label {
+  color: #9a9aa0 !important;
+  font-size: 11px !important;
+}
+
+.dashboard-topbar p, .booking-page-header p, .gallery-manager-header p,
+.social-page-header p, .documents-page-header p,
+.dashboard-stat-label, .customer-stat-label, .employee-stat-label,
+.gallery-stat-card span, .social-summary-title,
+.dashboard-stat-note, .customer-stat-note, .employee-stat-note,
+.gallery-slug, .social-time, .smm-save-state { color: #a0a0a6 !important; font-size: 11.5px !important; }
+
+.spending-card, .spending-card-header, .spending-card-body,
+.spending-toolbar, .spending-summary, .spending-table-scroll,
+.spending-table-navigation { background: #161618 !important; }
+.spending-card-header, .spending-toolbar, .spending-summary,
+.spending-table-navigation { border-color: #303034 !important; }
+.spending-card-title, .spending-card-title h2,
+.spending-card-header h2, .spending-card-kicker { color: #f0f0f2 !important; }
+.spending-card-kicker { color: #a7a7ac !important; }
+.spending-total-label, .spending-summary-label { color: #aaaab0 !important; }
+.spending-total-value, .spending-summary-value { color: #f4f4f5 !important; }
+
+table, table thead, table tbody, table tr, table th, table td,
+.booking-table th, .gallery-table th, .social-table th,
+.transactions-table th, .customer-table th, .spending-table th,
+.employee-table th, .smm-table-wrap th, .shared-table-wrap th,
+.booking-table td, .gallery-table td, .social-table td,
+.transactions-table td, .customer-table td, .spending-table td,
+.employee-table td, .smm-table-wrap td, .shared-table-wrap td {
+  background: transparent !important;
+}
+table th, .booking-table th, .gallery-table th, .social-table th,
+.transactions-table th, .customer-table th, .spending-table th,
+.employee-table th, .smm-table-wrap th, .shared-table-wrap th {
+  color: #a4a4aa !important;
+  font-size: 11px !important;
+}
+table td, .booking-table td, .gallery-table td, .social-table td,
+.transactions-table td, .customer-table td, .spending-table td,
+.employee-table td, .smm-table-wrap td, .shared-table-wrap td {
+  color: #c8c8cc !important;
+  font-size: 12px !important;
+}
+table tbody tr:hover { background: #1d1d20 !important; }
+
+.active:not(.dashboard-nav-item),
+[aria-selected="true"], [data-selected="true"] {
+  color: #f5f5f6 !important;
+  background-color: #242427 !important;
+  border-color: #414146 !important;
+  box-shadow: none !important;
+}
+
+.period-picker {
+  position: relative;
+  min-width: 184px;
+  display: inline-flex;
+  align-items: center;
+}
+.period-picker > svg {
+  position: absolute;
+  left: 11px;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #a5a5aa;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.period-picker input, .period-picker select {
+  width: 100% !important;
+  min-height: 38px !important;
+  padding-left: 36px !important;
+  color-scheme: dark;
+}
+.period-picker-year { min-width: 138px; }
+input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"] { color-scheme: dark; }
+input::-webkit-calendar-picker-indicator { opacity: .72; filter: grayscale(1); cursor: pointer; }
+
+.smm-multi-menu { color: #d6d6d9 !important; background: #18181b !important; border-color: #3b3b40 !important; box-shadow: 0 18px 42px rgba(0,0,0,.4) !important; }
+.smm-multi-menu label { color: #c5c5c9 !important; background: transparent !important; font-size: 11.5px !important; }
+.smm-multi-menu label:hover { color: #fff !important; background: #252528 !important; }
+.smm-multi-menu input[type="checkbox"] { accent-color: #77777c; }
+.smm-multi-trigger, .smm-status { color: #d3d3d6 !important; background: #1b1b1e !important; border-color: #3a3a3f !important; }
+.smm-multi-tags { display: flex !important; flex-wrap: wrap !important; gap: 4px !important; }
+.smm-multi-tags > span { padding: 3px 5px !important; color: #d9d9dc !important; background: #242427 !important; border: 1px solid #3a3a3e !important; border-radius: 5px !important; font-size: 11px !important; white-space: nowrap; }
+.smm-empty {
+  min-height: 112px;
+  padding: 22px;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  color: #99999f !important;
+  background: #151517 !important;
+  border: 1px solid #303034;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.smm-empty strong { color: #e3e3e5 !important; font-size: 14px; font-weight: 500; }
+
+.modal-overlay, .dialog-overlay, .drawer-overlay,
+.booking-modal-overlay, .gallery-modal-overlay, .social-modal-overlay,
+.transactions-modal-overlay, .customer-modal-overlay, .spending-modal-overlay,
+.bookkeeping-modal-overlay, .employee-modal-overlay, .documents-modal-overlay,
+.smm-modal-overlay, .dashboard-mobile-overlay, .booking-overlay,
+.customer-overlay, .spending-overlay, .employee-overlay, .bookkeeping-overlay,
+.smm-overlay, .social-detail-overlay, .dashboard-schedule-overlay,
+.dashboard-note-overlay, .client-gallery-download-overlay,
+.client-gallery-activity-backdrop {
+  animation: none !important;
+  transition: none !important;
+  backdrop-filter: none !important;
+}
+.modal, [role="dialog"], .booking-modal, .gallery-modal, .social-modal,
+.transactions-modal, .customer-modal, .spending-modal, .bookkeeping-modal,
+.employee-modal, .documents-modal, .smm-modal, .booking-form-box,
+.booking-payment-modal, .customer-form-box, .spending-form-box,
+.employee-form-box, .dashboard-schedule-modal, .dashboard-note-modal {
+  animation: none !important;
+  transition: none !important;
+  border-radius: 10px !important;
+}
+
+@media (min-width: 1025px) {
+  .smm-table-wrap table { width: 100% !important; table-layout: fixed !important; }
+  .smm-table-wrap th:nth-child(1), .smm-table-wrap td:nth-child(1) { width: 4% !important; }
+  .smm-table-wrap th:nth-child(2), .smm-table-wrap td:nth-child(2) { width: 14% !important; }
+  .smm-table-wrap th:nth-child(3), .smm-table-wrap td:nth-child(3) { width: 14% !important; }
+  .smm-table-wrap th:nth-child(4), .smm-table-wrap td:nth-child(4) { width: 10% !important; }
+  .smm-table-wrap th:nth-child(5), .smm-table-wrap td:nth-child(5) { width: 10% !important; }
+  .smm-table-wrap th:nth-child(6), .smm-table-wrap td:nth-child(6) { width: 9% !important; }
+  .smm-table-wrap th:nth-child(7), .smm-table-wrap td:nth-child(7) { width: 10% !important; }
+  .smm-table-wrap th:nth-child(8), .smm-table-wrap td:nth-child(8) { width: 9% !important; }
+  .smm-table-wrap th:nth-child(9), .smm-table-wrap td:nth-child(9) { width: 12% !important; }
+  .smm-table-wrap th:nth-child(10), .smm-table-wrap td:nth-child(10) { width: 8% !important; }
+  .smm-table-wrap textarea { min-height: 74px !important; }
+  .smm-multi-trigger { min-height: 42px !important; height: auto !important; }
+}
+
+@media (max-width: 760px) {
+  .period-picker { width: 100%; min-width: 0; }
+}
+
+/* ============================================================
+   PLUNO V3 - SELECTED STATES, BADGES, AND MESSAGE CONTRAST
+   ============================================================ */
+
+/* Every selectable surface stays dark; no white selected rows or controls. */
+button:active, button:focus, button:focus-visible,
+.btn:active, .btn:focus, .button:active, .button:focus,
+select:focus, input:focus, textarea:focus,
+.selected, .is-selected, [aria-selected="true"], [data-selected="true"],
+input[type="radio"]:checked + label,
+input[type="checkbox"]:checked + label {
+  color: #f7f7f8 !important;
+  background-color: #29292d !important;
+  border-color: #4a4a50 !important;
+  box-shadow: none !important;
+}
+select option:checked { color: #fff !important; background: #343439 !important; }
+
+.booking-table tbody tr,
+.booking-table tbody tr td,
+.customer-table tbody tr,
+.customer-table tbody tr td,
+.transactions-table tbody tr,
+.transactions-table tbody tr td,
+.spending-table tbody tr,
+.spending-table tbody tr td,
+.smm-table-wrap tbody tr,
+.smm-table-wrap tbody tr td {
+  color: #d0d0d4 !important;
+  background: #161618 !important;
+}
+.booking-table tbody tr:hover td,
+.booking-table tbody tr:focus-within td,
+.booking-table tbody tr.selected td,
+.customer-table tbody tr:hover td,
+.transactions-table tbody tr:hover td,
+.spending-table tbody tr:hover td,
+.smm-table-wrap tbody tr:hover td {
+  color: #f2f2f3 !important;
+  background: #222225 !important;
+}
+
+/* Titles use the same high-contrast white hierarchy on every module. */
+.dashboard-main h1, .dashboard-main h2, .dashboard-main h3,
+.booking-main h1, .booking-main h2, .booking-main h3,
+.transactions-main h1, .transactions-main h2, .transactions-main h3,
+.customer-main h1, .customer-main h2, .customer-main h3,
+.spending-main h1, .spending-main h2, .spending-main h3,
+.bookkeeping-main h1, .bookkeeping-main h2, .bookkeeping-main h3,
+.employee-main h1, .employee-main h2, .employee-main h3,
+.documents-main h1, .documents-main h2, .documents-main h3,
+.smm-main h1, .smm-main h2, .smm-main h3 {
+  color: #f5f5f6 !important;
+}
+.transactions-card .transactions-card-header h2 { color: #fff !important; font-size: 18px !important; }
+
+/* Status and payment information reads like a compact action control, not a pill. */
+.booking-payment-status, .booking-payment-badge, .booking-status,
+.booking-discount, .customer-status,
+.transactions-payment-type, .transactions-payment,
+.transactions-booking-status, .gallery-status,
+.smm-status, [class*="payment-badge"] {
+  min-height: 28px !important;
+  padding: 0 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #ededee !important;
+  background: #252528 !important;
+  border: 1px solid #48484d !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+.booking-payment-status.paid, .booking-payment-status.partial,
+.booking-payment-status.unpaid, .booking-payment-badge.paid,
+.booking-payment-badge.partial, .booking-payment-badge.unpaid,
+.booking-status-complete, .booking-status-canceled,
+.customer-status.status-done, .customer-status.status-process,
+.customer-status.status-canceled,
+.transactions-payment-type.final, .transactions-payment-type.down-payment,
+.transactions-payment.qris, .transactions-payment.cash,
+.transactions-booking-status.complete, .transactions-booking-status.canceled {
+  color: #f2f2f3 !important;
+  background: #252528 !important;
+  border-color: #4a4a50 !important;
+}
+.booking-payment-cell small { color: #aaaab0 !important; font-size: 11px !important; }
+
+/* Copy-link feedback follows the same compact panel language. */
+.smm-message, .gallery-alert, .social-message, .social-detail-message {
+  min-height: 48px !important;
+  margin-bottom: 12px !important;
+  padding: 9px 10px 9px 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  color: #ededee !important;
+  background: #1a1a1d !important;
+  border: 1px solid #3c3c41 !important;
+  border-radius: 7px !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+}
+.smm-message.success, .gallery-alert.success,
+.social-message.success, .social-detail-message.success {
+  color: #f0f0f1 !important;
+  background: #1c1c1f !important;
+  border-color: #48484d !important;
+}
+.smm-message button, .gallery-alert button,
+.social-message button, .social-detail-message button {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  color: #d7d7da !important;
+  background: #29292d !important;
+  border: 1px solid #444449 !important;
+  border-radius: 6px !important;
+  font-size: 15px !important;
+}
+
+/* V4: aligned layouts, readable details, and semantic status colors. */
+#root .customer-detail-box .detail-item strong { color: #f5f5f6 !important; }
+#root .customer-detail-box .detail-item span { color: #b0b0b6 !important; }
+#root .bookkeeping-generator-footer,
+#root .bookkeeping-overview-grid > div,
+#root .bookkeeping-settings-section,
+#root .bookkeeping-empty-small,
+#root .bookkeeping-modal-footer {
+  color: #ededee !important;
+  background: #1c1c1f !important;
+  border-color: #39393e !important;
+}
+#root .bookkeeping-generator-footer strong,
+#root .bookkeeping-overview-grid strong,
+#root .bookkeeping-settings-title h3 { color: #f5f5f6 !important; }
+#root .bookkeeping-generator-footer span,
+#root .bookkeeping-overview-grid span { color: #adadb3 !important; }
+
+#root .booking-payment-status.paid,
+#root .booking-payment-badge.paid,
+#root .booking-status-complete,
+#root .customer-status.status-done,
+#root .transactions-booking-status.complete,
+#root .transactions-payment-type.final {
+  color: #9ce0b4 !important; background: #193126 !important; border-color: #365b46 !important;
+}
+#root .booking-payment-status.partial,
+#root .booking-payment-badge.partial,
+#root .customer-status.status-process {
+  color: #a9caff !important; background: #1d2b40 !important; border-color: #3d5679 !important;
+}
+#root .booking-payment-status.unpaid,
+#root .booking-payment-badge.unpaid,
+#root .booking-status-canceled,
+#root .customer-status.status-canceled,
+#root .transactions-booking-status.canceled {
+  color: #f0a9a5 !important; background: #382325 !important; border-color: #704147 !important;
+}
+#root .transactions-payment.qris { color: #c9baff !important; background: #2a243b !important; border-color: #54466f !important; }
+
+#root .transaction-date-cell { white-space: nowrap !important; font-variant-numeric: tabular-nums; }
+#root .transactions-summary {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+#root .transactions-summary > div { min-width: 0 !important; padding: 16px !important; }
+#root .dashboard-section-heading { margin-top: 0 !important; margin-bottom: 18px !important; }
+#root .dashboard-section-label { display: none !important; }
+#root .dashboard-stats, #root .customer-stat-grid, #root .employee-stat-grid,
+#root .gallery-stats, #root .social-summary-grid, #root .bookkeeping-overview-grid,
+#root .spending-columns, #root .dashboard-content-grid { gap: 12px !important; }
+#root .booking-form-grid, #root .customer-form-grid, #root .spending-form-grid,
+#root .detail-grid { gap: 12px !important; }
+#root .booking-period-filter, #root .smm-period-filter,
+#root .customer-performance-filter, #root .transactions-performance-filter { gap: 8px !important; }
+
+@media (max-width: 760px) {
+  #root .transactions-summary { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #root .transactions-summary > div:nth-child(1) { grid-column: 1; grid-row: 1; }
+  #root .transactions-summary > div:nth-child(4) { grid-column: 2; grid-row: 1; }
+  #root .transactions-summary > div:nth-child(2) { grid-column: 1; grid-row: 2; }
+  #root .transactions-summary > div:nth-child(3) { grid-column: 2; grid-row: 2; }
+  #root .transactions-summary > div:nth-child(5) { grid-column: 1; grid-row: 3; }
+  #root .transactions-summary > div:nth-child(6) { grid-column: 2; grid-row: 3; }
+  #root .transactions-summary > div { padding: 12px !important; }
+  #root .transactions-summary strong { font-size: clamp(16px, 4vw, 22px) !important; overflow-wrap: anywhere; }
+  #root .smm-period-filter { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) !important; }
+  #root .smm-period-filter select { min-width: 0 !important; width: 100% !important; }
+  #root .dashboard-section-heading { align-items: flex-start !important; flex-direction: column !important; gap: 12px !important; }
+  #root .dashboard-performance-filter { width: 100% !important; }
+  #root .detail-grid, #root .bookkeeping-overview-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  #root .detail-item.detail-wide { grid-column: 1 !important; }
+}
+
+/* Root-scoped rules intentionally outrank legacy per-page light hover rules. */
+@media screen {
+  #root .booking-table-scroll { overflow-x: auto !important; }
+  #root .booking-table { min-width: 1080px !important; }
+  #root input:not([type="checkbox"]):not([type="radio"]),
+  #root select, #root textarea {
+    color: #eeeeef !important;
+    background-color: #1b1b1e !important;
+    border-color: #3e3e43 !important;
+  }
+  #root input:not([type="checkbox"]):not([type="radio"]):focus,
+  #root select:hover, #root select:focus, #root textarea:focus {
+    color: #fff !important;
+    background-color: #29292d !important;
+    border-color: #55555b !important;
+  }
+  #root table tbody tr td {
+    color: #d0d0d4 !important;
+    background-color: #161618 !important;
+  }
+  #root table tbody tr:hover td,
+  #root table tbody tr:focus-within td,
+  #root table tbody tr.selected td,
+  #root table tbody tr[aria-selected="true"] td {
+    color: #f3f3f4 !important;
+    background-color: #242427 !important;
+  }
+  #root .booking-payment-preview > div,
+  #root .booking-payment-summary > div,
+  #root .booking-detail-notes {
+    color: #d6d6da !important;
+    background: #202023 !important;
+    border-color: #3c3c41 !important;
+  }
+  #root .booking-payment-preview strong,
+  #root .booking-payment-summary strong,
+  #root .booking-detail-item strong { color: #f2f2f3 !important; }
+}

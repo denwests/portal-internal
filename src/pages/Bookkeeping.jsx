@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import { PLUNO_PRINT_CSS } from "../lib/printTheme";
 import {
   isRevenueInRange,
 } from "../lib/revenuePeriod";
@@ -1412,6 +1413,8 @@ td {
   font-weight: 500;
 }
 
+${PLUNO_PRINT_CSS}
+
 </style>
 </head>
 
@@ -1433,7 +1436,7 @@ td {
       ${formatDate(
         report.start_date
       )}
-      —
+      -
       ${formatDate(
         report.end_date
       )}
@@ -1463,7 +1466,7 @@ td {
 <div class="section">
 
   <div class="section-title">
-    01 · Customer Final Revenue by Event Date
+    01 - Customer Final Revenue by Event Date
   </div>
 
   <div class="summary">
@@ -1482,7 +1485,7 @@ td {
 
     <div class="summary-row">
       <span>
-        Revenue With MDR
+        QRIS Revenue
       </span>
 
       <strong>
@@ -1494,7 +1497,7 @@ td {
 
     <div class="summary-row">
       <span>
-        Revenue Without MDR
+        Non-QRIS Revenue
       </span>
 
       <strong>
@@ -1541,7 +1544,7 @@ td {
 <div class="section">
 
   <div class="section-title">
-    02 · Expenses
+    02 - Expenses
   </div>
 
   <div class="subsection">
@@ -1642,7 +1645,7 @@ td {
 <div class="section">
 
   <div class="section-title">
-    03 · Profit
+    03 - Profit
   </div>
 
   <div class="summary">
@@ -1669,7 +1672,7 @@ td {
 <div class="section">
 
   <div class="section-title">
-    04 · BEP Allocation
+    04 - BEP Allocation
   </div>
 
   <div class="summary">
@@ -1722,7 +1725,7 @@ td {
 <div class="section">
 
   <div class="section-title">
-    05 · Profit Distribution
+    05 - Profit Distribution
   </div>
 
   <table>

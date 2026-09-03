@@ -62,10 +62,10 @@ function safeFolderName(value) {
     .trim();
 }
 
-function createPreviewBlob(file) {
-  return new Promise(async (resolve, reject) => {
+async function createPreviewBlob(file) {
+  let bitmap;
     try {
-      const bitmap = await createImageBitmap(file);
+      bitmap = await createImageBitmap(file);
       const maxDimension = 1200;
       const scale = Math.min(
         1,
@@ -79,15 +79,11 @@ function createPreviewBlob(file) {
       const context = canvas.getContext("2d");
 
       if (!context) {
-        bitmap.close?.();
-        reject(new Error(`Gagal membuat preview ${file.name}.`));
-        return;
+        throw new Error("Canvas context is unavailable.");
       }
 
       context.drawImage(bitmap, 0, 0, width, height);
-      bitmap.close?.();
-
-      canvas.toBlob(
+      return await new Promise((resolve, reject) => canvas.toBlob(
         (blob) => {
           if (!blob) {
             reject(new Error(`Gagal membuat preview ${file.name}.`));
@@ -98,17 +94,17 @@ function createPreviewBlob(file) {
         },
         "image/webp",
         0.7
-      );
+      ));
     } catch (error) {
-      reject(
-        new Error(
+      throw new Error(
           `Gagal membuat preview ${file.name}: ${
             error.message || "format gambar tidak didukung"
-          }`
-        )
+          }`,
+          { cause: error }
       );
+    } finally {
+      bitmap?.close?.();
     }
-  });
 }
 
 function GalleryManager() {
@@ -374,7 +370,7 @@ function GalleryManager() {
 
     try {
       await navigator.clipboard.writeText(url);
-      setSuccessMessage(`Guest link ${gallery.client_name} berhasil disalin.`);
+      setSuccessMessage(`Guest link for ${gallery.client_name} copied.`);
       setErrorMessage("");
     } catch {
       window.prompt("Copy guest link:", url);

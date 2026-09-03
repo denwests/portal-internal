@@ -354,6 +354,19 @@ function Login() {
         }
       >
 
+        <div className="login-brand">
+          <div>
+            <strong>PLUNO STUDIO</strong>
+            <span>INTERNAL PORTAL</span>
+          </div>
+        </div>
+
+        <div className="login-heading">
+          <span>{resetMode ? "ACCOUNT RECOVERY" : "SECURE WORKSPACE"}</span>
+          <h1>{resetMode ? "Reset your password" : "Welcome back"}</h1>
+          <p>{resetMode ? "We will send a secure reset link to your registered email." : "Sign in to manage studio operations, finance, and client delivery."}</p>
+        </div>
+
 
         {!resetMode ? (
 

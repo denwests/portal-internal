@@ -8,6 +8,8 @@ import {
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
 import TablePagination from "../components/TablePagination";
+import { MonthPicker } from "../components/PeriodPicker";
+import { PLUNO_PRINT_CSS } from "../lib/printTheme";
 import useTablePagination from "../hooks/useTablePagination";
 
 import "./Spending.css";
@@ -274,28 +276,6 @@ function Spending() {
     "November",
     "December",
   ];
-
-
-  /* =======================================================
-     YEAR OPTIONS
-  ======================================================= */
-
-  const currentYear =
-    new Date().getFullYear();
-
-  const yearOptions = [];
-
-  for (
-    let year =
-      currentYear - 5;
-    year <=
-      currentYear + 5;
-    year++
-  ) {
-    yearOptions.push(
-      String(year)
-    );
-  }
 
 
   /* =======================================================
@@ -1455,6 +1435,8 @@ function Spending() {
               letter-spacing: 1px;
             }
 
+            ${PLUNO_PRINT_CSS}
+
           </style>
 
         </head>
@@ -1473,17 +1455,18 @@ function Spending() {
                 INTERNAL FINANCIAL SYSTEM
               </div>
 
+              <div class="document-type">
+                ${title}
+              </div>
+
             </div>
 
-            <div class="period">
-              ${monthLabel} ${activeYear}
+            <div class="header-right">
+              <div class="label">PERIOD</div>
+              <div class="value">${monthLabel} ${activeYear}</div>
             </div>
 
           </div>
-
-          <h1>
-            ${title}
-          </h1>
 
           <table>
 
@@ -1612,85 +1595,15 @@ function Spending() {
 
 
           <div className="spending-performance-filter">
-
-
-            {/* MONTH */}
-
-            <select
-              value={
-                activeMonth
-              }
-              onChange={(
-                event
-              ) =>
-                setSelectedMonth(
-                  event.target.value
-                )
-              }
-            >
-
-              {monthNames.map(
-                (
-                  month,
-                  index
-                ) => (
-
-                  <option
-                    key={
-                      month
-                    }
-                    value={String(
-                      index + 1
-                    ).padStart(
-                      2,
-                      "0"
-                    )}
-                  >
-                    {month}
-                  </option>
-
-                )
-              )}
-
-            </select>
-
-
-            {/* YEAR */}
-
-            <select
-              value={
-                activeYear
-              }
-              onChange={(
-                event
-              ) =>
-                setSelectedYear(
-                  event.target.value
-                )
-              }
-            >
-
-              {yearOptions.map(
-                (
-                  year
-                ) => (
-
-                  <option
-                    key={
-                      year
-                    }
-                    value={
-                      year
-                    }
-                  >
-                    {year}
-                  </option>
-
-                )
-              )}
-
-            </select>
-
+            <MonthPicker
+              year={activeYear}
+              month={activeMonth}
+              ariaLabel="Spending month and year"
+              onChange={({ year, month }) => {
+                setSelectedYear(String(year));
+                setSelectedMonth(String(month).padStart(2, "0"));
+              }}
+            />
           </div>
 
         </div>

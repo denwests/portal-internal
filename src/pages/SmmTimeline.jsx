@@ -3,7 +3,9 @@ import { createPortal } from "react-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Sidebar from "../components/Sidebar";
+import { MonthPicker } from "../components/PeriodPicker";
 import { supabase } from "../supabase";
+import { drawPdfFooter, drawPdfHeader, plunoTableTheme } from "../lib/pdfTheme";
 import "./SmmTimeline.css";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -136,7 +138,6 @@ function SmmTimeline() {
 
   const selectedTimeline = timelines.find((timeline) => timeline.id === selectedId);
   const selectedClient = clients.find((client) => client.id === selectedClientId);
-  const yearOptions = Array.from({ length: 9 }, (_, index) => now.getFullYear() - 3 + index);
 
   const loadBase = useCallback(async () => {
     setLoading(true);
@@ -349,26 +350,20 @@ function SmmTimeline() {
   const downloadPdf = () => {
     if (!selectedTimeline) return;
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(15);
-    doc.text("PLUNO STUDIO", 14, 15);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(100);
-    doc.text("SOCIAL MEDIA CONTENT TIMELINE", 14, 21);
-    doc.setTextColor(20);
-    doc.setFontSize(11);
-    doc.text(`${selectedClient?.name || "Client"} — ${MONTHS[selectedMonth - 1]} ${selectedYear}`, 14, 30);
+    drawPdfHeader(doc, {
+      kicker: "PLUNO STUDIO · SOCIAL MEDIA",
+      title: "Content Timeline",
+      subtitle: `${selectedClient?.name || "Client"} — ${MONTHS[selectedMonth - 1]} ${selectedYear}`,
+    });
     autoTable(doc, {
       head: [["No", "Content", "Materials", "Reference", "Platform", "Format", "Status", "Schedule", "Notes"]],
       body: items.map((item, index) => [index + 1, item.content, item.materials, item.reference, (item.platforms || []).join(", "), (item.formats || []).join(", "), item.status, displaySchedule(item.schedule_date), item.notes]),
-      startY: 38,
+      startY: 44,
       theme: "grid",
-      styles: { fontSize: 6.5, cellPadding: 2, textColor: 35, lineColor: 210, lineWidth: 0.15 },
-      headStyles: { fillColor: [24, 24, 24], textColor: 245, fontStyle: "bold" },
-      alternateRowStyles: { fillColor: [247, 247, 247] },
+      ...plunoTableTheme(6.5),
       margin: { left: 14, right: 14 },
     });
+    drawPdfFooter(doc, "PLUNO STUDIO - CONTENT TIMELINE");
     doc.save(`${safeFileName(selectedClient?.name)}-${MONTHS[selectedMonth - 1]}-${selectedYear}.pdf`);
   };
 
@@ -389,7 +384,7 @@ function SmmTimeline() {
     const url = `${window.location.origin}/timeline/share/${token}`;
     try {
       await navigator.clipboard.writeText(url);
-      setNotice("Link preview berhasil disalin.");
+      setNotice("Preview link copied.");
     } catch {
       window.prompt("Salin link preview berikut:", url);
     }
@@ -415,12 +410,16 @@ function SmmTimeline() {
               <option value="">Select client</option>
               {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
             </select>
-            <select value={selectedMonth} onChange={(event) => { periodRequestRef.current = ""; setSelectedMonth(Number(event.target.value)); }} aria-label="Month">
-              {MONTHS.map((month, index) => <option key={month} value={index + 1}>{month}</option>)}
-            </select>
-            <select value={selectedYear} onChange={(event) => { periodRequestRef.current = ""; setSelectedYear(Number(event.target.value)); }} aria-label="Year">
-              {yearOptions.map((year) => <option key={year}>{year}</option>)}
-            </select>
+            <MonthPicker
+              year={selectedYear}
+              month={selectedMonth}
+              ariaLabel="Timeline month and year"
+              onChange={({ year, month }) => {
+                periodRequestRef.current = "";
+                setSelectedYear(year);
+                setSelectedMonth(month);
+              }}
+            />
           </div>
         </div>
 
@@ -436,10 +435,10 @@ function SmmTimeline() {
           </div>
         </div>
 
-        {error && <div className="smm-message error" role="alert">{error}<button onClick={() => setError("")}>×</button></div>}
-        {notice && <div className="smm-message success" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
+        {error && <div className="smm-message error" role="alert"><span>{error}</span><button type="button" aria-label="Dismiss error" onClick={() => setError("")}>×</button></div>}
+        {notice && <div className="smm-message success" role="status"><span>{notice}</span><button type="button" aria-label="Dismiss notification" onClick={() => setNotice("")}>×</button></div>}
 
-        {loading || periodLoading ? <div className="smm-empty">Loading timeline...</div> : !selectedClient ? <div className="smm-empty"><strong>Belum ada client</strong><span>Tambahkan client untuk membuat timeline bulan berjalan.</span></div> : !selectedTimeline ? <div className="smm-empty"><strong>Timeline belum tersedia</strong><span>Timeline periode ini belum dibuat.</span></div> : (
+        {loading || periodLoading ? <div className="smm-empty">Loading timeline...</div> : !selectedClient ? <div className="smm-empty"><strong>No client yet</strong><span>Add a client to create this month's timeline.</span></div> : !selectedTimeline ? <div className="smm-empty"><strong>No timeline available</strong><span>A timeline has not been created for this period.</span></div> : (
           <>
             <section className="smm-summary">
               <div><span>CLIENT</span><strong>{selectedClient.name}</strong></div>

@@ -12,6 +12,8 @@ import {
 } from "../supabase";
 
 import Sidebar from "../components/Sidebar";
+import RevenueTrendChart from "../components/RevenueTrendChart";
+import { MonthPicker } from "../components/PeriodPicker";
 
 import "./Dashboard.css";
 
@@ -96,6 +98,13 @@ function Dashboard() {
   const [
     monthlyRevenue,
     setMonthlyRevenue,
+  ] = useState(
+    Array(12).fill(0)
+  );
+
+  const [
+    previousMonthlyRevenue,
+    setPreviousMonthlyRevenue,
   ] = useState(
     Array(12).fill(0)
   );
@@ -218,34 +227,6 @@ function Dashboard() {
 
 
   /* =======================================================
-     YEAR OPTIONS
-  ======================================================= */
-
-  const currentYear =
-    today.getFullYear();
-
-
-  const yearOptions = [];
-
-
-  for (
-    let year =
-      currentYear - 5;
-
-    year <=
-    currentYear + 5;
-
-    year++
-  ) {
-
-    yearOptions.push(
-      year
-    );
-
-  }
-
-
-  /* =======================================================
      LOAD DASHBOARD
   ======================================================= */
 
@@ -262,6 +243,9 @@ function Dashboard() {
 
       const yearStart =
         `${selectedYear}-01-01`;
+
+      const previousYearStart =
+        `${selectedYear - 1}-01-01`;
 
 
       const yearEnd =
@@ -403,7 +387,7 @@ function Dashboard() {
             )
             .gte(
               "revenue_date",
-              yearStart
+              previousYearStart
             )
             .lt(
               "revenue_date",
@@ -427,9 +411,21 @@ function Dashboard() {
           transactionYearData ||
           [];
 
+        const currentYearTransactions =
+          transactions.filter(
+            (transaction) =>
+              transaction.revenue_date >= yearStart
+          );
+
+        const previousYearTransactions =
+          transactions.filter(
+            (transaction) =>
+              transaction.revenue_date < yearStart
+          );
+
 
         const selectedRevenue =
-          transactions
+          currentYearTransactions
             .filter(
               (transaction) =>
                 transaction.revenue_date &&
@@ -458,7 +454,7 @@ function Dashboard() {
           Array(12).fill(0);
 
 
-        transactions.forEach(
+        currentYearTransactions.forEach(
           (transaction) => {
 
             if (
@@ -494,10 +490,43 @@ function Dashboard() {
           monthly
         );
 
+        const previousMonthly =
+          Array(12).fill(0);
+
+        previousYearTransactions.forEach(
+          (transaction) => {
+            if (!transaction.revenue_date) {
+              return;
+            }
+
+            const monthIndex =
+              Number(
+                transaction.revenue_date.slice(5, 7)
+              ) - 1;
+
+            if (
+              monthIndex >= 0 &&
+              monthIndex < 12
+            ) {
+              previousMonthly[monthIndex] +=
+                Number(
+                  transaction.amount || 0
+                );
+            }
+          }
+        );
+
+        setPreviousMonthlyRevenue(
+          previousMonthly
+        );
+
       } else {
 
         setTotalRevenue(0);
         setMonthlyRevenue(
+          Array(12).fill(0)
+        );
+        setPreviousMonthlyRevenue(
           Array(12).fill(0)
         );
 
@@ -1184,49 +1213,6 @@ function Dashboard() {
 
 
   /* =======================================================
-     PERFORMANCE FILTER
-  ======================================================= */
-
-  const handlePerformanceMonthChange =
-    (
-      event
-    ) => {
-
-      setSelectedMonth(
-        Number(
-          event.target.value
-        )
-      );
-
-    };
-
-
-  const handlePerformanceYearChange =
-    (
-      event
-    ) => {
-
-      setSelectedYear(
-        Number(
-          event.target.value
-        )
-      );
-
-    };
-
-
-  /* =======================================================
-     MAX REVENUE
-  ======================================================= */
-
-  const maxRevenue =
-    Math.max(
-      ...monthlyRevenue,
-      1
-    );
-
-
-  /* =======================================================
      RENDER
   ======================================================= */
 
@@ -1255,36 +1241,6 @@ function Dashboard() {
             TOPBAR
         ================================================= */}
 
-        <header className="dashboard-topbar">
-
-          <div>
-
-            <div className="dashboard-eyebrow">
-              PLUNO STUDIO · INTERNAL PORTAL
-            </div>
-
-            <h1>
-              Dashboard
-            </h1>
-
-            <p>
-              Overview of your studio activity.
-            </p>
-
-          </div>
-
-
-          <div className="dashboard-status">
-
-            <span></span>
-
-            Studio Online
-
-          </div>
-
-        </header>
-
-
         {/* =================================================
             OVERVIEW
         ================================================= */}
@@ -1308,61 +1264,15 @@ function Dashboard() {
 
 
             <div className="dashboard-performance-filter">
-
-              <select
-                value={
-                  selectedMonth
-                }
-                onChange={
-                  handlePerformanceMonthChange
-                }
-              >
-
-                {monthNames.map(
-                  (
-                    month,
-                    index
-                  ) => (
-
-                    <option
-                      value={index}
-                      key={month}
-                    >
-                      {month}
-                    </option>
-
-                  )
-                )}
-
-              </select>
-
-
-              <select
-                value={
-                  selectedYear
-                }
-                onChange={
-                  handlePerformanceYearChange
-                }
-              >
-
-                {yearOptions.map(
-                  (
-                    year
-                  ) => (
-
-                    <option
-                      value={year}
-                      key={year}
-                    >
-                      {year}
-                    </option>
-
-                  )
-                )}
-
-              </select>
-
+              <MonthPicker
+                year={selectedYear}
+                month={selectedMonth + 1}
+                ariaLabel="Dashboard month and year"
+                onChange={({ year, month }) => {
+                  setSelectedYear(year);
+                  setSelectedMonth(month - 1);
+                }}
+              />
             </div>
 
           </div>
@@ -1641,66 +1551,12 @@ function Dashboard() {
               </div>
 
 
-              <div className="revenue-chart">
-
-                {monthlyRevenue.map(
-                  (
-                    value,
-                    index
-                  ) => {
-
-                    const height =
-                      (
-                        value /
-                        maxRevenue
-                      ) *
-                      100;
-
-
-                    return (
-
-                      <div
-                        className="revenue-column"
-                        key={index}
-                      >
-
-                        <div className="revenue-bar-area">
-
-                          <div
-                            className="revenue-bar"
-                            style={{
-                              height:
-                                `${Math.max(
-                                  height,
-                                  3
-                                )}%`,
-                            }}
-                          />
-
-                        </div>
-
-
-                        <div className="revenue-month">
-
-                          {monthNames[
-                            index
-                          ]
-                            .substring(
-                              0,
-                              3
-                            )
-                            .toUpperCase()}
-
-                        </div>
-
-                      </div>
-
-                    );
-
-                  }
-                )}
-
-              </div>
+              <RevenueTrendChart
+                current={monthlyRevenue}
+                comparison={previousMonthlyRevenue}
+                currentLabel={`${selectedYear}`}
+                comparisonLabel={`${selectedYear - 1}`}
+              />
 
             </div>
 

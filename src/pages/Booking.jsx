@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import { MonthPicker, YearPicker } from "../components/PeriodPicker";
 import "./Booking.css";
 
 const BOOKINGS_PER_PAGE = 10;
@@ -1530,85 +1531,30 @@ function Booking() {
 
               {periodFilter.type ===
                 "month" && (
-                <>
-                  <select
-                    value={
-                      periodFilter.month
-                    }
-                    onChange={(event) =>
-                      updatePeriodFilter(
-                        "month",
-                        event.target.value
-                      )
-                    }
-                    aria-label="Booking month"
-                  >
-                    {monthNames.map(
-                      (month, index) => (
-                        <option
-                          key={month}
-                          value={String(
-                            index + 1
-                          ).padStart(
-                            2,
-                            "0"
-                          )}
-                        >
-                          {month}
-                        </option>
-                      )
-                    )}
-                  </select>
-
-                  <select
-                    value={
-                      periodFilter.year
-                    }
-                    onChange={(event) =>
-                      updatePeriodFilter(
-                        "year",
-                        event.target.value
-                      )
-                    }
-                    aria-label="Booking year"
-                  >
-                    {yearOptions.map(
-                      (year) => (
-                        <option
-                          key={year}
-                          value={year}
-                        >
-                          {year}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </>
+                <MonthPicker
+                  year={periodFilter.year}
+                  month={periodFilter.month}
+                  ariaLabel="Booking month and year"
+                  onChange={({ year, month }) => {
+                    updatePeriodFilter("year", String(year));
+                    updatePeriodFilter("month", String(month).padStart(2, "0"));
+                  }}
+                />
               )}
 
               {periodFilter.type ===
                 "year" && (
-                <select
+                <YearPicker
                   value={periodFilter.year}
-                  onChange={(event) =>
+                  options={yearOptions}
+                  onChange={(year) =>
                     updatePeriodFilter(
                       "year",
-                      event.target.value
+                      year
                     )
                   }
                   aria-label="Booking year"
-                >
-                  {yearOptions.map(
-                    (year) => (
-                      <option
-                        key={year}
-                        value={year}
-                      >
-                        {year}
-                      </option>
-                    )
-                  )}
-                </select>
+                />
               )}
             </div>
 
@@ -1822,7 +1768,7 @@ function Booking() {
                                 packagePrice >
                                   0 && (
                                   <small>
-                                    Sisa{" "}
+                                    Remaining{" "}
                                     {formatCurrency(
                                       remainingAmount
                                     )}

@@ -4,8 +4,10 @@ import autoTable from "jspdf-autotable";
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
 import TablePagination from "../components/TablePagination";
+import { MonthPicker } from "../components/PeriodPicker";
 import useTablePagination from "../hooks/useTablePagination";
 import { summarizeCustomerFinance } from "../lib/customerFinance";
+import { drawPdfFooter, drawPdfHeader, plunoTableTheme } from "../lib/pdfTheme";
 import "./Customer.css";
 
 /* =========================================================
@@ -36,6 +38,10 @@ function calculateMdr(amount, paymentMethod) {
     mdrAmount,
     netAmount: gross - mdrAmount,
   };
+}
+
+function formatCustomerStatus(status) {
+  return ({ Selesai: "Complete", Proses: "In Progress", Batal: "Canceled" })[status] || status || "-";
 }
 
 /* =========================================================
@@ -180,21 +186,6 @@ function Customer() {
     status: "Proses",
   });
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
   const monthNamesIndonesia = [
     "Januari",
     "Februari",
@@ -242,16 +233,6 @@ function Customer() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCustomers();
   }, []);
-
-  /* =========================================================
-     YEAR
-  ========================================================= */
-
-  const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from(
-    { length: 11 },
-    (_, index) => String(currentYear - 5 + index)
-  );
 
   const activeYear = selectedYear;
 
@@ -312,25 +293,13 @@ function Customer() {
       format: "a4",
     });
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text("PLUNO INTERNAL SYSTEM", 14, 14);
-
-    doc.setFontSize(20);
-    doc.setTextColor(30, 30, 30);
-    doc.text("Customer List", 14, 24);
-
-    doc.setFontSize(9);
-    doc.setTextColor(100, 100, 100);
-    doc.text(
-      `${monthNamesIndonesia[Number(activeMonth) - 1]} ${activeYear}`,
-      14,
-      31
-    );
+    drawPdfHeader(doc, {
+      title: "Customer List",
+      subtitle: `${monthNamesIndonesia[Number(activeMonth) - 1]} ${activeYear}`,
+    });
 
     autoTable(doc, {
-      startY: 40,
+      startY: 44,
       head: [[
         "Customer",
         "Package",
@@ -345,19 +314,12 @@ function Customer() {
         formatDate(customer.date),
         formatRupiah(customer.totalPackageValue),
         formatRupiah(customer.totalNetValue),
-        customer.status || "-",
+        formatCustomerStatus(customer.status),
       ]),
-      styles: {
-        font: "helvetica",
-        fontSize: 8,
-        cellPadding: 3,
-      },
-      headStyles: {
-        fillColor: [25, 25, 25],
-        textColor: [235, 235, 235],
-        fontStyle: "normal",
-      },
+      ...plunoTableTheme(8),
     });
+
+    drawPdfFooter(doc, "PLUNO STUDIO - CUSTOMER DATA");
 
     doc.save(`customers-${activeYear}-${activeMonth}.pdf`);
   };
@@ -695,35 +657,15 @@ function Customer() {
           </div>
 
           <div className="customer-performance-filter">
-            <select
-              value={activeMonth}
-              onChange={(event) =>
-                setSelectedMonth(event.target.value)
-              }
-            >
-              {monthNames.map((month, index) => {
-                const value = String(index + 1).padStart(2, "0");
-
-                return (
-                  <option key={month} value={value}>
-                    {month}
-                  </option>
-                );
-              })}
-            </select>
-
-            <select
-              value={activeYear}
-              onChange={(event) =>
-                setSelectedYear(event.target.value)
-              }
-            >
-              {yearOptions.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
+            <MonthPicker
+              year={activeYear}
+              month={activeMonth}
+              ariaLabel="Customer month and year"
+              onChange={({ year, month }) => {
+                setSelectedYear(String(year));
+                setSelectedMonth(String(month).padStart(2, "0"));
+              }}
+            />
           </div>
         </div>
 
@@ -912,7 +854,7 @@ function Customer() {
                               : "status-process"
                           }`}
                         >
-                          {customer.status}
+                          {formatCustomerStatus(customer.status)}
                         </span>
                       </td>
 
@@ -1063,11 +1005,11 @@ function Customer() {
                     onChange={handleChange}
                   >
                     <option value="Proses">
-                      Proses
+                      In Progress
                     </option>
 
                     <option value="Selesai">
-                      Selesai
+                      Complete
                     </option>
 
                     <option value="Canceled">
@@ -1295,7 +1237,7 @@ function Customer() {
                 <span>STATUS</span>
 
                 <strong>
-                  {selectedCustomer.status}
+                  {formatCustomerStatus(selectedCustomer.status)}
                 </strong>
               </div>
             </div>
@@ -1422,7 +1364,7 @@ function Customer() {
                   {formatRupiah(customer.totalNetValue)}
                 </td>
 
-                <td>{customer.status}</td>
+                <td>{formatCustomerStatus(customer.status)}</td>
               </tr>
             ))}
           </tbody>

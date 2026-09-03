@@ -7,11 +7,14 @@ import {
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
 import TablePagination from "../components/TablePagination";
+import { MonthPicker } from "../components/PeriodPicker";
 import useTablePagination from "../hooks/useTablePagination";
+import { formatNumericDate } from "../lib/uiFormatting";
 import {
   getRevenueDate,
   isRevenueInMonth,
 } from "../lib/revenuePeriod";
+import { drawPdfFooter, drawPdfHeader, PDF_COLORS } from "../lib/pdfTheme";
 import "./Transactions.css";
 
 import jsPDF from "jspdf";
@@ -65,6 +68,7 @@ function formatRevenuePeriod(date) {
 
   return `${months[Number(month) - 1] || month} ${year}`;
 }
+
 
 
 
@@ -127,14 +131,6 @@ function Transactions() {
     "November",
     "December",
   ];
-
-  const currentYear = new Date().getFullYear();
-  const yearOptions = [];
-
-  for (let year = currentYear - 5; year <= currentYear + 5; year += 1) {
-    yearOptions.push(String(year));
-  }
-
 
   /* =========================================================
      FETCH
@@ -692,31 +688,16 @@ function Transactions() {
         format: "a4",
       });
 
-      doc.setFont("helvetica", "normal");
-
-      doc.setFontSize(9);
-      doc.setTextColor(95, 95, 95);
-      doc.text("PLUNO STUDIO", 16, 16);
-
-      doc.setFontSize(20);
-      doc.setTextColor(25, 25, 25);
-      doc.text("INVOICE PEMBAYARAN", 16, 27);
-
-      doc.setFontSize(8);
-      doc.setTextColor(105, 105, 105);
-      doc.text(`No. Invoice: ${invoiceNumber}`, 16, 34);
-      doc.text(`Tanggal Pembayaran: ${formatDate(transaction.transaction_date)}`, 16, 39);
-
       const statusText = paymentStatus;
-      doc.setFontSize(10);
-      doc.setTextColor(25, 25, 25);
-      doc.text(statusText, 194, 27, { align: "right" });
-
-      doc.setDrawColor(220, 220, 220);
-      doc.line(16, 45, 194, 45);
+      drawPdfHeader(doc, {
+        kicker: "PLUNO STUDIO · PAYMENT DOCUMENT",
+        title: "Invoice Pembayaran",
+        subtitle: `No. ${invoiceNumber} · ${formatDate(transaction.transaction_date)}`,
+        rightLabel: statusText,
+      });
 
       autoTable(doc, {
-        startY: 51,
+        startY: 44,
         theme: "plain",
         head: [["KLIEN", "BOOKING"]],
         body: [[
@@ -729,15 +710,15 @@ function Transactions() {
           font: "helvetica",
           fontSize: 9,
           cellPadding: 4,
-          textColor: [40, 40, 40],
-          lineColor: [225, 225, 225],
+          textColor: PDF_COLORS.ink,
+          lineColor: PDF_COLORS.line,
           lineWidth: 0.2,
         },
         headStyles: {
           fontSize: 7,
-          textColor: [105, 105, 105],
+          textColor: PDF_COLORS.muted,
           fontStyle: "normal",
-          fillColor: [248, 248, 248],
+          fillColor: PDF_COLORS.paperSoft,
         },
         columnStyles: {
           0: { cellWidth: 89 },
@@ -774,18 +755,18 @@ function Transactions() {
           font: "helvetica",
           fontSize: 9,
           cellPadding: 3.4,
-          lineColor: [225, 225, 225],
+          lineColor: PDF_COLORS.line,
           lineWidth: 0.2,
-          textColor: [40, 40, 40],
+          textColor: PDF_COLORS.ink,
         },
         headStyles: {
-          fillColor: [25, 25, 25],
-          textColor: [240, 240, 240],
+          fillColor: PDF_COLORS.header,
+          textColor: PDF_COLORS.headerText,
           fontStyle: "normal",
           fontSize: 8,
         },
         columnStyles: {
-          0: { cellWidth: 88, textColor: [100, 100, 100] },
+          0: { cellWidth: 88, textColor: PDF_COLORS.muted },
           1: { cellWidth: 90 },
         },
         margin: { left: 16, right: 16 },
@@ -821,7 +802,7 @@ function Transactions() {
         noteY += 7;
       }
 
-      doc.setDrawColor(225, 225, 225);
+      doc.setDrawColor(...PDF_COLORS.line);
       doc.line(16, noteY + 3, 194, noteY + 3);
 
       doc.setFontSize(7);
@@ -831,6 +812,8 @@ function Transactions() {
         16,
         noteY + 10
       );
+
+      drawPdfFooter(doc, "PLUNO STUDIO - PAYMENT INVOICE");
 
       const filename = `invoice-${safeFileName(customerName)}-${
         transaction.transaction_date || "payment"
@@ -869,30 +852,19 @@ function Transactions() {
       format: "a4",
     });
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text("PLUNO INTERNAL SYSTEM", 14, 14);
-
-    doc.setFontSize(20);
-    doc.setTextColor(30, 30, 30);
-    doc.text("Transaction & Revenue Performance", 14, 24);
-
-    doc.setFontSize(9);
-    doc.setTextColor(100, 100, 100);
-    doc.text(
-      `Cash flow and fixed revenue · ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}`,
-      14,
-      31
-    );
+    drawPdfHeader(doc, {
+      kicker: "PLUNO STUDIO · FINANCE",
+      title: "Transaction & Revenue Performance",
+      subtitle: `Cash flow and fixed revenue · ${monthNames[Number(selectedMonth) - 1]} ${selectedYear}`,
+    });
 
     if (filteredTransactions.length > 0) {
       doc.setFontSize(10);
       doc.setTextColor(45, 45, 45);
-      doc.text("Cash In — by Payment Date", 14, 39);
+      doc.text("Cash In — by Payment Date", 14, 43);
 
       autoTable(doc, {
-        startY: 43,
+        startY: 47,
         head: [[
           "Payment Date",
           "Event Date",
@@ -929,8 +901,8 @@ function Transactions() {
           cellPadding: 2.2,
         },
         headStyles: {
-          fillColor: [25, 25, 25],
-          textColor: [235, 235, 235],
+          fillColor: PDF_COLORS.header,
+          textColor: PDF_COLORS.headerText,
           fontStyle: "normal",
         },
       });
@@ -953,8 +925,8 @@ function Transactions() {
         cellPadding: 3,
       },
       headStyles: {
-        fillColor: [245, 245, 245],
-        textColor: [80, 80, 80],
+        fillColor: [235, 235, 237],
+        textColor: [58, 58, 62],
         fontStyle: "normal",
       },
     });
@@ -994,8 +966,8 @@ function Transactions() {
           cellPadding: 2.3,
         },
         headStyles: {
-          fillColor: [25, 25, 25],
-          textColor: [235, 235, 235],
+          fillColor: PDF_COLORS.header,
+          textColor: PDF_COLORS.headerText,
           fontStyle: "normal",
         },
       });
@@ -1028,11 +1000,13 @@ function Transactions() {
         cellPadding: 3,
       },
       headStyles: {
-        fillColor: [245, 245, 245],
-        textColor: [80, 80, 80],
+        fillColor: [235, 235, 237],
+        textColor: [58, 58, 62],
         fontStyle: "normal",
       },
     });
+
+    drawPdfFooter(doc, "PLUNO STUDIO - FINANCIAL PERFORMANCE");
 
     doc.save(
       `transactions-${selectedYear}-${selectedMonth}.pdf`
@@ -1054,30 +1028,15 @@ function Transactions() {
           </div>
 
           <div className="transactions-performance-filter">
-            <select
-              value={selectedMonth}
-              onChange={(event) => setSelectedMonth(event.target.value)}
-            >
-              {monthNames.map((month, index) => (
-                <option
-                  key={month}
-                  value={String(index + 1).padStart(2, "0")}
-                >
-                  {month}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={selectedYear}
-              onChange={(event) => setSelectedYear(event.target.value)}
-            >
-              {yearOptions.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
+            <MonthPicker
+              year={selectedYear}
+              month={selectedMonth}
+              ariaLabel="Transaction month and year"
+              onChange={({ year, month }) => {
+                setSelectedYear(String(year));
+                setSelectedMonth(String(month).padStart(2, "0"));
+              }}
+            />
           </div>
         </div>
 
@@ -1099,13 +1058,13 @@ function Transactions() {
           </div>
 
           <div>
-            <span>CASH MDR</span>
-            <strong>{formatRupiah(totalMdr)}</strong>
+            <span>NET CASH RECEIVED</span>
+            <strong>{formatRupiah(totalNet)}</strong>
           </div>
 
           <div>
-            <span>NET CASH RECEIVED</span>
-            <strong>{formatRupiah(totalNet)}</strong>
+            <span>CASH MDR</span>
+            <strong>{formatRupiah(totalMdr)}</strong>
           </div>
 
           <div>
@@ -1195,8 +1154,8 @@ function Transactions() {
                 ) : (
                   transactionPagination.visibleItems.map((item) => (
                     <tr key={item.id}>
-                      <td>{formatDate(item.transaction_date)}</td>
-                      <td>{formatDate(getRevenueDate(item))}</td>
+                      <td className="transaction-date-cell">{formatNumericDate(item.transaction_date)}</td>
+                      <td className="transaction-date-cell">{formatNumericDate(getRevenueDate(item))}</td>
                       <td>
                         <span className="transactions-revenue-period">
                           {formatRevenuePeriod(getRevenueDate(item))}
