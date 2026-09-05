@@ -705,6 +705,7 @@ function Dashboard() {
     loadDashboard();
 
   }, [
+    employeeRole,
     selectedMonth,
     selectedYear,
   ]);
@@ -767,9 +768,8 @@ function Dashboard() {
 
 
   useEffect(() => {
-
-    fetchNotes();
-
+    const timer = window.setTimeout(() => { void fetchNotes(); }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
 

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
 import { MonthPicker, YearPicker } from "../components/PeriodPicker";
+import { buildBookingScheduleMessage, buildBookingScheduleMessages } from "../lib/bookingScheduleMessage";
 import "./Booking.css";
 
 const BOOKINGS_PER_PAGE = 10;
@@ -156,7 +157,8 @@ function Booking() {
     getInitialPeriodFilter
   );
 
-  const [shareCopied, setShareCopied] = useState(false);
+  const [copiedBookingId, setCopiedBookingId] = useState("");
+  const [copyAllCopied, setCopyAllCopied] = useState(false);
   const [settlementMethod, setSettlementMethod] = useState("Cash");
 
   const getEmptyForm = () => ({
@@ -224,7 +226,8 @@ function Booking() {
   };
 
   useEffect(() => {
-    fetchBookings();
+    const timer = window.setTimeout(() => { void fetchBookings(); }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const bookingYears = bookings
@@ -308,6 +311,14 @@ function Booking() {
     setPeriodFilter((current) => {
       const next = { ...current, [field]: value };
 
+      if (field === "startDate" && value && !next.endDate) {
+        next.endDate = value;
+      }
+
+      if (field === "endDate" && value && !next.startDate) {
+        next.startDate = value;
+      }
+
       if (
         field === "startDate" &&
         value &&
@@ -328,8 +339,8 @@ function Booking() {
 
       return next;
     });
-
-    setShareCopied(false);
+    setCurrentPage(0);
+    setCopyAllCopied(false);
   };
 
   useEffect(() => {
@@ -376,29 +387,45 @@ function Booking() {
     periodFilter.year,
   ]);
 
-  const handleShare = async () => {
+  const writeClipboard = async (message) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(message);
+      return;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = message;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  };
+
+  const copyBookingInfo = async (booking) => {
     try {
-      const shareUrl = window.location.href;
+      await writeClipboard(buildBookingScheduleMessage(booking));
 
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(shareUrl);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = shareUrl;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      }
-
-      setShareCopied(true);
-      window.setTimeout(() => setShareCopied(false), 1800);
+      setCopiedBookingId(booking.id);
+      window.setTimeout(() => {
+        setCopiedBookingId((current) => current === booking.id ? "" : current);
+      }, 1800);
     } catch (error) {
-      console.error("SHARE ERROR:", error);
-      setErrorMessage("Gagal menyalin link booking.");
+      console.error("COPY BOOKING INFO ERROR:", error);
+      setErrorMessage("Gagal menyalin informasi jadwal booking.");
+    }
+  };
+
+  const copyAllBookingInfo = async () => {
+    if (!periodBookings.length) return;
+    try {
+      await writeClipboard(buildBookingScheduleMessages(periodBookings));
+      setCopyAllCopied(true);
+      window.setTimeout(() => setCopyAllCopied(false), 1800);
+    } catch (error) {
+      console.error("COPY ALL BOOKING INFO ERROR:", error);
+      setErrorMessage("Gagal menyalin seluruh informasi jadwal booking.");
     }
   };
 
@@ -431,17 +458,6 @@ function Booking() {
     safeCurrentPage * BOOKINGS_PER_PAGE,
     safeCurrentPage * BOOKINGS_PER_PAGE + BOOKINGS_PER_PAGE
   );
-
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [
-    search,
-    periodFilter.type,
-    periodFilter.startDate,
-    periodFilter.endDate,
-    periodFilter.month,
-    periodFilter.year,
-  ]);
 
   const resetForm = () => {
     setForm(getEmptyForm());
@@ -1556,21 +1572,18 @@ function Booking() {
                   aria-label="Booking year"
                 />
               )}
-            </div>
+          </div>
 
+          {periodFilter.type === "date" && periodFilter.startDate && periodFilter.endDate && (
             <button
               type="button"
-              className={`booking-share-button ${
-                shareCopied
-                  ? "copied"
-                  : ""
-              }`}
-              onClick={handleShare}
+              className={`booking-copy-all-button ${copyAllCopied ? "copied" : ""}`}
+              onClick={copyAllBookingInfo}
+              disabled={!periodBookings.length}
             >
-              {shareCopied
-                ? "Copied"
-                : "Share"}
+              {copyAllCopied ? "Copied All" : "Copy All Info"}
             </button>
+          )}
 
             {canManageBooking && (
               <button
@@ -1613,11 +1626,10 @@ function Booking() {
                   type="text"
                   placeholder="Search..."
                   value={search}
-                  onChange={(event) =>
-                    setSearch(
-                      event.target.value
-                    )
-                  }
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                    setCurrentPage(0);
+                  }}
                 />
               </div>
             </div>
@@ -1795,6 +1807,14 @@ function Booking() {
 
                           <td>
                             <div className="booking-actions booking-actions-v2">
+                              <button
+                                type="button"
+                                className="copy-info"
+                                onClick={() => copyBookingInfo(booking)}
+                              >
+                                {copiedBookingId === booking.id ? "Copied" : "Copy Info"}
+                              </button>
+
                               <button
                                 type="button"
                                 className="view"

@@ -1,19 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import Sidebar from "../components/Sidebar";
 import { MonthPicker } from "../components/PeriodPicker";
 import { supabase } from "../supabase";
-import { drawPdfFooter, drawPdfHeader, plunoTableTheme } from "../lib/pdfTheme";
 import "./SmmTimeline.css";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const STATUSES = ["Not Started", "In Progress", "Complete"];
-const PLATFORMS = ["Instagram", "TikTok"];
+const PLATFORMS = ["Instagram", "TikTok", "Other"];
 const FORMATS = ["Design", "Photo", "Video"];
 const PAGE_SIZE = 9;
 const EMPTY_ITEM = { content: "", materials: "", reference: "", platform: "Instagram", format: "Video", output: "Design", platforms: [], formats: [], status: "Not Started", schedule: null, schedule_date: null, notes: "" };
+
+function timelineErrorMessage(error, fallback = "Unable to save timeline changes.") {
+  if (error?.message?.includes("smm_timeline_items_platforms_check")) {
+    return "The Other platform requires the included Supabase platform update before it can be saved.";
+  }
+  return error?.message || fallback;
+}
 
 function debounce(callback, delay) {
   let timer;
@@ -35,16 +39,6 @@ function debounce(callback, delay) {
     callback(...argsToUse);
   };
   return wrapped;
-}
-
-function safeFileName(value) {
-  return String(value || "timeline").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-|-$/g, "");
-}
-
-function displaySchedule(value) {
-  if (!value) return "-";
-  const [year, month, day] = String(value).slice(0, 10).split("-");
-  return `${day}/${month}/${year}`;
 }
 
 function MultiCheckbox({ options, value, onChange, label }) {
@@ -94,7 +88,7 @@ function MultiCheckbox({ options, value, onChange, label }) {
   return <div className="smm-multi-select">
     <button ref={buttonRef} type="button" className="smm-multi-trigger" aria-label={label} aria-expanded={open} onClick={toggleMenu}>
       <span className="smm-multi-tags">
-        {selected.length ? selected.map((item) => <span key={item}>{item}</span>) : <span className="placeholder">Select</span>}
+        {selected.length ? <span className="smm-multi-value">{selected.join(", ")}</span> : <span className="placeholder">Select</span>}
       </span>
     </button>
     {open && createPortal(<div ref={menuRef} className="smm-multi-menu" style={menuStyle}>
@@ -130,7 +124,6 @@ function SmmTimeline() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [platformFilter, setPlatformFilter] = useState("All");
   const [page, setPage] = useState(1);
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [clientName, setClientName] = useState("");
@@ -240,7 +233,7 @@ function SmmTimeline() {
       const results = await Promise.all(pending.map(([id, changes]) => supabase.from("smm_timeline_items").update(changes).eq("id", id)));
       const saveError = results.find((result) => result.error)?.error;
       if (saveError) {
-        setError(saveError.message || "Gagal menyimpan perubahan.");
+        setError(timelineErrorMessage(saveError));
         setSaveState("Save failed");
       } else setSaveState("Saved");
     }, 650);
@@ -265,7 +258,7 @@ function SmmTimeline() {
     setSaving(true);
     setError("");
     const { data, error: insertError } = await supabase.from("smm_timeline_items").insert({ ...EMPTY_ITEM, timeline_id: selectedId, sort_order: items.length + 1, created_by: employeeId }).select().single();
-    if (insertError) setError(insertError.message);
+    if (insertError) setError(timelineErrorMessage(insertError, "Unable to add content."));
     else {
       setItems((current) => [...current, data]);
       setPage(Math.ceil((items.length + 1) / PAGE_SIZE));
@@ -277,7 +270,7 @@ function SmmTimeline() {
     const { id, created_at, updated_at, ...copy } = item;
     void id; void created_at; void updated_at;
     const { data, error: copyError } = await supabase.from("smm_timeline_items").insert({ ...copy, schedule: null, schedule_date: copy.schedule_date || null, sort_order: items.length + 1, created_by: employeeId }).select().single();
-    if (copyError) setError(copyError.message);
+    if (copyError) setError(timelineErrorMessage(copyError, "Unable to duplicate content."));
     else setItems((current) => [...current, data]);
   };
 
@@ -340,31 +333,27 @@ function SmmTimeline() {
     setSaving(false);
   };
 
-  const updateTimelineStatus = async (value) => {
-    if (!canManage || !selectedTimeline) return;
-    setTimelines((current) => current.map((timeline) => timeline.id === selectedId ? { ...timeline, status: value } : timeline));
-    const { error: statusError } = await supabase.from("smm_timelines").update({ status: value }).eq("id", selectedId);
-    if (statusError) setError(statusError.message);
-  };
-
-  const downloadPdf = () => {
-    if (!selectedTimeline) return;
-    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-    drawPdfHeader(doc, {
-      kicker: "PLUNO STUDIO · SOCIAL MEDIA",
-      title: "Content Timeline",
-      subtitle: `${selectedClient?.name || "Client"} — ${MONTHS[selectedMonth - 1]} ${selectedYear}`,
-    });
-    autoTable(doc, {
-      head: [["No", "Content", "Materials", "Reference", "Platform", "Format", "Status", "Schedule", "Notes"]],
-      body: items.map((item, index) => [index + 1, item.content, item.materials, item.reference, (item.platforms || []).join(", "), (item.formats || []).join(", "), item.status, displaySchedule(item.schedule_date), item.notes]),
-      startY: 44,
-      theme: "grid",
-      ...plunoTableTheme(6.5),
-      margin: { left: 14, right: 14 },
-    });
-    drawPdfFooter(doc, "PLUNO STUDIO - CONTENT TIMELINE");
-    doc.save(`${safeFileName(selectedClient?.name)}-${MONTHS[selectedMonth - 1]}-${selectedYear}.pdf`);
+  const deleteClient = async () => {
+    if (!canManage || !selectedClient) return;
+    const confirmed = window.confirm(`Delete ${selectedClient.name} from active clients? Existing timeline data will be preserved.`);
+    if (!confirmed) return;
+    setSaving(true);
+    setError("");
+    const { error: deleteError } = await supabase.from("smm_clients").update({ active: false }).eq("id", selectedClient.id);
+    if (deleteError) {
+      setError(deleteError.message);
+      setSaving(false);
+      return;
+    }
+    const remainingClients = clients.filter((client) => client.id !== selectedClient.id);
+    setClients(remainingClients);
+    setSelectedClientId(remainingClients[0]?.id || "");
+    setSelectedId("");
+    setItems([]);
+    setPage(1);
+    periodRequestRef.current = "";
+    setNotice("Client removed from active clients. Existing timeline data was preserved.");
+    setSaving(false);
   };
 
   const shareTimeline = async () => {
@@ -391,10 +380,11 @@ function SmmTimeline() {
     setSaving(false);
   };
 
-  const filteredItems = useMemo(() => items.filter((item) => (statusFilter === "All" || item.status === statusFilter) && (platformFilter === "All" || (item.platforms || []).includes(platformFilter))), [items, statusFilter, platformFilter]);
+  const filteredItems = useMemo(() => items.filter((item) => statusFilter === "All" || item.status === statusFilter), [items, statusFilter]);
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
   const visibleItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const completed = items.filter((item) => item.status === "Complete").length;
+  const progressPercent = items.length ? Math.round((completed / items.length) * 100) : 0;
 
   return (
     <div className="smm-page">
@@ -429,9 +419,9 @@ function SmmTimeline() {
             <strong>{selectedClient ? `${selectedClient.name} · ${MONTHS[selectedMonth - 1]} ${selectedYear}` : "Select or add a client"}</strong>
           </div>
           <div className="smm-header-actions">
-            {selectedTimeline && <button className="smm-secondary-button" onClick={downloadPdf}>Download PDF</button>}
             {selectedTimeline && canManage && <button className="smm-secondary-button" onClick={shareTimeline} disabled={saving}>Share</button>}
-            {canManage && <button className="smm-primary-button" onClick={() => setClientModalOpen(true)}>New Client</button>}
+            {selectedClient && canManage && <button className="smm-delete-client" onClick={deleteClient} disabled={saving}>Delete Client</button>}
+            {canManage && <button className="smm-primary-button" onClick={() => setClientModalOpen(true)}>Add Client</button>}
           </div>
         </div>
 
@@ -442,36 +432,39 @@ function SmmTimeline() {
           <>
             <section className="smm-summary">
               <div><span>CLIENT</span><strong>{selectedClient.name}</strong></div>
-              <div><span>PERIOD</span><strong>{MONTHS[selectedMonth - 1]} {selectedYear}</strong></div>
-              <div><span>STATUS</span><select value={selectedTimeline.status} disabled={!canManage} onChange={(event) => updateTimelineStatus(event.target.value)}>{["Draft", "Active", "Completed"].map((value) => <option key={value}>{value}</option>)}</select></div>
-              <div><span>PROGRESS</span><strong>{completed} / {items.length}</strong><small>{items.length ? Math.round((completed / items.length) * 100) : 0}% complete</small></div>
+              <div className="smm-progress-card">
+                <span>PROGRESS</span>
+                <div className="smm-progress-copy"><strong>{progressPercent}%</strong><small>{completed} of {items.length} complete</small></div>
+                <div className="smm-progress-track" role="progressbar" aria-label="Timeline completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}>
+                  <span style={{ width: `${progressPercent}%` }} />
+                </div>
+              </div>
             </section>
 
             <section className="smm-table-card">
               <div className="smm-table-tools">
                 <div>
-                  <select value={platformFilter} onChange={(event) => { setPlatformFilter(event.target.value); setPage(1); }}><option>All</option>{PLATFORMS.map((value) => <option key={value}>{value}</option>)}</select>
-                  <select value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }}><option>All</option>{STATUSES.map((value) => <option key={value}>{value}</option>)}</select>
+                  <select aria-label="Filter by progress" value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }}><option value="All">All statuses</option>{STATUSES.map((value) => <option key={value}>{value}</option>)}</select>
                 </div>
                 <span className="smm-save-state">{saveState}</span>
                 {canManage && <button className="smm-primary-button" onClick={addItem} disabled={saving}>+ Add Content</button>}
               </div>
               <div className="smm-table-wrap">
                 <table>
-                  <thead><tr><th>No</th><th>Content</th><th>Materials</th><th>Reference</th><th>Platform</th><th>Format</th><th>Status</th><th>Schedule</th><th>Notes</th>{canManage && <th>Actions</th>}</tr></thead>
+                  <thead><tr><th>No</th><th>Content</th><th>Materials</th><th>Reference</th><th>Platform</th><th>Format</th><th>Status</th><th>Schedule</th>{canManage && <th>Actions</th>}</tr></thead>
                   <tbody>
-                    {visibleItems.length === 0 ? <tr><td colSpan={canManage ? 10 : 9} className="smm-no-rows">No content found.</td></tr> : visibleItems.map((item) => {
+                    {visibleItems.length === 0 ? <tr><td colSpan={canManage ? 9 : 8} className="smm-no-rows">No content found.</td></tr> : visibleItems.map((item) => {
                       const absoluteIndex = items.findIndex((row) => row.id === item.id);
                       return <tr key={item.id}>
-                        <td>{absoluteIndex + 1}</td>
-                        {["content", "materials"].map((field) => <td key={field}><textarea value={item[field] || ""} disabled={!canManage} onChange={(event) => updateItem(item.id, field, event.target.value)} onBlur={() => saveItem.current?.flush()} /></td>)}
-                        <td><input type="url" value={item.reference || ""} disabled={!canManage} placeholder="https://" onChange={(event) => updateItem(item.id, "reference", event.target.value)} onBlur={() => saveItem.current?.flush()} />{item.reference && <a href={item.reference} target="_blank" rel="noreferrer">Open</a>}</td>
-                        <td><MultiCheckbox label="Platform" options={PLATFORMS} value={item.platforms} onChange={(value) => updateItemAndSave(item.id, "platforms", value)} /></td>
-                        <td><MultiCheckbox label="Format" options={FORMATS} value={item.formats} onChange={(value) => updateItemAndSave(item.id, "formats", value)} /></td>
-                        <td><select className="smm-status" value={item.status} onChange={(event) => updateItemAndSave(item.id, "status", event.target.value)}>{STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
-                        <td><input type="date" value={item.schedule_date || ""} onChange={(event) => updateItemAndSave(item.id, "schedule_date", event.target.value || null)} /></td>
-                        <td><textarea value={item.notes || ""} disabled={!canManage} onChange={(event) => updateItem(item.id, "notes", event.target.value)} onBlur={() => saveItem.current?.flush()} /></td>
-                        {canManage && <td><div className="smm-row-actions"><button title="Move up" disabled={absoluteIndex === 0} onClick={() => moveItem(absoluteIndex, -1)}>↑</button><button title="Move down" disabled={absoluteIndex === items.length - 1} onClick={() => moveItem(absoluteIndex, 1)}>↓</button><button title="Duplicate" onClick={() => duplicateItem(item)}>+</button><button className="danger" title="Delete" onClick={() => deleteItem(item)}>×</button></div></td>}
+                        <td data-label="No">{absoluteIndex + 1}</td>
+                        <td data-label="Content"><textarea value={item.content || ""} disabled={!canManage} onChange={(event) => updateItem(item.id, "content", event.target.value)} onBlur={() => saveItem.current?.flush()} /></td>
+                        <td data-label="Materials"><textarea value={item.materials || ""} disabled={!canManage} onChange={(event) => updateItem(item.id, "materials", event.target.value)} onBlur={() => saveItem.current?.flush()} /></td>
+                        <td data-label="Reference"><input type="url" value={item.reference || ""} disabled={!canManage} placeholder="https://" onChange={(event) => updateItem(item.id, "reference", event.target.value)} onBlur={() => saveItem.current?.flush()} />{item.reference && <a href={item.reference} target="_blank" rel="noreferrer">Open</a>}</td>
+                        <td data-label="Platform"><MultiCheckbox label="Platform" options={PLATFORMS} value={item.platforms} onChange={(value) => updateItemAndSave(item.id, "platforms", value)} /></td>
+                        <td data-label="Format"><MultiCheckbox label="Format" options={FORMATS} value={item.formats} onChange={(value) => updateItemAndSave(item.id, "formats", value)} /></td>
+                        <td data-label="Status"><select className="smm-status" value={item.status} onChange={(event) => updateItemAndSave(item.id, "status", event.target.value)}>{STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
+                        <td data-label="Schedule"><input type="date" value={item.schedule_date || ""} onChange={(event) => updateItemAndSave(item.id, "schedule_date", event.target.value || null)} /></td>
+                        {canManage && <td data-label="Actions"><div className="smm-row-actions"><button title="Move up" disabled={absoluteIndex === 0} onClick={() => moveItem(absoluteIndex, -1)}>↑</button><button title="Move down" disabled={absoluteIndex === items.length - 1} onClick={() => moveItem(absoluteIndex, 1)}>↓</button><button title="Duplicate" onClick={() => duplicateItem(item)}>+</button><button className="danger" title="Delete" onClick={() => deleteItem(item)}>×</button></div></td>}
                       </tr>;
                     })}
                   </tbody>
@@ -490,7 +483,7 @@ function SmmTimeline() {
 
       {clientModalOpen && <div className="smm-overlay" onMouseDown={(event) => event.target === event.currentTarget && setClientModalOpen(false)}>
         <form className="smm-modal" onSubmit={createClient}>
-          <header><div><span>CLIENT MANAGEMENT</span><h2>New Client</h2></div><button type="button" onClick={() => setClientModalOpen(false)}>×</button></header>
+          <header><div><span>CLIENT MANAGEMENT</span><h2>Add Client</h2></div><button type="button" onClick={() => setClientModalOpen(false)}>×</button></header>
           <label>Client Name<input autoFocus value={clientName} onChange={(event) => setClientName(event.target.value)} required placeholder="Company or brand name" /></label>
           <footer><button type="button" className="smm-secondary-button" onClick={() => setClientModalOpen(false)}>Cancel</button><button className="smm-primary-button" disabled={saving}>Add Client</button></footer>
         </form>
