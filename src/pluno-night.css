@@ -348,8 +348,7 @@ table strong, .booking-customer-name, .customer-name, .employee-name,
 .calendar-day { color: #8f9197 !important; background: #111214 !important; border-color: #232529 !important; }
 .calendar-day:hover { background: #17181b !important; }
 .calendar-date { color: #777a80 !important; }
-.calendar-booking { color: #d4d1a0 !important; background: rgba(185,181,119,.09) !important; border-color: rgba(185,181,119,.14) !important; }
-.calendar-more { color: #7b7e84 !important; }
+.calendar-booking-dots { color: #d4d4d7 !important; }
 
 /* Revenue trend chart */
 .revenue-card { min-width: 0; overflow: visible !important; }
@@ -455,6 +454,19 @@ table strong, .booking-customer-name, .customer-name, .employee-name,
   color: #b6b7b4 !important;
   background: #1a1b1e !important;
   border-color: #292b2f !important;
+}
+.dashboard-schedule-detail-grid > div,
+.dashboard-schedule-notes {
+  background: #1b1c1f !important;
+  border-color: #303237 !important;
+}
+.dashboard-schedule-detail-grid strong,
+.dashboard-schedule-notes p {
+  color: #f4f4f1 !important;
+}
+.dashboard-schedule-detail-grid span,
+.dashboard-schedule-notes > span {
+  color: #b7b8bc !important;
 }
 .booking-form-footer, .customer-form-footer, .spending-form-footer,
 .bookkeeping-modal-footer, .employee-form-footer, .gallery-modal-actions,
@@ -720,8 +732,15 @@ table strong, .booking-customer-name, .customer-name, .employee-name,
 }
 
 #root .booking-calendar-card .calendar-day {
-  min-height: 58px !important;
-  padding: 5px !important;
+  min-height: 62px !important;
+  padding: 8px 5px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
+  background: #18191c !important;
+  border: 1px solid #27292d !important;
+  border-radius: 8px !important;
 }
 
 #root .booking-calendar-card .calendar-date {
@@ -729,18 +748,35 @@ table strong, .booking-customer-name, .customer-name, .employee-name,
   line-height: 1 !important;
 }
 
-#root .booking-calendar-card .calendar-booking {
-  margin-top: 4px !important;
-  padding: 4px 5px !important;
-  border-radius: 3px !important;
-  font-size: 9px !important;
-  line-height: 1.15 !important;
+#root .booking-calendar-card .calendar-day:not(.has-booking) {
+  color: #74777d !important;
+  background: #141517 !important;
 }
 
-#root .booking-calendar-card .calendar-more {
-  margin-top: 3px !important;
-  font-size: 9px !important;
-  line-height: 1 !important;
+#root .booking-calendar-card .calendar-day.has-booking {
+  color: #ededeb !important;
+  background: #242529 !important;
+  border-color: #3b3d42 !important;
+  cursor: pointer !important;
+}
+
+#root .booking-calendar-card .calendar-day.has-booking:hover {
+  background: #2b2c30 !important;
+  border-color: #4a4c52 !important;
+}
+
+#root .booking-calendar-card .calendar-day.today {
+  box-shadow: inset 0 0 0 1px #6c6e74 !important;
+}
+
+#root .booking-calendar-card .calendar-booking-dots {
+  margin-top: 9px !important;
+}
+
+#root .booking-calendar-card .calendar-booking-dots span {
+  width: 4px !important;
+  height: 4px !important;
+  background: #d8d8d5 !important;
 }
 
 @media (max-width: 760px) {
@@ -750,13 +786,30 @@ table strong, .booking-customer-name, .customer-name, .employee-name,
   }
 
   #root .booking-calendar-card .calendar-day {
-    min-height: 52px !important;
+    min-height: 46px !important;
     padding: 4px !important;
   }
 
-  #root .booking-calendar-card .calendar-booking {
-    padding: 3px 4px !important;
-    font-size: 8.5px !important;
+  #root .booking-calendar-card .calendar-booking-dots {
+    margin-top: 7px !important;
+  }
+}
+
+/* Spending and bookkeeping use high-contrast text throughout the internal UI. */
+@media screen {
+  #root .spending-page :is(h1, h2, h3, h4, p, span, strong, small, label, th, td),
+  #root .bookkeeping-page :is(h1, h2, h3, h4, p, span, strong, small, label, th, td) {
+    color: #f4f4f5 !important;
+  }
+
+  #root .spending-page :is(input, select, textarea, button),
+  #root .bookkeeping-page :is(input, select, textarea, button) {
+    color: #f4f4f5 !important;
+  }
+
+  #root .spending-page :is(input, textarea)::placeholder,
+  #root .bookkeeping-page :is(input, textarea)::placeholder {
+    color: #c4c4c8 !important;
   }
 }
 
@@ -887,7 +940,6 @@ button:hover, .btn:hover, .button:hover,
   --gallery-olive: #a4a4a8;
   --gallery-olive-soft: rgba(164,164,168,.1);
 }
-.calendar-booking { color: #d4d4d7 !important; background: #242427 !important; border-color: #3b3b40 !important; }
 .legend-current, .legend-comparison { background: #c7c7cb !important; }
 .legend-comparison { background: none !important; border-color: #69696f !important; }
 .trend-line-current { stroke: #d0d0d3 !important; filter: none !important; }

@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../supabase";
-import { getSocialSummary, isSocialApiConfigured } from "../lib/socialApi";
 import PortalIcon from "./PortalIcon";
 import "./Sidebar.css";
 
@@ -10,7 +9,6 @@ function Sidebar({ activePage }) {
   const employeeRole = localStorage.getItem("employeeRole") || "Staff";
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [socialBadge, setSocialBadge] = useState(0);
 
   const closeMobileSidebar = () => {
     setSidebarOpen(false);
@@ -31,43 +29,6 @@ function Sidebar({ activePage }) {
 
   const isOperational =
     employeeRole === "Founder" || employeeRole === "Administrator";
-
-  useEffect(() => {
-    if (!isOperational || !isSocialApiConfigured()) {
-      return undefined;
-    }
-
-    let active = true;
-
-    const loadBadge = async () => {
-      try {
-        const summary = await getSocialSummary();
-
-        if (active) {
-          setSocialBadge(Number(summary?.counts?.need_reply || 0));
-        }
-      } catch {
-        if (active) {
-          setSocialBadge(0);
-        }
-      }
-    };
-
-    const handleInboxUpdate = () => {
-      void loadBadge();
-    };
-
-    void loadBadge();
-
-    const intervalId = window.setInterval(loadBadge, 60000);
-    window.addEventListener("social-inbox-updated", handleInboxUpdate);
-
-    return () => {
-      active = false;
-      window.clearInterval(intervalId);
-      window.removeEventListener("social-inbox-updated", handleInboxUpdate);
-    };
-  }, [isOperational]);
 
   return (
     <>
@@ -123,34 +84,6 @@ function Sidebar({ activePage }) {
               <PortalIcon name="booking" />
               Booking List
             </Link>
-
-            <Link
-              to="/galleries"
-              className={`dashboard-nav-item ${isActive("galleries")}`}
-              onClick={closeMobileSidebar}
-            >
-              <PortalIcon name="gallery" />
-              Client Gallery
-            </Link>
-
-            {isOperational && (
-              <Link
-                to="/social-media"
-                className={`dashboard-nav-item ${isActive("social-media")}`}
-                onClick={closeMobileSidebar}
-              >
-                <PortalIcon name="social" />
-                <span className="dashboard-nav-label">Social Media</span>
-                {socialBadge > 0 && (
-                  <span
-                    className="dashboard-nav-badge"
-                    aria-label={`${socialBadge} komentar perlu dibalas`}
-                  >
-                    {socialBadge > 99 ? "99+" : socialBadge}
-                  </span>
-                )}
-              </Link>
-            )}
 
             {isOperational && (
               <div className="dashboard-nav-section second">FINANCE</div>
@@ -214,6 +147,17 @@ function Sidebar({ activePage }) {
               >
                 <PortalIcon name="timeline" />
                 Timeline
+              </Link>
+            )}
+
+            {isOperational && (
+              <Link
+                to="/smm-invoice"
+                className={`dashboard-nav-item ${isActive("smm-invoice")}`}
+                onClick={closeMobileSidebar}
+              >
+                <PortalIcon name="invoice" />
+                Invoice
               </Link>
             )}
 

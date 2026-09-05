@@ -1707,19 +1707,24 @@ function Dashboard() {
                             ? "has-booking"
                             : ""
                         } ${
-                          day
+                          dayBookings.length
                             ? "calendar-day-clickable"
                             : ""
                         }`}
-                        role={day ? "button" : undefined}
-                        tabIndex={day ? 0 : undefined}
+                        role={dayBookings.length ? "button" : undefined}
+                        tabIndex={dayBookings.length ? 0 : undefined}
+                        aria-label={
+                          dayBookings.length
+                            ? `${formatScheduleDate(day)}, ${dayBookings.length} booking${dayBookings.length > 1 ? "s" : ""}`
+                            : undefined
+                        }
                         onClick={() => {
-                          if (!day) return;
+                          if (!day || !dayBookings.length) return;
                           setSelectedScheduleDay(day);
                           setSelectedScheduleBooking(null);
                         }}
                         onKeyDown={(event) => {
-                          if (!day) return;
+                          if (!day || !dayBookings.length) return;
                           if (event.key === "Enter" || event.key === " ") {
                             event.preventDefault();
                             setSelectedScheduleDay(day);
@@ -1739,63 +1744,15 @@ function Dashboard() {
                             </div>
 
 
-                            {dayBookings
-                              .slice(
-                                0,
-                                2
-                              )
-                              .map(
-                                (
-                                  booking,
-                                  bookingIndex
-                                ) => (
-
-                                  <div
-                                    className="calendar-booking"
-                                    key={
-                                      booking.id ||
-                                      bookingIndex
-                                    }
-                                  >
-
-                                    {
-                                      booking.start_time
-                                        ? booking.start_time.substring(
-                                            0,
-                                            5
-                                          )
-                                        : "--:--"
-                                    }
-
-                                    {" - "}
-
-                                    {
-                                      booking.package ||
-                                      "Booking"
-                                    }
-
-                                  </div>
-
-                                )
-                              )}
-
-
-                            {dayBookings.length >
-                              2 && (
-
-                              <div className="calendar-more">
-
-                                +
-
-                                {
-                                  dayBookings.length -
-                                  2
-                                }{" "}
-
-                                more
-
+                            {dayBookings.length > 0 && (
+                              <div
+                                className="calendar-booking-dots"
+                                aria-hidden="true"
+                              >
+                                {dayBookings.slice(0, 3).map((booking, bookingIndex) => (
+                                  <span key={booking.id || bookingIndex} />
+                                ))}
                               </div>
-
                             )}
 
                           </>
@@ -1843,6 +1800,9 @@ function Dashboard() {
                     BOOKING SCHEDULE
                   </div>
                   <h3>{formatScheduleDate(selectedScheduleDay)}</h3>
+                  <p className="dashboard-schedule-count">
+                    {selectedScheduleBookings.length} booking{selectedScheduleBookings.length === 1 ? "" : "s"}
+                  </p>
                 </div>
 
                 <button
@@ -1875,7 +1835,13 @@ function Dashboard() {
                       >
                         <div className="dashboard-schedule-copy">
                           <strong>{booking.customer_name || "Unnamed Customer"}</strong>
-                          <span>{booking.package || "Booking"}</span>
+                          <span>
+                            {booking.start_time
+                              ? booking.start_time.substring(0, 5)
+                              : "--:--"}
+                            {" · "}
+                            {booking.package || "Booking"}
+                          </span>
                         </div>
 
                         <button

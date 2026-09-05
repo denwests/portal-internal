@@ -106,12 +106,14 @@
   display:grid;
   grid-template-columns:minmax(360px,.78fr) minmax(610px,1.35fr);
   gap:13px;
-  align-items:start;
+  align-items:stretch;
 }
 
 .dashboard-left-stack{
   min-width:0;
+  height:100%;
   display:grid;
+  grid-template-rows:auto 1fr;
   gap:13px;
 }
 
@@ -272,7 +274,13 @@
 .booking-calendar-card{
   position:sticky;
   top:22px;
+  height:100%;
   min-height:485px;
+}
+
+.revenue-card{
+  height:100%;
+  box-sizing:border-box;
 }
 
 .booking-calendar-card .dashboard-card-header{
@@ -331,24 +339,20 @@
 .calendar-grid{
   display:grid;
   grid-template-columns:repeat(7,minmax(0,1fr));
-
+  gap:6px;
+  padding:8px;
   background:var(--surface);
 }
 
 .calendar-day{
   min-width:0;
-  min-height:100px;
-  padding:7px;
+  min-height:72px;
+  padding:9px 7px;
 
   color:#686a61;
-  background:#fffefa;
-
-  border-right:1px solid var(--line-soft);
-  border-bottom:1px solid var(--line-soft);
-}
-
-.calendar-day:nth-child(7n){
-  border-right:0;
+  background:var(--surface-soft);
+  border:1px solid var(--line-soft);
+  border-radius:8px;
 }
 
 .calendar-day.today{
@@ -356,39 +360,33 @@
 }
 
 .calendar-day.has-booking{
-  background:#fdfcf7;
+  background:var(--surface-muted);
 }
 
 .calendar-date{
-  font-size:9px;
+  font-size:11px;
+  line-height:1;
 }
 
-.calendar-booking{
-  margin-top:6px;
-  padding:6px 7px;
-
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-
-  color:#484827;
-  background:#ebe9dc;
-
-  border-left:2px solid var(--pluno);
-  border-radius:4px;
-
-  font-size:8px;
+.calendar-booking-dots{
+  margin-top:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
 }
 
-.calendar-more{
-  margin-top:4px;
-  color:#8b8d84;
-  font-size:7px;
+.calendar-booking-dots span{
+  width:5px;
+  height:5px;
+  display:block;
+  background:currentColor;
+  border-radius:50%;
 }
 
 /* Schedule modal */
 .dashboard-schedule-modal{
-  width:min(640px,100%);
+  width:min(800px,100%);
   max-height:86vh;
   overflow:hidden;
 
@@ -401,8 +399,8 @@
 }
 
 .dashboard-schedule-modal-header{
-  min-height:65px;
-  padding:15px 17px;
+  min-height:92px;
+  padding:18px 20px;
 
   display:flex;
   align-items:center;
@@ -416,6 +414,12 @@
   margin:5px 0 0;
   font-size:18px;
   font-weight:500;
+}
+
+.dashboard-schedule-count{
+  margin:5px 0 0;
+  color:var(--text-2);
+  font-size:11px;
 }
 
 .dashboard-schedule-close{
@@ -463,18 +467,21 @@
 }
 
 .dashboard-schedule-detail{
-  padding:17px;
+  padding:20px;
 }
 
 .dashboard-schedule-detail-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:9px;
+  grid-auto-rows:90px;
+  gap:12px;
 }
 
 .dashboard-schedule-detail-grid>div{
-  min-height:72px;
-  padding:12px 13px;
+  min-width:0;
+  height:100%;
+  padding:14px 16px;
+  box-sizing:border-box;
 
   background:var(--surface-soft);
   border:1px solid var(--line-soft);
@@ -485,7 +492,7 @@
 .dashboard-schedule-notes>span{
   display:block;
 
-  color:#96988f;
+  color:#b7b8bc;
 
   font-size:8px;
   font-weight:500;
@@ -496,15 +503,18 @@
   display:block;
   margin-top:6px;
 
-  color:#2c2d27;
+  color:#f4f4f1;
 
   font-size:12px;
   font-weight:500;
 }
 
 .dashboard-schedule-notes{
-  margin-top:9px;
-  padding:12px 13px;
+  width:100%;
+  min-height:74px;
+  margin-top:12px;
+  padding:14px 16px;
+  box-sizing:border-box;
 
   background:#fbfaf6;
   border:1px solid var(--line-soft);
@@ -512,16 +522,16 @@
 }
 
 .dashboard-schedule-notes p{
-  margin:6px 0 0;
+  margin:7px 0 0;
 
-  color:var(--text-2);
+  color:#f4f4f1;
 
-  font-size:10.5px;
+  font-size:12px;
   line-height:1.5;
 }
 
 .dashboard-schedule-detail-footer{
-  margin-top:12px;
+  margin-top:14px;
   display:flex;
   justify-content:flex-end;
 }
@@ -536,7 +546,7 @@
   }
 
   .calendar-day{
-    min-height:90px;
+    min-height:64px;
   }
 }
 
@@ -552,6 +562,7 @@
 
   .dashboard-left-stack{
     grid-template-columns:1fr 1fr;
+    grid-template-rows:auto;
   }
 }
 
@@ -562,6 +573,7 @@
 
   .dashboard-left-stack{
     grid-template-columns:1fr;
+    grid-template-rows:auto;
   }
 }
 
@@ -586,11 +598,22 @@
   }
 
   .calendar-day{
-    min-height:75px;
+    min-height:48px;
+    padding:7px 4px;
+  }
+
+  .calendar-grid{
+    gap:4px;
+    padding:6px;
+  }
+
+  .calendar-booking-dots{
+    margin-top:8px;
   }
 
   .dashboard-schedule-detail-grid{
     grid-template-columns:1fr;
+    grid-auto-rows:minmax(78px,auto);
   }
 }
 
@@ -627,11 +650,6 @@
 .calendar-date{
   font-size:var(--fs-micro)!important;
 }
-
-.calendar-booking{
-  font-size:var(--fs-micro)!important;
-}
-
 
 /* ============================================================
    V9 — ADD NOTE MODAL

@@ -56,3 +56,73 @@ Known follow-up: existing React-hook lint findings and mobile/live-data QA.
 ## Apply before committing
 
 Back up your current checkout and review local edits first. Extract this package without overwriting .git or private environment files. Remove the obsolete source paths listed above from the destination too if overlay-copying the archive, since extraction does not delete old files. Run npm ci, build, and tests, inspect git diff, then commit only the intended source changes. The ZIP contains no node_modules, dist, private secrets, or Git metadata.
+
+## SMM Invoice update - 2026-09-05
+
+- Added the protected **Social Media Management > Invoice** page below Timeline.
+- Added configurable Vanguena title, service, price, information, and payment defaults without a parent-brand label or mandatory billing period.
+- Added invoice generation from active SMM clients, immutable invoice snapshots, generated timestamps, preview, and PDF download.
+- Added responsive desktop-table and mobile-card layouts with dark neutral panels and no decorative logo, yellow accent, or gradient.
+- Added `supabase/smm-invoice.sql` with monthly invoice numbering, indexes, explicit grants, and Founder/Administrator RLS policies.
+- Added an invoice regression suite. Root tests now pass 24/24 and Worker tests pass 3/3.
+- Production build and targeted lint for all Invoice integration files pass. Full source lint still reports five pre-existing React effect findings in ClientGallery, Employee, GalleryManager, Spending, and Transactions; no lint rule was disabled.
+
+Suggested commit:
+
+```text
+feat(smm): add invoice generator and PDF archive
+```
+
+Reason:
+
+```text
+Add a protected SMM invoice workspace with reusable defaults, active-client
+selection, immutable invoice history, monthly invoice IDs, and a consistent
+print-ready Vanguena PDF. Include responsive layouts, role-based Supabase RLS,
+setup guidance, and regression coverage without changing existing portal data.
+```
+
+## Dashboard calendar update - 2026-09-05
+
+- Replaced booking text blocks inside calendar cells with compact booking dots.
+- Kept every date cell at a consistent height so busy dates no longer stretch the calendar grid.
+- Limited interaction to dates containing bookings and retained keyboard-accessible opening behavior.
+- Reused the existing overlay for the selected day's booking list, now with booking count, time, package, and detail view.
+- Added compact desktop and mobile sizing plus regression coverage for the dot-and-overlay behavior.
+
+Suggested commit:
+
+```text
+feat(dashboard): redesign booking calendar with day indicators
+```
+
+### Booking detail polish
+
+- Changed Customer, Package, Time, Status, and Description values to high-contrast white.
+- Standardized the four information cards to equal 90px rows, 12px gaps, and identical internal padding.
+- Aligned the Description card and Back action to the same content width and spacing system.
+- Preserved a single-column mobile layout with consistent minimum card heights.
+
+## Alignment, navigation, contrast, and invoice deletion - 2026-09-05
+
+- Stretched the two lower Dashboard columns to one shared height so Monthly Revenue and Booking Schedule finish on the same bottom edge on desktop.
+- Removed Client Gallery and Social Media from the sidebar only. Their routes and stored data remain intact to avoid destructive changes.
+- Applied high-contrast white text throughout the Spending and Bookkeeping interfaces while keeping PDF/print output ink-friendly.
+- Added a red, compact Delete action to generated invoices with an explicit confirmation dialog and immediate list/summary refresh.
+- Extended `supabase/smm-invoice.sql` with the explicit DELETE grant and Founder/Administrator RLS policy. Existing installations must run this SQL file again.
+- Validation: production build passed, targeted lint passed, 29 root tests passed, 3 Worker tests passed, and `git diff --check` passed.
+
+Suggested commit:
+
+```text
+fix(ui): align dashboard and add safe invoice deletion
+```
+
+Reason:
+
+```text
+Align the Dashboard lower cards, simplify sidebar navigation, and improve
+financial-page text contrast. Add confirmed invoice deletion with an explicit
+Supabase grant and role-based RLS policy while preserving hidden routes and
+all existing client, social, and financial data.
+```

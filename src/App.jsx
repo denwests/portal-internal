@@ -19,6 +19,7 @@ import Employee from "./pages/Employee";
 import Documents from "./pages/Documents";
 import SocialMedia from "./pages/SocialMedia";
 import SmmTimeline from "./pages/SmmTimeline";
+import SmmInvoice from "./pages/SmmInvoice";
 import SharedTimeline from "./pages/SharedTimeline";
 
 import GalleryManager from "./pages/GalleryManager";
@@ -224,6 +225,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={OPERATIONAL_ROLES}>
               <SmmTimeline />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/smm-invoice"
+          element={
+            <ProtectedRoute allowedRoles={OPERATIONAL_ROLES}>
+              <SmmInvoice />
             </ProtectedRoute>
           }
         />

@@ -16,12 +16,12 @@ test("sidebar keeps final order and hides operational sections from Staff", asyn
   const labels = [
     "Dashboard",
     "Booking List",
-    "Client Gallery",
-    "Social Media",
     "Transactions",
     "Customer Data",
     "Spending",
     "Bookkeeping",
+    "Timeline",
+    "Invoice",
   ];
   let previous = -1;
 
@@ -31,7 +31,8 @@ test("sidebar keeps final order and hides operational sections from Staff", asyn
     previous = position;
   }
 
-  assert.match(sidebar, /isOperational[\s\S]*?to="\/social-media"/);
+  assert.doesNotMatch(sidebar, /to="\/galleries"/);
+  assert.doesNotMatch(sidebar, /to="\/social-media"/);
 });
 
 test("social inbox uses ten rows per page", async () => {
