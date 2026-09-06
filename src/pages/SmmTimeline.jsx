@@ -16,6 +16,9 @@ function timelineErrorMessage(error, fallback = "Unable to save timeline changes
   if (error?.message?.includes("smm_timeline_items_platforms_check")) {
     return "The Other platform requires the included Supabase platform update before it can be saved.";
   }
+  if (error?.code === "PGRST202" || error?.message?.includes("delete_smm_client") || error?.message?.includes("create_smm_client_timeline")) {
+    return "SMM client management is not ready. Run the latest supabase/smm-timeline-client-delete.sql in the Supabase SQL Editor, then reload this page.";
+  }
   return error?.message || fallback;
 }
 
@@ -86,10 +89,11 @@ function MultiCheckbox({ options, value, onChange, label }) {
   }, [open]);
 
   return <div className="smm-multi-select">
-    <button ref={buttonRef} type="button" className="smm-multi-trigger" aria-label={label} aria-expanded={open} onClick={toggleMenu}>
+    <button ref={buttonRef} type="button" className="smm-multi-trigger smm-timeline-control" aria-label={label} aria-expanded={open} onClick={toggleMenu}>
       <span className="smm-multi-tags">
         {selected.length ? <span className="smm-multi-value">{selected.join(", ")}</span> : <span className="placeholder">Select</span>}
       </span>
+      <span className="smm-control-chevron" aria-hidden="true">⌄</span>
     </button>
     {open && createPortal(<div ref={menuRef} className="smm-multi-menu" style={menuStyle}>
       {options.map((option) => <label key={option}>
@@ -127,6 +131,7 @@ function SmmTimeline() {
   const [page, setPage] = useState(1);
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [clientName, setClientName] = useState("");
+  const [clientError, setClientError] = useState("");
   const periodRequestRef = useRef("");
 
   const selectedTimeline = timelines.find((timeline) => timeline.id === selectedId);
@@ -309,50 +314,67 @@ function SmmTimeline() {
     const name = clientName.trim();
     if (!name) return;
     setSaving(true);
+    setClientError("");
     setError("");
-    const { data: client, error: clientError } = await supabase.from("smm_clients").insert({ name, created_by: employeeId }).select().single();
-    if (clientError) {
-      setError(clientError.message);
+
+    const { data: result, error: createError } = await supabase.rpc("create_smm_client_timeline", {
+      target_client_name: name,
+    });
+
+    if (createError || !result?.client || !result?.timeline) {
+      setClientError(timelineErrorMessage(createError, "Unable to add this client."));
       setSaving(false);
       return;
     }
-    const { data: timeline, error: timelineError } = await supabase.from("smm_timelines").insert({ client_id: client.id, month: now.getMonth() + 1, year: now.getFullYear(), status: "Draft", created_by: employeeId }).select().single();
-    if (timelineError) setError(timelineError.message);
-    else {
-      setClients((current) => [...current, client].sort((a, b) => a.name.localeCompare(b.name)));
-      setTimelines((current) => [timeline, ...current]);
-      setSelectedClientId(client.id);
-      setSelectedMonth(now.getMonth() + 1);
-      setSelectedYear(now.getFullYear());
-      setSelectedId(timeline.id);
-      periodRequestRef.current = `${client.id}-${now.getFullYear()}-${now.getMonth() + 1}`;
-      setClientName("");
-      setClientModalOpen(false);
-      setNotice("Client dan timeline bulan berjalan berhasil dibuat.");
+
+    const client = result.client;
+    const timeline = result.timeline;
+    const currentMonth = Number(timeline.month);
+    const currentYear = Number(timeline.year);
+
+    setClients((current) => [...current.filter((item) => item.id !== client.id), client].sort((a, b) => a.name.localeCompare(b.name)));
+    setTimelines((current) => [timeline, ...current.filter((item) => item.id !== timeline.id)]);
+    setSelectedClientId(client.id);
+    setSelectedMonth(currentMonth);
+    setSelectedYear(currentYear);
+    setSelectedId(timeline.id);
+    periodRequestRef.current = `${client.id}-${currentYear}-${currentMonth}`;
+    setClientName("");
+    setClientModalOpen(false);
+    if (result.reset) {
+      setNotice(`${client.name} was recreated from zero with a new Timeline.`);
+    } else if (result.reused) {
+      setNotice(`${client.name} already exists and has been selected.`);
+    } else {
+      setNotice("Client and the current timeline were added.");
     }
     setSaving(false);
   };
 
   const deleteClient = async () => {
     if (!canManage || !selectedClient) return;
-    const confirmed = window.confirm(`Delete ${selectedClient.name} from active clients? Existing timeline data will be preserved.`);
+    const clientNameToDelete = selectedClient.name;
+    const confirmed = window.confirm(`Delete ${clientNameToDelete} permanently? All Timeline content, schedules, and shared links for this client will be deleted. Invoice snapshots will remain.`);
     if (!confirmed) return;
     setSaving(true);
     setError("");
-    const { error: deleteError } = await supabase.from("smm_clients").update({ active: false }).eq("id", selectedClient.id);
+    const { error: deleteError } = await supabase.rpc("delete_smm_client", {
+      target_client_id: selectedClient.id,
+    });
     if (deleteError) {
-      setError(deleteError.message);
+      setError(timelineErrorMessage(deleteError, "Unable to delete this client."));
       setSaving(false);
       return;
     }
     const remainingClients = clients.filter((client) => client.id !== selectedClient.id);
+    setTimelines((current) => current.filter((timeline) => timeline.client_id !== selectedClient.id));
     setClients(remainingClients);
     setSelectedClientId(remainingClients[0]?.id || "");
     setSelectedId("");
     setItems([]);
     setPage(1);
     periodRequestRef.current = "";
-    setNotice("Client removed from active clients. Existing timeline data was preserved.");
+    setNotice(`${clientNameToDelete} and all Timeline data were permanently deleted.`);
     setSaving(false);
   };
 
@@ -421,7 +443,7 @@ function SmmTimeline() {
           <div className="smm-header-actions">
             {selectedTimeline && canManage && <button className="smm-secondary-button" onClick={shareTimeline} disabled={saving}>Share</button>}
             {selectedClient && canManage && <button className="smm-delete-client" onClick={deleteClient} disabled={saving}>Delete Client</button>}
-            {canManage && <button className="smm-primary-button" onClick={() => setClientModalOpen(true)}>Add Client</button>}
+            {canManage && <button className="smm-primary-button" onClick={() => { setClientError(""); setClientName(""); setClientModalOpen(true); }}>Add Client</button>}
           </div>
         </div>
 
@@ -459,11 +481,11 @@ function SmmTimeline() {
                         <td data-label="No">{absoluteIndex + 1}</td>
                         <td data-label="Content"><textarea value={item.content || ""} disabled={!canManage} onChange={(event) => updateItem(item.id, "content", event.target.value)} onBlur={() => saveItem.current?.flush()} /></td>
                         <td data-label="Materials"><textarea value={item.materials || ""} disabled={!canManage} onChange={(event) => updateItem(item.id, "materials", event.target.value)} onBlur={() => saveItem.current?.flush()} /></td>
-                        <td data-label="Reference"><input type="url" value={item.reference || ""} disabled={!canManage} placeholder="https://" onChange={(event) => updateItem(item.id, "reference", event.target.value)} onBlur={() => saveItem.current?.flush()} />{item.reference && <a href={item.reference} target="_blank" rel="noreferrer">Open</a>}</td>
-                        <td data-label="Platform"><MultiCheckbox label="Platform" options={PLATFORMS} value={item.platforms} onChange={(value) => updateItemAndSave(item.id, "platforms", value)} /></td>
-                        <td data-label="Format"><MultiCheckbox label="Format" options={FORMATS} value={item.formats} onChange={(value) => updateItemAndSave(item.id, "formats", value)} /></td>
-                        <td data-label="Status"><select className="smm-status" value={item.status} onChange={(event) => updateItemAndSave(item.id, "status", event.target.value)}>{STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
-                        <td data-label="Schedule"><input type="date" value={item.schedule_date || ""} onChange={(event) => updateItemAndSave(item.id, "schedule_date", event.target.value || null)} /></td>
+                        <td data-label="Reference" className="smm-control-cell"><div className="smm-reference-control"><input className="smm-timeline-control" aria-label="Content reference" type="url" value={item.reference || ""} disabled={!canManage} placeholder="Paste URL" onChange={(event) => updateItem(item.id, "reference", event.target.value)} onBlur={() => saveItem.current?.flush()} />{item.reference && <a href={item.reference} target="_blank" rel="noreferrer" aria-label="Open content reference">Open</a>}</div></td>
+                        <td data-label="Platform" className="smm-control-cell"><MultiCheckbox label="Platform" options={PLATFORMS} value={item.platforms} onChange={(value) => updateItemAndSave(item.id, "platforms", value)} /></td>
+                        <td data-label="Format" className="smm-control-cell"><MultiCheckbox label="Format" options={FORMATS} value={item.formats} onChange={(value) => updateItemAndSave(item.id, "formats", value)} /></td>
+                        <td data-label="Status" className="smm-control-cell"><select className="smm-status smm-timeline-control" data-status={item.status} aria-label="Content status" value={item.status} onChange={(event) => updateItemAndSave(item.id, "status", event.target.value)}>{STATUSES.map((value) => <option key={value}>{value}</option>)}</select></td>
+                        <td data-label="Schedule" className="smm-control-cell"><input className="smm-schedule-control smm-timeline-control" aria-label="Content schedule" type="date" value={item.schedule_date || ""} onChange={(event) => updateItemAndSave(item.id, "schedule_date", event.target.value || null)} /></td>
                         {canManage && <td data-label="Actions"><div className="smm-row-actions"><button title="Move up" disabled={absoluteIndex === 0} onClick={() => moveItem(absoluteIndex, -1)}>↑</button><button title="Move down" disabled={absoluteIndex === items.length - 1} onClick={() => moveItem(absoluteIndex, 1)}>↓</button><button title="Duplicate" onClick={() => duplicateItem(item)}>+</button><button className="danger" title="Delete" onClick={() => deleteItem(item)}>×</button></div></td>}
                       </tr>;
                     })}
@@ -481,11 +503,15 @@ function SmmTimeline() {
         <footer className="smm-footer">PLUNO STUDIO · INTERNAL PORTAL <span>{role}</span></footer>
       </main>
 
-      {clientModalOpen && <div className="smm-overlay" onMouseDown={(event) => event.target === event.currentTarget && setClientModalOpen(false)}>
-        <form className="smm-modal" onSubmit={createClient}>
-          <header><div><span>CLIENT MANAGEMENT</span><h2>Add Client</h2></div><button type="button" onClick={() => setClientModalOpen(false)}>×</button></header>
-          <label>Client Name<input autoFocus value={clientName} onChange={(event) => setClientName(event.target.value)} required placeholder="Company or brand name" /></label>
-          <footer><button type="button" className="smm-secondary-button" onClick={() => setClientModalOpen(false)}>Cancel</button><button className="smm-primary-button" disabled={saving}>Add Client</button></footer>
+      {clientModalOpen && <div className="smm-overlay" onMouseDown={(event) => event.target === event.currentTarget && !saving && setClientModalOpen(false)}>
+        <form className="smm-modal smm-client-modal" onSubmit={createClient} role="dialog" aria-modal="true" aria-labelledby="smm-add-client-title">
+          <header><div><span>CLIENT MANAGEMENT</span><h2 id="smm-add-client-title">Add Client</h2><p>Add a brand or company to the active timeline workspace.</p></div><button type="button" className="smm-modal-close" aria-label="Close" disabled={saving} onClick={() => setClientModalOpen(false)}>×</button></header>
+          <div className="smm-client-modal-body">
+            <label className="smm-client-field"><span>Client name</span><input autoFocus value={clientName} onChange={(event) => { setClientName(event.target.value); setClientError(""); }} required placeholder="Company or brand name" /></label>
+            <div className="smm-client-period"><span>Initial timeline</span><strong>{MONTHS[now.getMonth()]} {now.getFullYear()}</strong></div>
+            {clientError && <div className="smm-client-form-error" role="alert">{clientError}</div>}
+          </div>
+          <footer><button type="button" className="smm-secondary-button" onClick={() => setClientModalOpen(false)} disabled={saving}>Cancel</button><button type="submit" className="smm-primary-button" disabled={saving}>{saving ? "Adding..." : "Add Client"}</button></footer>
         </form>
       </div>}
     </div>

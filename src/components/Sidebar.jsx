@@ -178,6 +178,17 @@ function Sidebar({ activePage }) {
 
             {employeeRole === "Founder" && (
               <Link
+                to="/employee-payslips"
+                className={`dashboard-nav-item ${isActive("employee-payslips")}`}
+                onClick={closeMobileSidebar}
+              >
+                <PortalIcon name="payslip" />
+                Employee Payslips
+              </Link>
+            )}
+
+            {employeeRole === "Founder" && (
+              <Link
                 to="/documents"
                 className={`dashboard-nav-item ${isActive("documents")}`}
                 onClick={closeMobileSidebar}

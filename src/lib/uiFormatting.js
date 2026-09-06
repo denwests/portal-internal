@@ -25,3 +25,12 @@ export function tryOpenPicker(input) {
     // Embedded browsers may forbid showPicker; native input remains usable.
   }
 }
+
+export function parseGroupedNumberInput(value) {
+  return String(value ?? "").replace(/\D/g, "").replace(/^0+(?=\d)/, "");
+}
+
+export function formatGroupedNumberInput(value) {
+  const digits = parseGroupedNumberInput(value);
+  return digits ? digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "";
+}

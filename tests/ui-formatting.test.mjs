@@ -1,6 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { formatNumericDate, parseMonthValue, tryOpenPicker } from "../src/lib/uiFormatting.js";
+import {
+  formatGroupedNumberInput,
+  formatNumericDate,
+  parseGroupedNumberInput,
+  parseMonthValue,
+  tryOpenPicker,
+} from "../src/lib/uiFormatting.js";
 
 test("numeric dates preserve calendar date without timezone shifts", () => {
   assert.equal(formatNumericDate("2026-09-04"), "04/09/2026");
@@ -24,4 +30,11 @@ test("picker fallback does not crash unsupported or embedded browsers", () => {
   assert.equal(opened, true);
   assert.doesNotThrow(() => tryOpenPicker({}));
   assert.doesNotThrow(() => tryOpenPicker({ showPicker: () => { throw new Error("SecurityError"); } }));
+});
+
+test("currency inputs display Indonesian thousand separators while retaining raw digits", () => {
+  assert.equal(parseGroupedNumberInput("Rp 1.000.000"), "1000000");
+  assert.equal(formatGroupedNumberInput("1000000"), "1.000.000");
+  assert.equal(formatGroupedNumberInput(5500000), "5.500.000");
+  assert.equal(parseGroupedNumberInput(""), "");
 });

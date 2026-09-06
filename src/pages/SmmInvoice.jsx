@@ -8,6 +8,7 @@ import {
   formatInvoiceDate,
   previewSmmInvoicePdf,
 } from "../lib/smmInvoicePdf";
+import { formatGroupedNumberInput, parseGroupedNumberInput } from "../lib/uiFormatting";
 import "./SmmInvoice.css";
 
 const DEFAULT_SETTINGS = {
@@ -355,7 +356,7 @@ function SmmInvoice() {
               <label className="invoice-field full"><span>Invoice date</span><input type="date" value={form.invoice_date} onChange={(event) => setForm((current) => ({ ...current, invoice_date: event.target.value }))} required /></label>
               <label className="invoice-field full"><span>Invoice title</span><input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} required /></label>
               <label className="invoice-field full"><span>Description</span><input value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} required /></label>
-              <label className="invoice-field"><span>Price (IDR)</span><input type="number" min="1" step="1" value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} placeholder="5500000" required /></label>
+              <label className="invoice-field"><span>Price (IDR)</span><input type="text" inputMode="numeric" value={formatGroupedNumberInput(form.amount)} onChange={(event) => setForm((current) => ({ ...current, amount: parseGroupedNumberInput(event.target.value) }))} placeholder="5.500.000" required /></label>
               <label className="invoice-field"><span>Information</span><input value={form.information} onChange={(event) => setForm((current) => ({ ...current, information: event.target.value }))} placeholder="Optional project detail" /></label>
             </div>
             <footer><button type="button" onClick={() => setGenerateOpen(false)}>Cancel</button><button type="submit" className="invoice-primary-button" disabled={saving}>{saving ? "Generating..." : "Generate Invoice"}</button></footer>
@@ -374,7 +375,7 @@ function SmmInvoice() {
               <label className="invoice-field full"><span>Brand name</span><input value={settingsDraft.brand_name} onChange={(event) => setSettingsDraft((current) => ({ ...current, brand_name: event.target.value }))} required /></label>
               <label className="invoice-field full"><span>Default invoice title</span><input value={settingsDraft.invoice_title} onChange={(event) => setSettingsDraft((current) => ({ ...current, invoice_title: event.target.value }))} required /></label>
               <label className="invoice-field full"><span>Default description</span><input value={settingsDraft.default_description} onChange={(event) => setSettingsDraft((current) => ({ ...current, default_description: event.target.value }))} placeholder="Example: Product Photography" /></label>
-              <label className="invoice-field"><span>Default price (IDR)</span><input type="number" min="0" step="1" value={settingsDraft.default_amount} onChange={(event) => setSettingsDraft((current) => ({ ...current, default_amount: event.target.value }))} /></label>
+              <label className="invoice-field"><span>Default price (IDR)</span><input type="text" inputMode="numeric" value={formatGroupedNumberInput(settingsDraft.default_amount)} onChange={(event) => setSettingsDraft((current) => ({ ...current, default_amount: parseGroupedNumberInput(event.target.value) }))} placeholder="5.500.000" /></label>
               <label className="invoice-field"><span>Default information</span><input value={settingsDraft.default_information} onChange={(event) => setSettingsDraft((current) => ({ ...current, default_information: event.target.value }))} placeholder="Optional project detail" /></label>
               <label className="invoice-field full"><span>Payment information</span><textarea rows="3" value={settingsDraft.payment_information} onChange={(event) => setSettingsDraft((current) => ({ ...current, payment_information: event.target.value }))} placeholder="Bank name, account number, and account holder" /></label>
             </div>

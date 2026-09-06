@@ -10,6 +10,7 @@ const paths = {
   timeline: <><path d="M5 5v14M5 8h6l2-2h6v6h-6l-2-2H5M9 15h9M9 19h6" /></>,
   invoice: <><path d="M6 3h9l4 4v14H6z" /><path d="M15 3v5h4M9 12h6M9 16h6" /><path d="M9 8h2" /></>,
   employee: <><circle cx="9" cy="8" r="3" /><path d="M3.5 18c.6-3.2 2.4-4.8 5.5-4.8s4.9 1.6 5.5 4.8M17 8v6M14 11h6" /></>,
+  payslip: <><path d="M6 3h9l4 4v14H6z" /><path d="M15 3v5h4M9 12h6M9 16h6" /><path d="M9 8h2M16.5 18.5l1 1 2-2.5" /></>,
   documents: <><path d="M6 3h9l4 4v14H6z" /><path d="M15 3v5h4M9 12h6M9 16h6" /></>,
 };
 

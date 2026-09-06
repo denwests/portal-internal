@@ -16,6 +16,7 @@ import Spending from "./pages/Spending";
 import Transactions from "./pages/Transactions";
 import Bookkeeping from "./pages/Bookkeeping";
 import Employee from "./pages/Employee";
+import EmployeePayslip from "./pages/EmployeePayslip";
 import Documents from "./pages/Documents";
 import SocialMedia from "./pages/SocialMedia";
 import SmmTimeline from "./pages/SmmTimeline";
@@ -327,6 +328,15 @@ function App() {
 
             </ProtectedRoute>
 
+          }
+        />
+
+        <Route
+          path="/employee-payslips"
+          element={
+            <ProtectedRoute allowedRoles={FOUNDER_ONLY}>
+              <EmployeePayslip />
+            </ProtectedRoute>
           }
         />
 

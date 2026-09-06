@@ -126,3 +126,83 @@ financial-page text contrast. Add confirmed invoice deletion with an explicit
 Supabase grant and role-based RLS policy while preserving hidden routes and
 all existing client, social, and financial data.
 ```
+
+## Timeline control and Add Client polish - 2026-09-05
+
+- Rebuilt Add Client as a compact, structured dialog with a clear description, client-name field, initial-period preview, inline error area, and balanced actions on desktop and mobile.
+- Standardized Reference, Platform, Format, Status, and Schedule to the same 40px control height, 7px radius, padding, border, typography, hover, and focus treatment.
+- Kept Platform and Format values as compact comma-separated text while retaining their multi-select menus.
+- Kept Status visually consistent while preserving subtle Not Started, In Progress, and Complete state colors.
+- Integrated the Reference action into the field so populated URLs no longer stretch or misalign a row.
+- Fixed `smm_clients_name_unique`: an existing active client is selected, while a legacy inactive client is fully cleared and recreated from zero instead of colliding with the unique name.
+- Database failures inside Add Client now appear inside the open dialog as readable messages rather than raw constraint text behind the overlay.
+- Validation: production build passed, targeted Timeline lint passed, 31 root tests passed, and `git diff --check` passed.
+
+Suggested commit:
+
+```text
+fix(smm): unify timeline controls and reuse existing clients
+```
+
+Reason:
+
+```text
+Standardize Timeline field geometry and responsive behavior, rebuild the Add
+Client dialog, and handle existing client names without duplicate inserts.
+Reuse active client records and safely reset legacy inactive records.
+```
+
+### Permanent Timeline client deletion correction
+
+- Replaced soft deletion (`active = false`) with the transactional `delete_smm_client` database function.
+- Delete Client now permanently removes the selected client's Timeline items, monthly timelines, and share links before deleting the client record.
+- Historical Invoice snapshots remain intact; only their optional `client_id` relation is cleared by the existing foreign key.
+- Adding a name left inactive by the old behavior first purges that legacy record and then creates a genuinely new client with an empty current timeline.
+- The confirmation message now explicitly explains the permanent scope.
+- Run `supabase/smm-timeline-client-delete.sql` once before using the corrected Delete Client action.
+
+### Hidden duplicate client correction
+
+- Moved Add Client into the transactional `create_smm_client_timeline` RPC so lookup, legacy cleanup, client creation, and initial Timeline creation happen inside one database transaction.
+- Client names are normalized for repeated spaces and compared case-insensitively, preventing hidden variants from bypassing the lookup and colliding with the database constraint.
+- The RPC uses an advisory transaction lock to prevent simultaneous Add Client requests from racing into the same unique name.
+- Active matches are selected; inactive matches are permanently cleared with their Timeline data and recreated from zero.
+- The public RPC is restricted to authenticated callers, checks the active Founder/Administrator role internally, uses a fixed empty search path, and does not expose service credentials.
+- Existing installations must rerun the latest `supabase/smm-timeline-client-delete.sql` before deploying this frontend update.
+
+## Founder Employee Payslips - 2026-09-06
+
+- Added **Management > Employee Payslips**, visible and routable only to active Founder accounts.
+- Added a compact generator for PLUNO STUDIO and VANGUENA with employee, period, position, base salary, deductions, and optional overtime/incentive/other-income rows.
+- Added automatic gross/net calculations, immutable salary snapshots, monthly payslip IDs, PDF preview/download, history, and confirmed deletion.
+- Added a neutral print-ready PDF layout and visually verified a representative one-page output.
+- Added `supabase/employee-payslips.sql` with explicit table grants, generated identifiers, Founder-only RLS, fixed function search paths, and restricted helper execution.
+- Validation: targeted lint passed, production build passed, 37 root tests passed, 3 Worker tests passed, PDF render passed, and `git diff --check` passed.
+
+Suggested commit:
+
+```text
+feat(management): add founder-only employee payslips
+```
+
+Reason:
+
+```text
+Add a Founder-only salary-slip workspace for PLUNO Studio and Vanguena with
+a compact generator, optional overtime and incentive details, automatic net
+pay, immutable history, secure deletion, and a consistent print-ready PDF.
+Include explicit Supabase grants, Founder-only RLS, setup guidance, and tests.
+```
+
+### Rupiah input formatting - 2026-09-06
+
+- Salary, deduction, overtime, incentive, and other-income inputs now add Indonesian thousand separators while typing.
+- SMM invoice price and default-price inputs use the same behavior.
+- Form state and database payloads remain plain numeric values, so calculations, stored data, and generated PDFs are unchanged.
+- Validation: targeted lint passed, 38 root tests passed, production build passed, and `git diff --check` passed.
+
+Suggested commit:
+
+```text
+fix(forms): format payslip and invoice currency inputs
+```

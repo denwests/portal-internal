@@ -24,3 +24,5 @@ Keep your existing environment configuration and Worker secrets outside source c
 See `REVIEW-FINAL.md` for review findings, validation limits, removed files, and the suggested commit message. See `REDESIGN-HANDOFF.md` for design history and `SOCIAL-MEDIA-SETUP.md` for integration setup.
 
 For the Social Media Management invoice generator, run the one-time database setup described in `SMM-INVOICE-SETUP.md`.
+
+For the Founder-only Employee Payslips generator, run the one-time database setup described in `EMPLOYEE-PAYSLIP-SETUP.md`.

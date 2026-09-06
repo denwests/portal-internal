@@ -1792,3 +1792,284 @@ select option:checked { color: #fff !important; background: #343439 !important; 
     min-height: 26px !important;
   }
 }
+
+/* ============================================================
+   TIMELINE V13 - UNIFIED CONTROLS AND CLIENT DIALOG
+   ============================================================ */
+
+#root .smm-table-wrap td.smm-control-cell {
+  vertical-align: middle !important;
+}
+
+#root .smm-timeline-control,
+#root .smm-reference-control {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  box-sizing: border-box !important;
+  color: #f3f3f4 !important;
+  background: #1d1d20 !important;
+  border: 1px solid #404045 !important;
+  border-radius: 7px !important;
+  font-family: inherit !important;
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+  box-shadow: none !important;
+}
+
+#root .smm-timeline-control:hover,
+#root .smm-reference-control:hover {
+  border-color: #55555b !important;
+}
+
+#root .smm-timeline-control:focus,
+#root .smm-timeline-control:focus-visible,
+#root .smm-reference-control:focus-within {
+  outline: 0 !important;
+  border-color: #707077 !important;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.045) !important;
+}
+
+#root .smm-multi-trigger.smm-timeline-control {
+  padding: 0 28px 0 11px !important;
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
+}
+
+#root .smm-control-chevron {
+  position: absolute !important;
+  top: 50% !important;
+  right: 10px !important;
+  color: #9b9ba1 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  transform: translateY(-54%) !important;
+}
+
+#root .smm-reference-control {
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: stretch !important;
+}
+
+#root .smm-reference-control > input.smm-timeline-control {
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 10px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#root .smm-reference-control > a {
+  min-width: 45px !important;
+  padding: 0 9px !important;
+  display: grid !important;
+  place-items: center !important;
+  color: #e9e9eb !important;
+  background: #28282c !important;
+  border-left: 1px solid #404045 !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+}
+
+#root .smm-reference-control > a:hover,
+#root .smm-reference-control > a:focus-visible {
+  color: #fff !important;
+  background: #323237 !important;
+}
+
+#root .smm-status[data-status="Not Started"] {
+  color: #d5d5d8 !important;
+  background: #242427 !important;
+}
+
+#root .smm-status[data-status="In Progress"] {
+  color: #e4d29d !important;
+  background: #2f2a20 !important;
+  border-color: #5a4d32 !important;
+}
+
+#root .smm-status[data-status="Complete"] {
+  color: #abd7b7 !important;
+  background: #203027 !important;
+  border-color: #3d6249 !important;
+}
+
+#root .smm-schedule-control {
+  padding: 0 9px !important;
+  color-scheme: dark !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+#root .smm-client-modal {
+  width: min(500px, 100%) !important;
+  overflow: hidden !important;
+  color: #f3f3f4 !important;
+  background: #151517 !important;
+  border: 1px solid #36363b !important;
+  border-radius: 10px !important;
+  box-shadow: 0 26px 80px rgba(0,0,0,.58) !important;
+}
+
+#root .smm-client-modal > header {
+  min-height: 92px !important;
+  padding: 18px 20px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  background: #18181b !important;
+  border-bottom: 1px solid #343438 !important;
+}
+
+#root .smm-client-modal > header span {
+  display: block !important;
+  margin-bottom: 7px !important;
+  color: #a9a9af !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: .08em !important;
+}
+
+#root .smm-client-modal > header h2 {
+  margin: 0 !important;
+  color: #f6f6f7 !important;
+  font-size: 20px !important;
+  line-height: 1.2 !important;
+  font-weight: 550 !important;
+  letter-spacing: -.025em !important;
+}
+
+#root .smm-client-modal > header p {
+  margin: 7px 0 0 !important;
+  color: #b8b8bd !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+
+#root .smm-modal-close {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  color: #c9c9cd !important;
+  background: #242427 !important;
+  border: 1px solid #3d3d42 !important;
+  border-radius: 7px !important;
+  font-size: 19px !important;
+  line-height: 1 !important;
+}
+
+#root .smm-client-modal-body {
+  padding: 20px !important;
+  display: grid !important;
+  gap: 14px !important;
+  background: #151517 !important;
+}
+
+#root .smm-client-field {
+  display: grid !important;
+  gap: 8px !important;
+  color: #ededee !important;
+}
+
+#root .smm-client-field > span,
+#root .smm-client-period > span {
+  color: #b6b6bb !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+}
+
+#root .smm-client-field > input {
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  box-sizing: border-box !important;
+  color: #f5f5f6 !important;
+  background: #1d1d20 !important;
+  border: 1px solid #414146 !important;
+  border-radius: 7px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+}
+
+#root .smm-client-period {
+  min-height: 54px !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  background: #1a1a1d !important;
+  border: 1px solid #343438 !important;
+  border-radius: 7px !important;
+}
+
+#root .smm-client-period > strong {
+  color: #f1f1f3 !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+}
+
+#root .smm-client-form-error {
+  padding: 10px 12px !important;
+  color: #f1aaa7 !important;
+  background: #2c1d20 !important;
+  border: 1px solid #603a40 !important;
+  border-radius: 7px !important;
+  font-size: 11.5px !important;
+  line-height: 1.45 !important;
+}
+
+#root .smm-client-modal > footer {
+  padding: 14px 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  background: #121214 !important;
+  border-top: 1px solid #343438 !important;
+}
+
+#root .smm-client-modal > footer button {
+  min-width: 104px !important;
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 7px !important;
+  font-size: 11px !important;
+}
+
+@media (max-width: 760px) {
+  #root .smm-control-cell {
+    align-items: center !important;
+  }
+
+  #root .smm-timeline-control,
+  #root .smm-reference-control {
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+
+  #root .smm-client-modal > header,
+  #root .smm-client-modal-body,
+  #root .smm-client-modal > footer {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+
+  #root .smm-client-modal > footer button {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+}
