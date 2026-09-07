@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../supabase";
 import { driveDownloadUrl } from "../lib/googleDrive";
+import { getPublicAppUrl } from "../lib/publicAppUrl";
 import {
   downloadPhotosAsZip,
   downloadPhotosSequentially,
@@ -319,7 +320,7 @@ function ClientGallery() {
       return;
     }
 
-    const guestUrl = window.location.href;
+    const guestUrl = getPublicAppUrl(`/gallery/${slug}`);
 
     const names = selectedPhotoList.map(
       (photo, index) => `${index + 1}. ${photo.filename}`

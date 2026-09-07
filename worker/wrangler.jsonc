@@ -11,7 +11,7 @@
     "crons": ["*/10 * * * *"]
   },
   "vars": {
-    "ALLOWED_ORIGINS": "https://pluno-internal.denwests-id.workers.dev,http://localhost:5173",
+    "ALLOWED_ORIGINS": "https://pluno-internal.denwests-id.workers.dev,http://localhost:5173,capacitor://localhost",
     "SOCIAL_ALLOWED_ROLES": "Founder,Administrator",
     "META_GRAPH_VERSION": "v25.0",
     "SYNC_POST_LIMIT": "25",

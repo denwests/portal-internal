@@ -10,6 +10,7 @@ import {
   requestDriveAccess,
   uploadPhotoToFolder,
 } from "../lib/googleDrive";
+import { getPublicAppUrl } from "../lib/publicAppUrl";
 import "./GalleryManager.css";
 
 function makeRandomSlug() {
@@ -363,7 +364,7 @@ function GalleryManager() {
   };
 
   const getGuestUrl = (gallery) =>
-    `${window.location.origin}/gallery/${gallery.slug}`;
+    getPublicAppUrl(`/gallery/${gallery.slug}`);
 
   const copyGuestLink = async (gallery) => {
     const url = getGuestUrl(gallery);

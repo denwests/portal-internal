@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import Sidebar from "../components/Sidebar";
 import { MonthPicker } from "../components/PeriodPicker";
 import { supabase } from "../supabase";
+import { getPublicAppUrl } from "../lib/publicAppUrl";
 import "./SmmTimeline.css";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -392,7 +393,7 @@ function SmmTimeline() {
       }
       setTimelines((current) => current.map((timeline) => timeline.id === selectedTimeline.id ? { ...timeline, share_token: token } : timeline));
     }
-    const url = `${window.location.origin}/timeline/share/${token}`;
+    const url = getPublicAppUrl(`/timeline/share/${token}`);
     try {
       await navigator.clipboard.writeText(url);
       setNotice("Preview link copied.");

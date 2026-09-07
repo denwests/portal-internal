@@ -15,6 +15,17 @@ npm test --prefix worker
 npm run lint
 ```
 
+## iOS (Capacitor)
+
+Proyek native iOS berada di folder `ios`. Petunjuk lengkap untuk environment,
+Supabase reset-password deep link, Cloudflare Worker CORS, signing Xcode, dan
+smoke test iPhone tersedia di `IOS-SETUP.md`.
+
+```text
+npm run ios:sync
+npm run ios:open
+```
+
 ## Configuration and safety
 
 Keep your existing environment configuration and Worker secrets outside source control. Never replace the project's existing `.git` directory with a delivery archive. Do not run database scripts merely to install a UI update.
