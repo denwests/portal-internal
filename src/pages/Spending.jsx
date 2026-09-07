@@ -11,9 +11,18 @@ import Sidebar from "../components/Sidebar";
 import TablePagination from "../components/TablePagination";
 import { MonthPicker } from "../components/PeriodPicker";
 import { PLUNO_PRINT_CSS } from "../lib/printTheme";
+import {
+  SPENDING_CATEGORIES,
+  calculateEvotoAmount,
+  getSpendingCategory,
+  normalizeSpendingCategory,
+  summarizeSpendings,
+} from "../lib/spendingFinance";
 import useTablePagination from "../hooks/useTablePagination";
 
 import "./Spending.css";
+
+const normalizeDatabaseCategory = normalizeSpendingCategory;
 
 
 /* =========================================================
@@ -52,6 +61,19 @@ function formatInputNumber(value) {
   return Number(
     numericValue
   ).toLocaleString("id-ID");
+}
+
+function normalizeCreditInput(value) {
+  const normalized = String(value ?? "")
+    .replace(/,/g, ".")
+    .replace(/[^\d.]/g, "");
+  const [whole = "", ...decimalParts] = normalized.split(".");
+  const decimal = decimalParts.join("").slice(0, 2);
+  return normalized.includes(".") ? `${whole || "0"}.${decimal}` : whole;
+}
+
+function formatCreditInput(value) {
+  return String(value ?? "").replace(".", ",");
 }
 
 
@@ -227,6 +249,11 @@ function Spending() {
     "Studio Expenses"
   );
 
+  const [selectedCategory, setSelectedCategory] = useState("expense");
+  const [evotoCreditRate, setEvotoCreditRate] = useState(0);
+  const [creditRateInput, setCreditRateInput] = useState("");
+  const [settingsAvailable, setSettingsAvailable] = useState(true);
+
   const [
     formData,
     setFormData,
@@ -245,6 +272,12 @@ function Spending() {
 
     information:
       "",
+
+    evoto_direction:
+      "Out",
+
+    evoto_credits:
+      "",
   });
 
 
@@ -252,10 +285,7 @@ function Spending() {
      TABLE REFS
   ======================================================= */
 
-  const studioTableRef =
-    useRef(null);
-
-  const cashTableRef =
+  const spendingTableRef =
     useRef(null);
 
 
@@ -283,54 +313,17 @@ function Spending() {
      DATABASE CATEGORY
   ======================================================= */
 
-  const normalizeDatabaseCategory =
-    (category) => {
-
-      const normalized =
-        String(
-          category || ""
-        )
-          .trim()
-          .toLowerCase();
-
-      if (
-        normalized === "expense" ||
-        normalized === "studio expense" ||
-        normalized === "studio expenses"
-      ) {
-        return "expense";
-      }
-
-      if (
-        normalized === "cash" ||
-        normalized === "cash spending" ||
-        normalized === "cash movement"
-      ) {
-        return "cash";
-      }
-
-      return normalized;
-    };
-
-
   const getDatabaseCategory =
     (category) => {
 
-      return category ===
-        "Studio Expenses"
-        ? "expense"
-        : "cash";
+      return getSpendingCategory(category).key;
     };
 
 
   const getDisplayCategory =
     (category) => {
 
-      return normalizeDatabaseCategory(
-        category
-      ) === "expense"
-        ? "Studio Expenses"
-        : "Cash Spending";
+      return getSpendingCategory(category).label;
     };
 
 
@@ -411,11 +404,34 @@ function Spending() {
       setLoading(false);
     }, []);
 
+  const fetchSpendingSettings = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("spending_settings")
+      .select("evoto_credit_rate")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (error) {
+      const missingTable = error.code === "42P01" || error.code === "PGRST205";
+      if (!missingTable) console.error("SPENDING SETTINGS ERROR:", error);
+      setSettingsAvailable(!missingTable);
+      return;
+    }
+
+    const rate = Number(data?.evoto_credit_rate || 0);
+    setEvotoCreditRate(rate);
+    setCreditRateInput(rate ? String(rate) : "");
+    setSettingsAvailable(true);
+  }, []);
+
 
   useEffect(() => {
-    const timer = window.setTimeout(() => void fetchSpendings(), 0);
+    const timer = window.setTimeout(() => {
+      void fetchSpendings();
+      void fetchSpendingSettings();
+    }, 0);
     return () => window.clearTimeout(timer);
-  }, [fetchSpendings]);
+  }, [fetchSpendings, fetchSpendingSettings]);
 
 
   /* =======================================================
@@ -520,15 +536,28 @@ function Spending() {
         ) === "cash"
     );
 
+  const attireSpendings = filteredSpendings.filter(
+    (item) => normalizeDatabaseCategory(item.category) === "attire"
+  );
+
+  const evotoSpendings = filteredSpendings.filter(
+    (item) => normalizeDatabaseCategory(item.category) === "evoto"
+  );
+
+  const categoryRows = {
+    expense: studioExpenses,
+    cash: cashSpendings,
+    attire: attireSpendings,
+    evoto: evotoSpendings,
+  };
+
+  const spendingSummary = summarizeSpendings(filteredSpendings, evotoCreditRate);
+
   const spendingPeriodKey = `${activeMonth}-${activeYear}`;
-  const studioPagination = useTablePagination(
-    studioExpenses,
-    spendingPeriodKey
-  );
-  const cashPagination = useTablePagination(
-    cashSpendings,
-    spendingPeriodKey
-  );
+  const studioPagination = useTablePagination(studioExpenses, spendingPeriodKey);
+  const cashPagination = useTablePagination(cashSpendings, spendingPeriodKey);
+  const attirePagination = useTablePagination(attireSpendings, spendingPeriodKey);
+  const evotoPagination = useTablePagination(evotoSpendings, spendingPeriodKey);
 
 
   /* =======================================================
@@ -536,53 +565,24 @@ function Spending() {
   ======================================================= */
 
   const totalStudioExpenses =
-    studioExpenses.reduce(
-      (
-        total,
-        item
-      ) =>
-        total +
-        Number(
-          item.amount_out ||
-            0
-        ),
-      0
-    );
+    spendingSummary.expense;
 
 
   const totalCashIn =
-    cashSpendings.reduce(
-      (
-        total,
-        item
-      ) =>
-        total +
-        Number(
-          item.amount_in ||
-            0
-        ),
-      0
-    );
+    spendingSummary.cashIn;
 
 
   const totalCashOut =
-    cashSpendings.reduce(
-      (
-        total,
-        item
-      ) =>
-        total +
-        Number(
-          item.amount_out ||
-            0
-        ),
-      0
-    );
+    spendingSummary.cashOut;
 
 
   const totalCashBalance =
-    totalCashIn -
-    totalCashOut;
+    spendingSummary.cashBalance;
+
+  const isSupplementalCategory = selectedCategory === "attire" || selectedCategory === "evoto";
+  const supplementalRows = selectedCategory === "evoto" ? evotoSpendings : attireSpendings;
+  const supplementalPagination = selectedCategory === "evoto" ? evotoPagination : attirePagination;
+  const supplementalCategory = getSpendingCategory(selectedCategory);
 
 
   /* =======================================================
@@ -642,6 +642,12 @@ function Spending() {
           "",
 
         information:
+          "",
+
+        evoto_direction:
+          "Out",
+
+        evoto_credits:
           "",
       });
 
@@ -717,6 +723,15 @@ function Spending() {
         information:
           item.information ||
           "",
+
+        evoto_direction:
+          item.evoto_direction ||
+          "Out",
+
+        evoto_credits:
+          item.evoto_credits
+            ? String(item.evoto_credits)
+            : "",
       });
 
       setErrorMessage("");
@@ -836,12 +851,21 @@ function Spending() {
             0
         );
 
+      const evotoCredits = Number(formData.evoto_credits || 0);
+      const isEvoto = activeCategory === "Evoto Balance";
+      const calculatedEvotoAmount = calculateEvotoAmount(
+        evotoCredits,
+        evotoCreditRate
+      );
+
 
       /* STUDIO */
 
       if (
         activeCategory ===
-        "Studio Expenses"
+          "Studio Expenses" ||
+        activeCategory ===
+          "Attire / Background"
       ) {
 
         if (
@@ -854,6 +878,20 @@ function Spending() {
 
           setSaving(false);
 
+          return;
+        }
+      }
+
+      if (isEvoto) {
+        if (evotoCreditRate <= 0) {
+          setErrorMessage("Atur harga per Evoto credit melalui tombol gear terlebih dahulu.");
+          setSaving(false);
+          return;
+        }
+
+        if (evotoCredits <= 0) {
+          setErrorMessage("Jumlah Evoto credit wajib lebih dari 0.");
+          setSaving(false);
           return;
         }
       }
@@ -915,9 +953,15 @@ function Spending() {
        *   dengan data lama.
        */
       const safeAmountIn =
-        databaseCategory === "expense"
+        databaseCategory === "expense" ||
+        databaseCategory === "attire" ||
+        databaseCategory === "evoto"
           ? 0
           : amountIn;
+
+      const safeAmountOut = isEvoto
+        ? calculatedEvotoAmount
+        : amountOut;
 
       const databaseData = {
 
@@ -934,17 +978,26 @@ function Spending() {
           formData.description.trim(),
 
         amount:
-          amountOut,
+          safeAmountOut,
 
         amount_in:
           safeAmountIn,
 
         amount_out:
-          amountOut,
+          safeAmountOut,
 
         information:
           formData.information.trim() ||
           null,
+
+        evoto_direction:
+          isEvoto ? formData.evoto_direction : null,
+
+        evoto_credits:
+          isEvoto ? evotoCredits : 0,
+
+        evoto_credit_rate:
+          isEvoto ? evotoCreditRate : 0,
       };
 
 
@@ -1087,6 +1140,44 @@ function Spending() {
       closeModal();
     };
 
+  const handleCreditChange = (event) => {
+    setFormData((current) => ({
+      ...current,
+      evoto_credits: normalizeCreditInput(event.target.value),
+    }));
+  };
+
+  const handleSaveCreditRate = async (event) => {
+    event.preventDefault();
+    const rate = Number(String(creditRateInput || "").replace(/\D/g, ""));
+
+    if (rate <= 0) {
+      setErrorMessage("Harga per Evoto credit wajib lebih dari 0.");
+      return;
+    }
+
+    setSaving(true);
+    setErrorMessage("");
+    const { error } = await supabase
+      .from("spending_settings")
+      .upsert({ id: 1, evoto_credit_rate: rate }, { onConflict: "id" });
+
+    if (error) {
+      setErrorMessage(
+        settingsAvailable
+          ? `Gagal menyimpan Evoto credit rate: ${error.message}`
+          : "Jalankan supabase/spending-four-panels.sql terlebih dahulu."
+      );
+      setSaving(false);
+      return;
+    }
+
+    setEvotoCreditRate(rate);
+    setSettingsAvailable(true);
+    setSaving(false);
+    setModalType(null);
+  };
+
 
   /* =======================================================
      DELETE
@@ -1159,10 +1250,7 @@ function Spending() {
     (category) => {
 
       const rows =
-        category ===
-        "Studio Expenses"
-          ? studioExpenses
-          : cashSpendings;
+        categoryRows[getDatabaseCategory(category)] || [];
 
 
       if (rows.length === 0) {
@@ -1179,10 +1267,7 @@ function Spending() {
 
 
       const title =
-        category ===
-        "Studio Expenses"
-          ? "STUDIO EXPENSES"
-          : "CASH SPENDING";
+        category.toUpperCase();
 
 
       const monthLabel =
@@ -1194,15 +1279,20 @@ function Spending() {
 
 
       const total =
-        category ===
-        "Studio Expenses"
+        category === "Studio Expenses"
           ? totalStudioExpenses
-          : totalCashBalance;
+          : category === "Cash Spending"
+          ? totalCashBalance
+          : category === "Attire / Background"
+          ? spendingSummary.attire
+          : spendingSummary.evotoUsageValue;
 
 
       const isCash =
         category ===
         "Cash Spending";
+
+      const isEvoto = category === "Evoto Balance";
 
 
       const tableRows =
@@ -1247,6 +1337,12 @@ function Spending() {
                                   "-"
                               )}
                             </td>
+                          `
+                          : isEvoto
+                          ? `
+                            <td>${escapeHTML(item.evoto_direction || "Out")}</td>
+                            <td>${Number(item.evoto_credits || 0).toLocaleString("id-ID")}</td>
+                            <td>${formatRupiah(item.amount_out)}</td>
                           `
                           : `
                             <td>
@@ -1301,6 +1397,14 @@ function Spending() {
               <th>IN</th>
               <th>OUT</th>
               <th>INFORMATION</th>
+            `
+          : isEvoto
+          ? `
+              <th>TRANSACTION DATE</th>
+              <th>DESCRIPTION</th>
+              <th>TYPE</th>
+              <th>CREDITS</th>
+              <th>VALUE</th>
             `
           : `
               <th>TRANSACTION DATE</th>
@@ -1628,6 +1732,65 @@ function Spending() {
             COLUMNS
         ================================================= */}
 
+        <div className="spending-overview-grid">
+          {SPENDING_CATEGORIES.map((category) => {
+            const isSelected = selectedCategory === category.key;
+            const cardContent =
+              category.key === "expense"
+                ? { value: formatRupiah(spendingSummary.expense), detail: `${studioExpenses.length} transactions` }
+                : category.key === "cash"
+                ? { value: formatRupiah(spendingSummary.cashBalance), detail: `In ${formatRupiah(totalCashIn)} · Out ${formatRupiah(totalCashOut)}` }
+                : category.key === "attire"
+                ? { value: formatRupiah(spendingSummary.attire), detail: `${attireSpendings.length} transactions` }
+                : { value: `${spendingSummary.evotoBalance.toLocaleString("id-ID")} credits`, detail: `In ${spendingSummary.evotoIn.toLocaleString("id-ID")} · Out ${spendingSummary.evotoOut.toLocaleString("id-ID")}` };
+
+            return (
+              <button
+                key={category.key}
+                type="button"
+                className={`spending-overview-card${isSelected ? " is-active" : ""}`}
+                onClick={() => setSelectedCategory(category.key)}
+                aria-pressed={isSelected}
+              >
+                <span className="spending-overview-kicker">{category.kicker}</span>
+                <strong>{category.label}</strong>
+                <b>{cardContent.value}</b>
+                <small>{cardContent.detail}</small>
+                {category.key === "evoto" && (
+                  <span
+                    role="button"
+                    tabIndex="0"
+                    className="spending-settings-trigger"
+                    aria-label="Open Evoto credit settings"
+                    title="Evoto credit settings"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setCreditRateInput(evotoCreditRate ? String(evotoCreditRate) : "");
+                      setErrorMessage("");
+                      setModalType("settings");
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setModalType("settings");
+                      }
+                    }}
+                  >
+                    ⚙
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {!settingsAvailable && (
+          <div className="spending-setup-note">
+            Run <strong>supabase/spending-four-panels.sql</strong> to activate Attire / Background and Evoto settings.
+          </div>
+        )}
+
         <div className="spending-columns">
 
 
@@ -1635,7 +1798,7 @@ function Spending() {
               STUDIO EXPENSES
           ================================================= */}
 
-          <section className="spending-card">
+          {selectedCategory === "expense" && <section className="spending-card">
 
 
             <div className="spending-card-header">
@@ -1711,7 +1874,7 @@ function Spending() {
                   aria-label="Scroll table left"
                   onClick={() =>
                     scrollTable(
-                      studioTableRef,
+                      spendingTableRef,
                       "left"
                     )
                   }
@@ -1725,7 +1888,7 @@ function Spending() {
                   aria-label="Scroll table right"
                   onClick={() =>
                     scrollTable(
-                      studioTableRef,
+                      spendingTableRef,
                       "right"
                     )
                   }
@@ -1741,7 +1904,7 @@ function Spending() {
             <div
               className="spending-table-scroll"
               ref={
-                studioTableRef
+                spendingTableRef
               }
             >
 
@@ -1942,14 +2105,14 @@ function Spending() {
 
             </div>
 
-          </section>
+          </section>}
 
 
           {/* =================================================
               CASH SPENDING
           ================================================= */}
 
-          <section className="spending-card">
+          {selectedCategory === "cash" && <section className="spending-card">
 
 
             <div className="spending-card-header">
@@ -2025,7 +2188,7 @@ function Spending() {
                   aria-label="Scroll table left"
                   onClick={() =>
                     scrollTable(
-                      cashTableRef,
+                      spendingTableRef,
                       "left"
                     )
                   }
@@ -2039,7 +2202,7 @@ function Spending() {
                   aria-label="Scroll table right"
                   onClick={() =>
                     scrollTable(
-                      cashTableRef,
+                      spendingTableRef,
                       "right"
                     )
                   }
@@ -2055,7 +2218,7 @@ function Spending() {
             <div
               className="spending-table-scroll"
               ref={
-                cashTableRef
+                spendingTableRef
               }
             >
 
@@ -2267,7 +2430,131 @@ function Spending() {
 
             </div>
 
-          </section>
+          </section>}
+
+          {isSupplementalCategory && (
+            <section className="spending-card">
+              <div className="spending-card-header">
+                <div className="spending-card-title">
+                  <div className="spending-card-kicker">{supplementalCategory.kicker}</div>
+                  <h2>{supplementalCategory.label}</h2>
+                </div>
+                <div className="spending-section-actions">
+                  {selectedCategory === "evoto" && (
+                    <button
+                      type="button"
+                      className="spending-settings-button"
+                      onClick={() => {
+                        setCreditRateInput(evotoCreditRate ? String(evotoCreditRate) : "");
+                        setErrorMessage("");
+                        setModalType("settings");
+                      }}
+                    >
+                      ⚙ Credit Rate
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="spending-pdf-button"
+                    onClick={() => downloadPDF(supplementalCategory.label)}
+                    disabled={loading || supplementalRows.length === 0}
+                  >
+                    Download PDF
+                  </button>
+                  <button
+                    type="button"
+                    className="spending-add-button"
+                    onClick={() => openAddForm(supplementalCategory.label)}
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              <div className="spending-toolbar">
+                <div className="spending-count">{supplementalRows.length} TRANSACTION</div>
+                <div className="spending-table-navigation">
+                  <button type="button" aria-label="Scroll table left" onClick={() => scrollTable(spendingTableRef, "left")}>←</button>
+                  <button type="button" aria-label="Scroll table right" onClick={() => scrollTable(spendingTableRef, "right")}>→</button>
+                </div>
+              </div>
+
+              <div className="spending-table-scroll" ref={spendingTableRef}>
+                <table className={`spending-table${selectedCategory === "evoto" ? " spending-table-evoto" : ""}`}>
+                  <thead>
+                    <tr>
+                      <th>DATE</th>
+                      <th>DESCRIPTION</th>
+                      {selectedCategory === "evoto" ? (
+                        <>
+                          <th>TYPE</th>
+                          <th>CREDITS</th>
+                          <th>VALUE</th>
+                        </>
+                      ) : (
+                        <>
+                          <th>OUT</th>
+                          <th>TOTAL</th>
+                          <th>INFORMATION</th>
+                        </>
+                      )}
+                      <th>ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr><td colSpan="6" className="spending-empty table-empty-cell"><span className="table-empty-viewport">Loading...</span></td></tr>
+                    ) : supplementalRows.length === 0 ? (
+                      <tr><td colSpan="6" className="spending-empty table-empty-cell"><span className="table-empty-viewport">No {supplementalCategory.label.toLowerCase()} found.</span></td></tr>
+                    ) : supplementalPagination.visibleItems.map((item) => (
+                      <tr key={item.id}>
+                        <td>{formatDate(item.transaction_date)}</td>
+                        <td><div className="spending-description">{item.description}</div></td>
+                        {selectedCategory === "evoto" ? (
+                          <>
+                            <td><span className={`spending-direction is-${String(item.evoto_direction || "Out").toLowerCase()}`}>{item.evoto_direction || "Out"}</span></td>
+                            <td>{Number(item.evoto_credits || 0).toLocaleString("id-ID")}</td>
+                            <td className="money-cell money-out">{formatRupiah(item.amount_out)}</td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="money-cell money-out">{formatRupiah(item.amount_out)}</td>
+                            <td className="money-cell money-out">{formatRupiah(item.amount_out)}</td>
+                            <td><span className="spending-information">{item.information || "-"}</span></td>
+                          </>
+                        )}
+                        <td>
+                          <div className="spending-actions">
+                            <button type="button" onClick={() => openEditForm(item)}>Edit</button>
+                            <button type="button" className="danger" onClick={() => handleDelete(item)}>Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <TablePagination
+                currentPage={supplementalPagination.currentPage}
+                totalPages={supplementalPagination.totalPages}
+                onPageChange={supplementalPagination.setCurrentPage}
+                label={supplementalCategory.label.toLowerCase()}
+              />
+
+              <div className={`spending-summary${selectedCategory === "evoto" ? " spending-summary-evoto" : ""}`}>
+                {selectedCategory === "evoto" ? (
+                  <>
+                    <div><span>CREDIT RATE</span><strong>{formatRupiah(evotoCreditRate)}</strong></div>
+                    <div><span>USAGE VALUE</span><strong>{formatRupiah(spendingSummary.evotoUsageValue)}</strong></div>
+                    <div><span>BALANCE</span><strong>{spendingSummary.evotoBalance.toLocaleString("id-ID")} credits</strong></div>
+                  </>
+                ) : (
+                  <div><span>TOTAL</span><strong>{formatRupiah(spendingSummary.attire)}</strong></div>
+                )}
+              </div>
+            </section>
+          )}
 
         </div>
 
@@ -2295,7 +2582,44 @@ function Spending() {
           MODAL
       ===================================================== */}
 
-      {modalType && (
+      {modalType === "settings" && (
+        <div className="spending-overlay">
+          <div className="spending-form-box spending-settings-modal">
+            <div className="spending-form-header">
+              <div>
+                <div className="spending-form-kicker">EVOTO SETTINGS</div>
+                <h2>Credit Conversion</h2>
+                <p>Set the Rupiah value of one Evoto credit.</p>
+              </div>
+              <button type="button" className="spending-close" onClick={closeModal}>×</button>
+            </div>
+            <form onSubmit={handleSaveCreditRate}>
+              <div className="spending-field">
+                <label>1 CREDIT VALUE</label>
+                <div className="spending-money-input">
+                  <span>Rp</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={formatInputNumber(creditRateInput)}
+                    placeholder="0"
+                    onChange={(event) => setCreditRateInput(event.target.value.replace(/\D/g, ""))}
+                    autoFocus
+                  />
+                </div>
+                <small>Every Evoto Out entry is converted automatically using this rate.</small>
+              </div>
+              {errorMessage && <div className="spending-form-error">{errorMessage}</div>}
+              <div className="spending-form-footer">
+                <button type="button" className="spending-cancel" onClick={closeModal}>Cancel</button>
+                <button type="submit" className="spending-save" disabled={saving}>{saving ? "Saving..." : "Save Rate"}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {modalType && modalType !== "settings" && (
 
         <div className="spending-overlay">
 
@@ -2312,10 +2636,7 @@ function Spending() {
                   {modalType ===
                   "edit"
                     ? "EDIT TRANSACTION"
-                    : activeCategory ===
-                      "Studio Expenses"
-                    ? "STUDIO EXPENSES"
-                    : "CASH SPENDING"}
+                    : getSpendingCategory(activeCategory).kicker}
 
                 </div>
 
@@ -2332,10 +2653,7 @@ function Spending() {
 
                 <p>
 
-                  {activeCategory ===
-                  "Studio Expenses"
-                    ? "Add studio expense transaction."
-                    : "Add cash movement transaction."}
+                  Add or update a {activeCategory.toLowerCase()} transaction.
 
                 </p>
 
@@ -2407,6 +2725,32 @@ function Spending() {
                 </div>
 
 
+                {activeCategory === "Evoto Balance" && (
+                  <div className="spending-field">
+                    <label>TYPE</label>
+                    <select name="evoto_direction" value={formData.evoto_direction} onChange={handleChange}>
+                      <option value="In">Credit In</option>
+                      <option value="Out">Credit Out</option>
+                    </select>
+                  </div>
+                )}
+
+                {activeCategory === "Evoto Balance" && (
+                  <div className="spending-field">
+                    <label>CREDITS</label>
+                    <input
+                      type="text"
+                      name="evoto_credits"
+                      inputMode="decimal"
+                      pattern="[0-9]+([,.][0-9]{0,2})?"
+                      placeholder="0"
+                      value={formatCreditInput(formData.evoto_credits)}
+                      onChange={handleCreditChange}
+                      required
+                    />
+                  </div>
+                )}
+
                 {activeCategory ===
                   "Cash Spending" && (
 
@@ -2434,6 +2778,7 @@ function Spending() {
                 )}
 
 
+                {activeCategory !== "Evoto Balance" ? (
                 <div className="spending-field">
 
                   <label>
@@ -2453,11 +2798,20 @@ function Spending() {
                     }
                     required={
                       activeCategory ===
-                      "Studio Expenses"
+                        "Studio Expenses" ||
+                      activeCategory ===
+                        "Attire / Background"
                     }
                   />
 
                 </div>
+                ) : (
+                  <div className="spending-field spending-calculated-value">
+                    <label>AUTOMATIC VALUE</label>
+                    <strong>{formatRupiah(calculateEvotoAmount(formData.evoto_credits, evotoCreditRate))}</strong>
+                    <small>{formatRupiah(evotoCreditRate)} per credit</small>
+                  </div>
+                )}
 
 
                 <div className="spending-field spending-field-wide">

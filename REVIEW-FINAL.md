@@ -1,5 +1,16 @@
 # Final source review - 2026-09-04
 
+## Spending four-panel update - 2026-09-07
+
+- Reworked Spending into four compact monthly selectors with one focused transaction workspace.
+- Added Attire / Background as a dedicated monthly wallet.
+- Added Evoto Credit In, Credit Out, current balance, per-credit setting, and automatic Rupiah conversion.
+- Kept Attire / Background and Evoto outside Bookkeeping because both use separate wallets.
+- Matched the overview, transaction panel, toolbar, table, and summary to the same `--page-max` geometry used by Customer Data so wallet switching does not resize the layout.
+- Added fractional Evoto credit input using Indonesian decimal formatting, including 0,5, 1,5, and 2,5 credits.
+- Added a rerunnable Supabase migration with explicit grants, RLS, and operational-role policies.
+- Verified production build, full lint, 47 tests, and the browser accessibility layout.
+
 ## Scope
 
 Reviewed the redesign working copy based on commit 6abb6ee. No commit, push, deployment, database mutation, or change to the user's main checkout was performed.

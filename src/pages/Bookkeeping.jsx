@@ -9,6 +9,7 @@ import {
 import {
   customerFinanceToRevenueRow,
 } from "../lib/customerFinance";
+import { isBookkeepingExpense } from "../lib/spendingFinance";
 import "./Bookkeeping.css";
 
 /* =========================================================
@@ -172,15 +173,7 @@ function normalizeSettings(rawSettings) {
 ========================================================= */
 
 function isStudioExpense(item) {
-  const category = String(item.category || "")
-    .trim()
-    .toLowerCase();
-
-  return (
-    category === "expense" ||
-    category === "studio expense" ||
-    category === "studio expenses"
-  );
+  return isBookkeepingExpense(item);
 }
 
 function getSpendingAmount(item) {

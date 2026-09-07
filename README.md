@@ -2,6 +2,10 @@
 
 React/Vite portal for studio bookings, customer data, finance, galleries, and social content.
 
+## Spending wallets
+
+Spending uses four compact monthly panels: Studio Expenses, Cash Spending, Attire / Background, and Evoto Balance. Run `supabase/spending-four-panels.sql` before using the two new wallets. See `SPENDING-FOUR-PANELS-SETUP.md` for the workflow and deliberate Bookkeeping separation.
+
 ## Install and run
 
 Run `npm ci` after replacing source files. This installs the bundled Inter font dependency as well.

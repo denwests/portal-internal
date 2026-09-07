@@ -188,3 +188,312 @@ table td{
 .spending-table td{
   height:var(--table-row-h)!important;
 }
+
+/* ============================================================
+   V11 — FOUR-PANEL MONTHLY SPENDING WORKSPACE
+   ============================================================ */
+
+.spending-overview-grid{
+  max-width:1460px;
+  margin:0 auto 14px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+
+.spending-overview-card{
+  position:relative;
+  min-width:0;
+  min-height:142px;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:6px;
+  text-align:left;
+  color:var(--text)!important;
+  background:#161618!important;
+  border:1px solid #303034!important;
+  border-radius:12px!important;
+  box-shadow:none!important;
+}
+
+.spending-overview-card:hover,
+.spending-overview-card.is-active{
+  color:var(--text)!important;
+  background:#242427!important;
+  border-color:#505055!important;
+  transform:none!important;
+}
+
+.spending-overview-card.is-active::after{
+  content:"";
+  position:absolute;
+  left:15px;
+  right:15px;
+  bottom:0;
+  height:2px;
+  background:#e8e8eb;
+  border-radius:2px 2px 0 0;
+}
+
+.spending-overview-kicker{
+  color:#a7a7ac!important;
+  font-size:10px!important;
+  font-weight:600!important;
+  letter-spacing:.08em;
+}
+
+.spending-overview-card strong{
+  width:100%;
+  overflow:hidden;
+  color:#f3f3f4!important;
+  font-size:14px!important;
+  font-weight:550!important;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.spending-overview-card b{
+  margin-top:auto;
+  color:#fff!important;
+  font-size:20px!important;
+  font-weight:550!important;
+  line-height:1.15;
+  letter-spacing:-.025em;
+}
+
+.spending-overview-card small{
+  width:100%;
+  overflow:hidden;
+  color:#b7b7bc!important;
+  font-size:11px!important;
+  line-height:1.3;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.spending-settings-trigger{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  color:#e7e7ea!important;
+  background:#252528;
+  border:1px solid #3a3a3f;
+  border-radius:8px;
+  font-size:14px!important;
+}
+
+.spending-settings-trigger:hover{background:#303034}
+
+.spending-setup-note{
+  max-width:1460px;
+  margin:0 auto 14px;
+  padding:11px 13px;
+  color:#e7cf9c;
+  background:#211e18;
+  border:1px solid #4d422c;
+  border-radius:10px;
+  font-size:12px;
+}
+
+.spending-settings-button{white-space:nowrap}
+
+.spending-direction{
+  display:inline-flex!important;
+  min-width:48px;
+  min-height:26px;
+  align-items:center;
+  justify-content:center;
+  color:#f4f4f5!important;
+  background:#252528;
+  border:1px solid #3b3b40;
+  border-radius:7px;
+  font-size:11px!important;
+  font-weight:600!important;
+}
+
+.spending-direction.is-in{color:#bde9c5!important;border-color:#355d3d;background:#1b2b1e}
+.spending-direction.is-out{color:#ffc6c0!important;border-color:#603d3a;background:#2e1f1e}
+
+.spending-summary-evoto{justify-content:space-between!important;gap:20px}
+.spending-summary-evoto>div{text-align:left}
+.spending-summary-evoto>div:last-child{text-align:right}
+
+.spending-settings-modal{width:min(480px,100%)}
+.spending-money-input{display:flex;align-items:center;background:#18181b;border:1px solid #343438;border-radius:9px;overflow:hidden}
+.spending-money-input span{padding-left:12px;color:#b7b7bc!important;font-size:13px!important}
+.spending-money-input input{border:0!important;background:transparent!important}
+.spending-field>small,.spending-calculated-value small{color:#a7a7ac!important;font-size:11px!important;line-height:1.4}
+.spending-calculated-value{min-height:72px;padding:11px 12px;background:#1d1d20;border:1px solid #343438;border-radius:9px}
+.spending-calculated-value strong{color:#fff!important;font-size:18px!important;font-weight:550!important}
+
+@media(max-width:1100px){
+  .spending-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:760px){
+  .spending-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .spending-overview-card{min-height:132px;padding:13px}
+  .spending-overview-card b{font-size:17px!important}
+  .spending-card-header{width:100%}
+  .spending-section-actions{width:100%;flex-wrap:wrap}
+  .spending-section-actions>button{flex:1;min-width:max-content}
+  .spending-summary-evoto{display:grid!important;grid-template-columns:1fr 1fr}
+  .spending-summary-evoto>div:last-child{grid-column:1/-1;text-align:left}
+  .spending-form-box{max-height:calc(100dvh - 24px)}
+}
+
+@media(max-width:420px){
+  .spending-overview-grid{grid-template-columns:1fr}
+  .spending-overview-card{min-height:122px}
+}
+
+/* ============================================================
+   V12 — STABLE GEOMETRY ACROSS WALLET SWITCHES
+   ============================================================ */
+
+.spending-section-heading,
+.spending-overview-grid,
+.spending-setup-note,
+.spending-columns{
+  width:100%!important;
+  max-width:var(--page-max)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+
+.spending-overview-grid{
+  grid-auto-rows:128px!important;
+}
+
+.spending-overview-card{
+  width:100%!important;
+  height:128px!important;
+  min-height:128px!important;
+  padding:14px 15px!important;
+  overflow:hidden!important;
+}
+
+.spending-overview-card b{
+  min-height:24px;
+  display:flex;
+  align-items:flex-end;
+}
+
+.spending-overview-card small{
+  min-height:15px;
+}
+
+.spending-columns{
+  align-items:stretch!important;
+}
+
+.spending-card{
+  min-height:488px!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+
+.spending-card-header{
+  width:100%!important;
+  min-height:80px!important;
+  flex:0 0 80px!important;
+}
+
+.spending-card-title,
+.spending-card-title h2{
+  min-width:0!important;
+}
+
+.spending-section-actions{
+  min-height:38px!important;
+  justify-content:flex-end!important;
+  flex-wrap:nowrap!important;
+}
+
+.spending-section-actions>button{
+  min-height:38px!important;
+  white-space:nowrap!important;
+}
+
+.spending-toolbar{
+  width:100%!important;
+  min-height:58px!important;
+  flex:0 0 58px!important;
+}
+
+.spending-table-scroll{
+  width:100%!important;
+  min-height:250px!important;
+  flex:1 1 250px!important;
+}
+
+.spending-table{
+  min-width:900px!important;
+  table-layout:fixed!important;
+}
+
+.spending-table th:nth-child(1),
+.spending-table td:nth-child(1){width:13%!important}
+.spending-table th:nth-child(2),
+.spending-table td:nth-child(2){width:29%!important}
+.spending-table th:nth-child(3),
+.spending-table td:nth-child(3){width:14%!important}
+.spending-table th:nth-child(4),
+.spending-table td:nth-child(4){width:14%!important}
+.spending-table th:nth-child(5),
+.spending-table td:nth-child(5){width:20%!important}
+.spending-table th:nth-child(6),
+.spending-table td:nth-child(6){width:10%!important}
+
+.spending-summary{
+  width:100%!important;
+  min-height:68px!important;
+  flex:0 0 68px!important;
+}
+
+.spending-summary-evoto>div{
+  min-width:0;
+  flex:1 1 0;
+}
+
+@media(max-width:1100px){
+  .spending-overview-grid{grid-auto-rows:122px!important}
+  .spending-overview-card{height:122px!important;min-height:122px!important}
+}
+
+@media(max-width:760px){
+  .spending-section-heading,
+  .spending-overview-grid,
+  .spending-setup-note,
+  .spending-columns{max-width:none!important}
+
+  .spending-card{min-height:470px!important}
+  .spending-card-header{
+    min-height:auto!important;
+    flex:0 0 auto!important;
+    gap:12px!important;
+  }
+  .spending-section-actions{
+    min-height:auto!important;
+    justify-content:stretch!important;
+    flex-wrap:wrap!important;
+  }
+  .spending-section-actions>button{
+    flex:1 1 118px!important;
+    min-width:0!important;
+  }
+  .spending-table-scroll{min-height:244px!important;flex-basis:244px!important}
+}
+
+@media(max-width:420px){
+  .spending-overview-grid{grid-auto-rows:116px!important}
+  .spending-overview-card{height:116px!important;min-height:116px!important}
+}
