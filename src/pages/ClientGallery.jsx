@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../supabase";
 import { driveDownloadUrl } from "../lib/googleDrive";
-import { getPublicAppUrl } from "../lib/publicAppUrl";
 import {
   downloadPhotosAsZip,
   downloadPhotosSequentially,
@@ -78,7 +77,7 @@ function ClientGallery() {
 
   const visitorId = useMemo(() => getVisitorId(), []);
 
-  const loadGallery = async () => {
+  const loadGallery = useCallback(async () => {
     setLoading(true);
     setErrorMessage("");
 
@@ -106,13 +105,14 @@ function ClientGallery() {
 
     setGallery(data);
     setLoading(false);
-  };
-
-  useEffect(() => {
-    loadGallery();
   }, [slug, visitorId]);
 
-  const photos = gallery?.photos || [];
+  useEffect(() => {
+    const timer = window.setTimeout(() => void loadGallery(), 0);
+    return () => window.clearTimeout(timer);
+  }, [loadGallery]);
+
+  const photos = useMemo(() => gallery?.photos || [], [gallery]);
 
   const activePhotoIndex = photos.findIndex(
     (photo) => photo.id === activePhotoId
@@ -217,7 +217,7 @@ function ClientGallery() {
     setCommentText("");
   };
 
-  const showPreviousPhoto = () => {
+  const showPreviousPhoto = useCallback(() => {
     if (photos.length <= 1 || activePhotoIndex < 0) return;
 
     const previousIndex =
@@ -225,9 +225,9 @@ function ClientGallery() {
 
     setActivePhotoId(photos[previousIndex].id);
     setCommentText("");
-  };
+  }, [activePhotoIndex, photos]);
 
-  const showNextPhoto = () => {
+  const showNextPhoto = useCallback(() => {
     if (photos.length <= 1 || activePhotoIndex < 0) return;
 
     const nextIndex =
@@ -235,7 +235,7 @@ function ClientGallery() {
 
     setActivePhotoId(photos[nextIndex].id);
     setCommentText("");
-  };
+  }, [activePhotoIndex, photos]);
 
   useEffect(() => {
     if (!activePhotoId) return undefined;
@@ -263,7 +263,7 @@ function ClientGallery() {
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
     };
-  }, [activePhotoId, activePhotoIndex, photos.length]);
+  }, [activePhotoId, showNextPhoto, showPreviousPhoto]);
 
   const addComment = async (event) => {
     event.preventDefault();
@@ -320,7 +320,7 @@ function ClientGallery() {
       return;
     }
 
-    const guestUrl = getPublicAppUrl(`/gallery/${slug}`);
+    const guestUrl = window.location.href;
 
     const names = selectedPhotoList.map(
       (photo, index) => `${index + 1}. ${photo.filename}`

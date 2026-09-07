@@ -795,6 +795,96 @@ table strong, .booking-customer-name, .customer-name, .employee-name,
   }
 }
 
+/* ============================================================
+   BOOKING V12 - ACTIVE DP AND IOS PAYMENT SHEET
+   ============================================================ */
+
+#root .booking-deposit-total {
+  color: #b9b9be !important;
+}
+
+#root .booking-deposit-total strong,
+#root .booking-deposit-value {
+  color: #f2f2f3 !important;
+}
+
+@media (min-width: 1025px) {
+  #root .booking-table th:nth-child(1), #root .booking-table td:nth-child(1) { width: 11% !important; }
+  #root .booking-table th:nth-child(2), #root .booking-table td:nth-child(2) { width: 8% !important; }
+  #root .booking-table th:nth-child(3), #root .booking-table td:nth-child(3) { width: 5% !important; }
+  #root .booking-table th:nth-child(4), #root .booking-table td:nth-child(4) { width: 10% !important; }
+  #root .booking-table th:nth-child(5), #root .booking-table td:nth-child(5) { width: 9% !important; }
+  #root .booking-table th:nth-child(6), #root .booking-table td:nth-child(6) { width: 6% !important; }
+  #root .booking-table th:nth-child(7), #root .booking-table td:nth-child(7) { width: 9% !important; }
+  #root .booking-table th:nth-child(8), #root .booking-table td:nth-child(8) { width: 10% !important; }
+  #root .booking-table th:nth-child(9), #root .booking-table td:nth-child(9) { width: 8% !important; }
+  #root .booking-table th:nth-child(10), #root .booking-table td:nth-child(10) { width: 24% !important; }
+}
+
+@media (max-width: 1024px) {
+  #root .booking-table { min-width: 1260px !important; }
+}
+
+@media (max-width: 760px) {
+  #root .booking-overlay {
+    padding: 10px !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+
+  #root .booking-payment-modal {
+    width: 100% !important;
+    max-height: calc(100dvh - 20px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root .booking-payment-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    padding: 12px 14px !important;
+  }
+
+  #root .booking-payment-preview.settlement {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+  }
+
+  #root .booking-payment-summary > div,
+  #root .booking-payment-preview.settlement > div {
+    min-height: 64px !important;
+    padding: 9px 10px !important;
+  }
+
+  #root .booking-payment-preview.settlement span {
+    font-size: 8.5px !important;
+  }
+
+  #root .booking-payment-preview.settlement strong {
+    font-size: 10.5px !important;
+  }
+
+  #root .booking-payment-method-field {
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+  }
+
+  #root .booking-payment-modal .booking-form-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 2 !important;
+    margin-top: 10px !important;
+    padding: 12px 14px !important;
+    background: #151618 !important;
+  }
+}
+
 /* Spending and bookkeeping use high-contrast text throughout the internal UI. */
 @media screen {
   #root .spending-page :is(h1, h2, h3, h4, p, span, strong, small, label, th, td),
@@ -1773,15 +1863,16 @@ select option:checked { color: #fff !important; background: #343439 !important; 
     padding-right: 12px !important;
   }
 
-  #root .booking-table th:nth-child(1), #root .booking-table td:nth-child(1) { width: 13% !important; }
-  #root .booking-table th:nth-child(2), #root .booking-table td:nth-child(2) { width: 9% !important; }
-  #root .booking-table th:nth-child(3), #root .booking-table td:nth-child(3) { width: 6% !important; }
-  #root .booking-table th:nth-child(4), #root .booking-table td:nth-child(4) { width: 12% !important; }
-  #root .booking-table th:nth-child(5), #root .booking-table td:nth-child(5) { width: 11% !important; }
-  #root .booking-table th:nth-child(6), #root .booking-table td:nth-child(6) { width: 8% !important; }
-  #root .booking-table th:nth-child(7), #root .booking-table td:nth-child(7) { width: 10% !important; }
-  #root .booking-table th:nth-child(8), #root .booking-table td:nth-child(8) { width: 8% !important; }
-  #root .booking-table th:nth-child(9), #root .booking-table td:nth-child(9) { width: 23% !important; }
+  #root .booking-table th:nth-child(1), #root .booking-table td:nth-child(1) { width: 11% !important; }
+  #root .booking-table th:nth-child(2), #root .booking-table td:nth-child(2) { width: 8% !important; }
+  #root .booking-table th:nth-child(3), #root .booking-table td:nth-child(3) { width: 5% !important; }
+  #root .booking-table th:nth-child(4), #root .booking-table td:nth-child(4) { width: 10% !important; }
+  #root .booking-table th:nth-child(5), #root .booking-table td:nth-child(5) { width: 9% !important; }
+  #root .booking-table th:nth-child(6), #root .booking-table td:nth-child(6) { width: 6% !important; }
+  #root .booking-table th:nth-child(7), #root .booking-table td:nth-child(7) { width: 9% !important; }
+  #root .booking-table th:nth-child(8), #root .booking-table td:nth-child(8) { width: 10% !important; }
+  #root .booking-table th:nth-child(9), #root .booking-table td:nth-child(9) { width: 8% !important; }
+  #root .booking-table th:nth-child(10), #root .booking-table td:nth-child(10) { width: 24% !important; }
 }
 
 @media (max-width: 760px) {

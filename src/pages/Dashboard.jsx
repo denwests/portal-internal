@@ -14,6 +14,7 @@ import {
 import Sidebar from "../components/Sidebar";
 import RevenueTrendChart from "../components/RevenueTrendChart";
 import { MonthPicker } from "../components/PeriodPicker";
+import { buildCustomerNetRevenueSeries } from "../lib/customerFinance";
 
 import "./Dashboard.css";
 
@@ -244,10 +245,6 @@ function Dashboard() {
       const yearStart =
         `${selectedYear}-01-01`;
 
-      const previousYearStart =
-        `${selectedYear - 1}-01-01`;
-
-
       const yearEnd =
         `${selectedYear + 1}-01-01`;
 
@@ -366,8 +363,8 @@ function Dashboard() {
 
 
       /* ===================================================
-         REVENUE FROM TRANSACTIONS
-         revenue_date is the booking/event date used by Bookkeeping.
+         NET REVENUE FROM CUSTOMER FINAL VALUES
+         Uses the same finance summary as Customer Data.
          Staff does not request finance data.
       =================================================== */
 
@@ -377,145 +374,38 @@ function Dashboard() {
       ) {
 
         const {
-          data: transactionYearData,
-          error: transactionYearError,
-        } =
-          await supabase
-            .from("transactions")
-            .select(
-              "amount, revenue_date"
-            )
-            .gte(
-              "revenue_date",
-              previousYearStart
-            )
-            .lt(
-              "revenue_date",
-              yearEnd
-            );
+          data: customerFinanceData,
+          error: customerFinanceError,
+        } = await supabase.rpc(
+          "get_customer_finance_summary"
+        );
 
-
-        if (
-          transactionYearError
-        ) {
-
+        if (customerFinanceError) {
           console.error(
-            "TRANSACTION ERROR:",
-            transactionYearError
+            "CUSTOMER FINANCE ERROR:",
+            customerFinanceError
           );
-
         }
 
-
-        const transactions =
-          transactionYearData ||
-          [];
-
-        const currentYearTransactions =
-          transactions.filter(
-            (transaction) =>
-              transaction.revenue_date >= yearStart
-          );
-
-        const previousYearTransactions =
-          transactions.filter(
-            (transaction) =>
-              transaction.revenue_date < yearStart
-          );
-
-
-        const selectedRevenue =
-          currentYearTransactions
-            .filter(
-              (transaction) =>
-                transaction.revenue_date &&
-                transaction.revenue_date >=
-                  selectedMonthStart &&
-                transaction.revenue_date <
-                  selectedMonthEnd
-            )
-            .reduce(
-              (sum, transaction) =>
-                sum +
-                Number(
-                  transaction.amount ||
-                  0
-                ),
-              0
-            );
-
-
-        setTotalRevenue(
-          selectedRevenue
-        );
-
+        const customerFinance =
+          customerFinanceData || [];
 
         const monthly =
-          Array(12).fill(0);
-
-
-        currentYearTransactions.forEach(
-          (transaction) => {
-
-            if (
-              !transaction.revenue_date
-            ) {
-              return;
-            }
-
-            const monthIndex =
-              Number(
-                transaction.revenue_date.slice(
-                  5,
-                  7
-                )
-              ) - 1;
-
-            if (
-              monthIndex >= 0 &&
-              monthIndex < 12
-            ) {
-              monthly[monthIndex] +=
-                Number(
-                  transaction.amount ||
-                  0
-                );
-            }
-
-          }
-        );
-
-
-        setMonthlyRevenue(
-          monthly
-        );
+          buildCustomerNetRevenueSeries(
+            customerFinance,
+            selectedYear
+          );
 
         const previousMonthly =
-          Array(12).fill(0);
+          buildCustomerNetRevenueSeries(
+            customerFinance,
+            selectedYear - 1
+          );
 
-        previousYearTransactions.forEach(
-          (transaction) => {
-            if (!transaction.revenue_date) {
-              return;
-            }
-
-            const monthIndex =
-              Number(
-                transaction.revenue_date.slice(5, 7)
-              ) - 1;
-
-            if (
-              monthIndex >= 0 &&
-              monthIndex < 12
-            ) {
-              previousMonthly[monthIndex] +=
-                Number(
-                  transaction.amount || 0
-                );
-            }
-          }
+        setTotalRevenue(
+          monthly[selectedMonth] || 0
         );
-
+        setMonthlyRevenue(monthly);
         setPreviousMonthlyRevenue(
           previousMonthly
         );
@@ -1290,7 +1180,7 @@ function Dashboard() {
             <div className="dashboard-stat featured">
 
               <div className="dashboard-stat-label">
-                GROSS REVENUE
+                NET REVENUE
               </div>
 
               <div className="dashboard-stat-value">
@@ -1533,11 +1423,11 @@ function Dashboard() {
                 <div>
 
                   <div className="dashboard-card-kicker">
-                    REVENUE
+                    NET REVENUE
                   </div>
 
                   <h3>
-                    Monthly Revenue
+                    Monthly Net Revenue
                   </h3>
 
                 </div>

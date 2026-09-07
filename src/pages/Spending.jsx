@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -338,7 +339,7 @@ function Spending() {
   ======================================================= */
 
   const fetchSpendings =
-    async () => {
+    useCallback(async () => {
 
       setLoading(true);
       setErrorMessage("");
@@ -408,12 +409,13 @@ function Spending() {
       );
 
       setLoading(false);
-    };
+    }, []);
 
 
   useEffect(() => {
-    fetchSpendings();
-  }, []);
+    const timer = window.setTimeout(() => void fetchSpendings(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchSpendings]);
 
 
   /* =======================================================

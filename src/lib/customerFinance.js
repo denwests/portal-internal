@@ -44,3 +44,22 @@ export function summarizeCustomerFinance(customers) {
     }
   );
 }
+
+export function buildCustomerNetRevenueSeries(customers, year) {
+  const series = Array(12).fill(0);
+  const yearPrefix = `${Number(year)}-`;
+
+  for (const customer of customers || []) {
+    const date = String(customer.date || "");
+    if (!date.startsWith(yearPrefix)) continue;
+
+    const monthIndex = Number(date.slice(5, 7)) - 1;
+    if (monthIndex < 0 || monthIndex > 11) continue;
+
+    series[monthIndex] += Number(
+      customer.total_net_value ?? customer.totalNetValue ?? 0
+    );
+  }
+
+  return series;
+}

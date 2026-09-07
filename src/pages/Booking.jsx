@@ -4,6 +4,7 @@ import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
 import { MonthPicker, YearPicker } from "../components/PeriodPicker";
 import { buildBookingScheduleMessage, buildBookingScheduleMessages } from "../lib/bookingScheduleMessage";
+import { getActiveBookingDeposit, sumActiveBookingDeposits } from "../lib/bookingPayments";
 import "./Booking.css";
 
 const BOOKINGS_PER_PAGE = 10;
@@ -444,6 +445,11 @@ function Booking() {
         .includes(keyword)
     );
   }, [periodBookings, search]);
+
+  const activeDepositTotal = useMemo(
+    () => sumActiveBookingDeposits(filteredBookings),
+    [filteredBookings]
+  );
 
   const totalPages = Math.ceil(
     filteredBookings.length / BOOKINGS_PER_PAGE
@@ -1620,6 +1626,11 @@ function Booking() {
                 {filteredBookings.length} BOOKING
               </div>
 
+              <div className="booking-deposit-total">
+                <span>ACTIVE DP</span>
+                <strong>{formatCurrency(activeDepositTotal)}</strong>
+              </div>
+
               <div className="booking-search">
                 <span>/</span>
                 <input
@@ -1645,6 +1656,7 @@ function Booking() {
                   <th>PACKAGE</th>
                   <th>PACKAGE PRICE</th>
                   <th>DISCOUNT</th>
+                  <th>ACTIVE DP</th>
                   <th>PAYMENT</th>
                   <th>STATUS</th>
                   <th>ACTION</th>
@@ -1655,7 +1667,7 @@ function Booking() {
                 {loading ? (
                   <tr>
                     <td
-                      colSpan="9"
+                      colSpan="10"
                       className="booking-empty table-empty-cell"
                     >
                       <span className="table-empty-viewport">
@@ -1667,7 +1679,7 @@ function Booking() {
                   0 ? (
                   <tr>
                     <td
-                      colSpan="9"
+                      colSpan="10"
                       className="booking-empty table-empty-cell"
                     >
                       <span className="table-empty-viewport">
@@ -1716,6 +1728,9 @@ function Booking() {
                           paidAmount
                         );
 
+                      const activeDeposit =
+                        getActiveBookingDeposit(booking);
+
                       return (
                         <tr key={booking.id}>
                           <td>
@@ -1763,6 +1778,12 @@ function Booking() {
                             >
                               {`${discount}%`}
                             </span>
+                          </td>
+
+                          <td className="booking-deposit-value">
+                            {activeDeposit > 0
+                              ? formatCurrency(activeDeposit)
+                              : "Rp 0"}
                           </td>
 
                           <td>

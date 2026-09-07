@@ -206,3 +206,29 @@ Suggested commit:
 ```text
 fix(forms): format payslip and invoice currency inputs
 ```
+
+## Responsive Booking and Dashboard finance review - 2026-09-07
+
+- Made the Booking payment-settlement modal vertically scrollable on iPhone, including dynamic viewport sizing, touch scrolling, a compact two-column summary, three-column payment preview, and a sticky action footer.
+- Added **Active DP** to the Booking List header and every booking row. Only current partial deposits are counted; Paid and Canceled bookings automatically contribute zero.
+- Changed Dashboard **Net Revenue** and its yearly chart to use `get_customer_finance_summary`, matching Customer Data final net values for the selected event month instead of summing received transaction amounts.
+- Removed avoidable initial-render fetch patterns in Client Gallery, Employee, Gallery Manager, Spending, and Transactions while preserving their existing data flows.
+- Excluded generated delivery/output folders from source lint so the same archived code is not checked repeatedly.
+- Responsive QA passed at 390×844 and 375×667 with no page-width overflow; the payment footer remained visible and the modal exposed vertical scrolling.
+- Validation: full lint passed, 42 root tests passed, 3 Worker tests passed, production build passed, and `git diff --check` passed.
+
+Suggested commit:
+
+```text
+fix(ui): optimize responsive booking and align dashboard net revenue
+```
+
+Reason:
+
+```text
+Fix iPhone payment-sheet scrolling and compact its financial cards. Add an
+Active DP balance to Booking List that clears after settlement, and source
+Dashboard net revenue from the same final customer values as Customer Data.
+Also remove avoidable initial-load render churn and keep generated deliveries
+outside source lint.
+```

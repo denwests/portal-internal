@@ -11,10 +11,6 @@ import {
   supabase,
 } from "../supabase";
 
-import {
-  getPasswordResetRedirectUrl,
-} from "../lib/nativeAuth";
-
 import "./Login.css";
 
 
@@ -294,7 +290,7 @@ function Login() {
         email,
         {
           redirectTo:
-            getPasswordResetRedirectUrl(),
+            `${window.location.origin}/reset-password`,
         }
       );
 

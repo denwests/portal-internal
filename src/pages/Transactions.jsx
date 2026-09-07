@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -136,7 +137,7 @@ function Transactions() {
      FETCH
   ========================================================= */
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     setLoading(true);
     setErrorMessage("");
 
@@ -210,11 +211,12 @@ function Transactions() {
     );
 
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    const timer = window.setTimeout(() => void fetchTransactions(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchTransactions]);
 
 
   /* =========================================================

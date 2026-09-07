@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
 import TablePagination from "../components/TablePagination";
@@ -34,7 +34,7 @@ function Employee() {
      LOAD EMPLOYEES
   ========================================================= */
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     setLoading(true);
     setErrorMessage("");
 
@@ -53,11 +53,12 @@ function Employee() {
 
     setEmployees(data || []);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    const timer = window.setTimeout(() => void fetchEmployees(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchEmployees]);
 
   /* =========================================================
      SEARCH

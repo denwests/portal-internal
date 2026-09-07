@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
 import TablePagination from "../components/TablePagination";
@@ -10,7 +10,6 @@ import {
   requestDriveAccess,
   uploadPhotoToFolder,
 } from "../lib/googleDrive";
-import { getPublicAppUrl } from "../lib/publicAppUrl";
 import "./GalleryManager.css";
 
 function makeRandomSlug() {
@@ -131,7 +130,7 @@ function GalleryManager() {
     storageDays: "30",
   });
 
-  const fetchGalleries = async () => {
+  const fetchGalleries = useCallback(async () => {
     setLoading(true);
     setErrorMessage("");
 
@@ -173,11 +172,12 @@ function GalleryManager() {
 
     setGalleries(data || []);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
-    fetchGalleries();
-  }, []);
+    const timer = window.setTimeout(() => void fetchGalleries(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchGalleries]);
 
   const normalizedGalleries = useMemo(
     () =>
@@ -364,7 +364,7 @@ function GalleryManager() {
   };
 
   const getGuestUrl = (gallery) =>
-    getPublicAppUrl(`/gallery/${gallery.slug}`);
+    `${window.location.origin}/gallery/${gallery.slug}`;
 
   const copyGuestLink = async (gallery) => {
     const url = getGuestUrl(gallery);

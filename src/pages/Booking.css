@@ -17,6 +17,7 @@
 .booking-list-tools{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 .booking-active-period{color:#7e8077;font-size:11px}
 .booking-count{padding-left:10px;color:#8d8f86;border-left:1px solid var(--line);font-size:9px;font-weight:500;letter-spacing:.06em}
+.booking-deposit-total{padding-left:10px;display:flex;align-items:center;gap:7px;border-left:1px solid var(--line);white-space:nowrap}.booking-deposit-total span{color:#8d8f86;font-size:9px;letter-spacing:.06em}.booking-deposit-total strong,.booking-deposit-value{color:#f0f0f2!important;font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
 .booking-search{display:flex;align-items:center;gap:7px;color:#9b9c94}
 .booking-search input{width:210px;min-height:38px;background:#f9f8f3}
 .booking-table-scroll{overflow-x:auto}
@@ -55,6 +56,12 @@
   .booking-period-date{flex:1;width:auto;min-width:0}.booking-list-header{align-items:flex-start;flex-direction:column}
   .booking-list-tools{width:100%;justify-content:flex-start}.booking-search{width:100%}.booking-search input{flex:1;width:auto}
   .booking-form-grid{grid-template-columns:1fr}.booking-field.booking-field-full,.booking-form-actions{grid-column:auto}
+  .booking-overlay{padding:10px!important;overflow-y:auto!important;align-items:flex-start!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .booking-payment-modal{width:100%!important;max-height:calc(100dvh - 20px)!important;overflow-x:hidden!important;overflow-y:auto!important}
+  .booking-payment-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:12px 14px!important}
+  .booking-payment-preview.settlement{grid-template-columns:repeat(3,minmax(0,1fr))!important;margin-left:14px!important;margin-right:14px!important}
+  .booking-payment-method-field{margin-left:14px!important;margin-right:14px!important}
+  .booking-payment-modal .booking-form-footer{position:sticky;bottom:0;z-index:2;margin-top:10px!important;padding:12px 14px!important;background:#151618!important}
 }
 
 
