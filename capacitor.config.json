@@ -1,6 +1,6 @@
 {
-  "appId": "com.plunostudio.portalinternal",
-  "appName": "PLUNO Internal",
+  "appId": "com.plunostudio.internal",
+  "appName": "Pluno Internal",
   "webDir": "dist",
   "loggingBehavior": "debug",
   "backgroundColor": "#f7f7f5"
