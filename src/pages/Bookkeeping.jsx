@@ -1,3 +1,4 @@
+import { usePdfFileExport, saveHtmlPdf } from "../lib/pdfExport";
 import { useEffect, useMemo, useState } from "react";
 
 import { supabase } from "../supabase";
@@ -1767,6 +1768,11 @@ ${PLUNO_PRINT_CSS}
 </body>
 </html>
 `;
+
+      if (usePdfFileExport()) {
+        void saveHtmlPdf(reportHTML, `bookkeeping-${new Date().toISOString().slice(0, 10)}.pdf`);
+        return;
+      }
 
       const printWindow =
         window.open(

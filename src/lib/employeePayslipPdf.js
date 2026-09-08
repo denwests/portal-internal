@@ -1,3 +1,4 @@
+import { savePdf } from "./pdfExport";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -167,7 +168,7 @@ export function buildEmployeePayslipPdf(payslip) {
 }
 
 export function downloadEmployeePayslipPdf(payslip) {
-  buildEmployeePayslipPdf(payslip).save(`${safeText(payslip.payslip_number, "employee-payslip")}.pdf`);
+  savePdf(buildEmployeePayslipPdf(payslip), `${safeText(payslip.payslip_number, "employee-payslip")}.pdf`);
 }
 
 export function previewEmployeePayslipPdf(payslip) {

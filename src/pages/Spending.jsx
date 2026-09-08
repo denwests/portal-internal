@@ -1,3 +1,4 @@
+import { usePdfFileExport, saveHtmlPdf } from "../lib/pdfExport";
 import {
   useCallback,
   useEffect,
@@ -1628,6 +1629,11 @@ function Spending() {
         </html>
       `;
 
+
+      if (usePdfFileExport()) {
+        void saveHtmlPdf(html, `spending-${new Date().toISOString().slice(0, 10)}.pdf`);
+        return;
+      }
 
       const printWindow =
         window.open(

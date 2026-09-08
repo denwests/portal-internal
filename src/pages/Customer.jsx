@@ -1,3 +1,4 @@
+import { savePdf } from "../lib/pdfExport";
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -321,7 +322,7 @@ function Customer() {
 
     drawPdfFooter(doc, "PLUNO STUDIO - CUSTOMER DATA");
 
-    doc.save(`customers-${activeYear}-${activeMonth}.pdf`);
+    savePdf(doc, `customers-${activeYear}-${activeMonth}.pdf`);
   };
 
   /* =========================================================

@@ -2164,3 +2164,85 @@ select option:checked { color: #fff !important; background: #343439 !important; 
     min-width: 0 !important;
   }
 }
+
+
+/* Mobile tables: horizontal editing with persistent row identity. */
+@media (max-width: 1024px) {
+  #root .smm-table-wrap {
+    overflow: auto !important;
+    padding: 0 !important;
+    isolation: isolate;
+    -webkit-overflow-scrolling: touch;
+  }
+  #root .smm-table-wrap table {
+    display: table !important;
+    width: 1400px !important;
+    min-width: 1400px !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+  }
+  #root .smm-table-wrap thead { display: table-header-group !important; }
+  #root .smm-table-wrap tbody { display: table-row-group !important; }
+  #root .smm-table-wrap table tr {
+    display: table-row !important;
+    overflow: visible !important;
+    border: 0 !important;
+  }
+  #root .smm-table-wrap table tr > :is(th, td) {
+    display: table-cell !important;
+    box-sizing: border-box;
+    height: auto !important;
+    padding: 10px 8px !important;
+    vertical-align: top !important;
+    border-bottom: 1px solid #303034 !important;
+  }
+  #root .smm-table-wrap tbody td::before { content: none !important; }
+  #root .smm-table-wrap table tr > :nth-child(1):not([colspan]) { width: 40px !important; }
+  #root .smm-table-wrap table tr > :nth-child(2) { width: 136px !important; }
+  #root .smm-table-wrap table tr > :nth-child(3) { width: 200px !important; }
+  #root .smm-table-wrap table tr > :nth-child(4) { width: 200px !important; }
+  #root .smm-table-wrap table tr > :nth-child(5) { width: 160px !important; }
+  #root .smm-table-wrap table tr > :nth-child(6) { width: 150px !important; }
+  #root .smm-table-wrap table tr > :nth-child(7) { width: 150px !important; }
+  #root .smm-table-wrap table tr > :nth-child(8) { width: 180px !important; }
+  #root .smm-table-wrap table tr > :nth-child(9) { width: 184px !important; }
+
+  #root .smm-table-wrap table tr > :nth-child(-n+2):not([colspan]) {
+    position: sticky !important;
+    z-index: 2;
+    background: #151517 !important;
+  }
+  #root .smm-table-wrap table tr > :first-child:not([colspan]) { left: 0; }
+  #root .smm-table-wrap table tr > :nth-child(2) {
+    left: 40px;
+    box-shadow: 2px 0 0 #404045;
+  }
+  #root .smm-table-wrap table thead tr > :nth-child(-n+2) {
+    z-index: 3;
+    background: #202023 !important;
+  }
+  #root .smm-table-wrap textarea {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 96px !important;
+    height: auto !important;
+    resize: vertical;
+  }
+
+  #root .customer-table-scroll { overflow-x: auto !important; }
+  #root .customer-table {
+    width: 1040px !important;
+    min-width: 1040px !important;
+    table-layout: fixed !important;
+  }
+  #root .customer-table tr > :is(th, td) { box-sizing: border-box; }
+  #root .customer-table tr > :nth-child(1):not([colspan]) { width: 210px !important; }
+  #root .customer-table tr > :nth-child(2) { width: 170px !important; }
+  #root .customer-table tr > :nth-child(3) { width: 170px !important; }
+  #root .customer-table tr > :nth-child(4) { width: 180px !important; }
+  #root .customer-table tr > :nth-child(5) { width: 130px !important; }
+  #root .customer-table tr > :nth-child(6) { width: 180px !important; }
+}

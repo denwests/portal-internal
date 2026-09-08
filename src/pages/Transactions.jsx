@@ -1,3 +1,4 @@
+import { savePdf } from "../lib/pdfExport";
 import {
   useCallback,
   useEffect,
@@ -821,7 +822,7 @@ function Transactions() {
         transaction.transaction_date || "payment"
       }.pdf`;
 
-      doc.save(filename);
+      await savePdf(doc, filename);
     } catch (error) {
       console.error("INVOICE PDF ERROR:", error);
       setErrorMessage(
@@ -1010,7 +1011,7 @@ function Transactions() {
 
     drawPdfFooter(doc, "PLUNO STUDIO - FINANCIAL PERFORMANCE");
 
-    doc.save(
+    savePdf(doc,
       `transactions-${selectedYear}-${selectedMonth}.pdf`
     );
   };

@@ -1,3 +1,4 @@
+import { savePdf } from "./pdfExport";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -154,7 +155,7 @@ export function buildSmmInvoicePdf(invoice) {
 
 export function downloadSmmInvoicePdf(invoice) {
   const doc = buildSmmInvoicePdf(invoice);
-  doc.save(`${safeText(invoice.invoice_number, "smm-invoice")}.pdf`);
+  savePdf(doc, `${safeText(invoice.invoice_number, "smm-invoice")}.pdf`);
 }
 
 export function previewSmmInvoicePdf(invoice) {
