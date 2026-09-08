@@ -58,11 +58,7 @@ function Sidebar({ activePage }) {
         <div className="dashboard-sidebar-top">
           <div className="dashboard-brand">
             <div className="dashboard-brand-copy">
-              <img
-                className="dashboard-brand-logo"
-                src="/brand/pluno-studio-logo-white.png"
-                alt="Pluno Studio"
-              />
+              <div className="dashboard-brand-name">PLUNO STUDIO</div>
               <div className="dashboard-brand-subtitle">INTERNAL PORTAL</div>
             </div>
             <span className="dashboard-brand-chevron" aria-hidden="true">⌄</span>

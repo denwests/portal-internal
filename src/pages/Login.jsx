@@ -356,11 +356,7 @@ function Login() {
 
         <div className="login-brand">
           <div>
-            <img
-              className="login-brand-logo"
-              src="/brand/pluno-studio-logo-white.png"
-              alt="Pluno Studio"
-            />
+            <strong>PLUNO STUDIO</strong>
             <span>INTERNAL PORTAL</span>
           </div>
         </div>

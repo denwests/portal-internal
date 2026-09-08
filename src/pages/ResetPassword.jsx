@@ -245,9 +245,8 @@ function ResetPassword() {
       <div className="reset-password-box">
 
 
-        <div className="reset-password-brand">
-          <img src="/brand/pluno-studio-logo-white.png" alt="Pluno Studio" />
-          <span>INTERNAL PORTAL</span>
+        <div className="reset-password-kicker">
+          PLUNO STUDIO / INTERNAL PORTAL
         </div>
 
         <h1>

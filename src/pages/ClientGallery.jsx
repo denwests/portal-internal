@@ -404,7 +404,7 @@ function ClientGallery() {
     return (
       <div className="client-gallery-state">
         <div className="client-gallery-state-card">
-          <img className="client-gallery-state-logo" src="/brand/pluno-studio-logo-white.png" alt="Pluno Studio" />
+          <strong>PLUNO STUDIO</strong>
           <span>Loading gallery...</span>
         </div>
       </div>
@@ -415,7 +415,7 @@ function ClientGallery() {
     return (
       <div className="client-gallery-state">
         <div className="client-gallery-state-card">
-          <img className="client-gallery-state-logo" src="/brand/pluno-studio-logo-white.png" alt="Pluno Studio" />
+          <strong>PLUNO STUDIO</strong>
           <h1>Gallery Unavailable</h1>
           <span>{errorMessage}</span>
         </div>
@@ -428,9 +428,7 @@ function ClientGallery() {
       <div className="client-gallery-shell">
         <header className="client-gallery-header">
           <div className="client-gallery-identity">
-            <div className="client-gallery-brand">
-              <img src="/brand/pluno-studio-logo-white.png" alt="Pluno Studio" />
-            </div>
+            <div className="client-gallery-brand">PLUNO STUDIO</div>
 
             <div className="client-gallery-hero">
               <span>CLIENT GALLERY</span>

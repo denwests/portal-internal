@@ -7,7 +7,6 @@
 .dashboard-sidebar>div:first-child{min-height:0;overflow:auto;scrollbar-width:none}
 .dashboard-sidebar>div:first-child::-webkit-scrollbar{display:none}
 .dashboard-brand{margin:0 8px 29px}
-.dashboard-brand-logo{display:block;width:146px;height:auto;object-fit:contain}
 .dashboard-brand-name{color:#282922;font-size:15px;line-height:1;font-weight:550;letter-spacing:.12em}
 .dashboard-brand-subtitle{margin-top:6px;color:#aaa99f;font-size:8px;line-height:1;font-weight:400;letter-spacing:.18em}
 .dashboard-navigation{display:flex;flex-direction:column;gap:3px}

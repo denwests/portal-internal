@@ -71,14 +71,6 @@
   white-space: nowrap;
 }
 
-.client-gallery-brand img,
-.client-gallery-state-logo {
-  display: block;
-  width: 142px;
-  height: auto;
-  object-fit: contain;
-}
-
 .client-gallery-hero {
   min-width: 0;
 }

@@ -155,7 +155,7 @@ function TimelineShare() {
     return (
       <div className="timeline-share-page">
         <main className="timeline-share-state timeline-share-error">
-          <img className="timeline-share-state-logo" src="/brand/pluno-studio-logo-dark.png" alt="Pluno Studio" />
+          <span>PLUNO STUDIO</span>
           <h1>Preview unavailable</h1>
           <p>{error || "The requested timeline could not be found."}</p>
         </main>
@@ -168,7 +168,7 @@ function TimelineShare() {
       <main className="timeline-share-container">
         <header className="timeline-share-header">
           <div className="timeline-share-brand">
-            <img src="/brand/pluno-studio-logo-dark.png" alt="Pluno Studio" />
+            <span>PLUNO STUDIO</span>
             <strong>SOCIAL MEDIA CONTENT TIMELINE</strong>
           </div>
 
@@ -322,7 +322,7 @@ function TimelineShare() {
         </section>
 
         <footer className="timeline-share-footer">
-          <img src="/brand/pluno-studio-logo-dark.png" alt="Pluno Studio" />
+          <span>PLUNO STUDIO</span>
           <p>Social Media Content Timeline</p>
         </footer>
       </main>
