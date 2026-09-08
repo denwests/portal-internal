@@ -9,6 +9,7 @@
   border-radius:16px;box-shadow:0 24px 62px rgba(34,35,24,.10)
 }
 .login-box::before,.login-box::after{display:none!important;content:none!important}
+.login-brand-logo{display:block;width:174px;height:auto;object-fit:contain}
 .login-box input{width:100%;min-height:49px;padding:0 14px;background:#f8f7f2;border-radius:10px;font-size:13px}
 .login-box button[type="submit"]{
   width:100%;min-height:48px;margin-top:3px;color:#fff;background:var(--pluno-gradient);

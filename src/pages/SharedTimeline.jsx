@@ -29,7 +29,7 @@ function SharedTimeline() {
   }, [token]);
 
   return <main className="shared-timeline-page">
-    <header><div className="shared-brand">PLUNO STUDIO</div><div className="shared-label">SOCIAL MEDIA CONTENT TIMELINE</div></header>
+    <header><div className="shared-brand"><img src="/brand/pluno-studio-logo-white.png" alt="Pluno Studio" /></div><div className="shared-label">SOCIAL MEDIA CONTENT TIMELINE</div></header>
     {loading ? <div className="shared-state">Loading timeline...</div> : error ? <div className="shared-state error">{error}</div> : <>
       <section className="shared-heading"><div><span>CLIENT</span><h1>{timeline.client_name}</h1></div><div><span>PERIOD</span><strong>{MONTHS[Number(timeline.month) - 1]} {timeline.year}</strong></div><div><span>STATUS</span><strong>{timeline.status}</strong></div></section>
       <div className="shared-table-wrap"><table><thead><tr><th>No</th><th>Content</th><th>Materials</th><th>Reference</th><th>Platform</th><th>Format</th><th>Status</th><th>Schedule</th><th>Notes</th></tr></thead><tbody>{(timeline.items || []).map((item, index) => <tr key={item.id}><td>{index + 1}</td><td>{item.content || "-"}</td><td>{item.materials || "-"}</td><td>{item.reference ? <a href={item.reference} target="_blank" rel="noreferrer">Open reference</a> : "-"}</td><td>{(item.platforms || []).join(", ") || "-"}</td><td>{(item.formats || []).join(", ") || "-"}</td><td><span className="shared-status">{item.status}</span></td><td>{formatSchedule(item.schedule_date)}</td><td>{item.notes || "-"}</td></tr>)}{!timeline.items?.length && <tr><td colSpan="9" className="shared-empty-row">Belum ada konten.</td></tr>}</tbody></table></div>

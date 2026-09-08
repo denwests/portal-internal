@@ -41,6 +41,22 @@
   gap: 5px;
 }
 
+.timeline-share-brand img,
+.timeline-share-state-logo {
+  display: block;
+  width: 154px;
+  height: auto;
+  object-fit: contain;
+}
+
+.timeline-share-footer img {
+  display: block;
+  width: 120px;
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
 .timeline-share-brand span {
   color: #38392f;
   font-size: 12px;

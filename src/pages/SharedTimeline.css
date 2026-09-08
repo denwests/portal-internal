@@ -2,3 +2,4 @@
 .client-gallery-page,.shared-timeline-page,.privacy-page{
   min-height:100vh;background:var(--bg)!important;color:var(--text)!important;font-family:var(--font)!important
 }
+.shared-brand img{display:block;width:154px;height:auto;object-fit:contain}
