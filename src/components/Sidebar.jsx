@@ -122,7 +122,7 @@ function Sidebar({ activePage }) {
               </Link>
             )}
 
-            {isOperational && (
+            {employeeRole === "Founder" && (
               <Link
                 to="/bookkeeping"
                 className={`dashboard-nav-item ${isActive("bookkeeping")}`}

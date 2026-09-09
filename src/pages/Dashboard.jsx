@@ -35,6 +35,24 @@ function formatRupiah(value) {
 ========================================================= */
 
 function Dashboard() {
+  const [numbersHidden, setNumbersHidden] = useState(() => {
+    try {
+      return localStorage.getItem("pluno.dashboard.numbersHidden") === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleNumbers = () => {
+    const next = !numbersHidden;
+    setNumbersHidden(next);
+    try {
+      localStorage.setItem("pluno.dashboard.numbersHidden", String(next));
+    } catch {
+      // Keep the toggle usable when browser storage is unavailable.
+    }
+  };
+
 
   const employeeRole =
     localStorage.getItem(
@@ -1154,6 +1172,15 @@ function Dashboard() {
 
 
             <div className="dashboard-performance-filter">
+              <button
+                type="button"
+                className="dashboard-numbers-toggle"
+                onClick={toggleNumbers}
+                aria-pressed={numbersHidden}
+                aria-label={numbersHidden ? "View dashboard numbers" : "Hide dashboard numbers"}
+              >
+                {numbersHidden ? "View angka" : "Hide angka"}
+              </button>
               <MonthPicker
                 year={selectedYear}
                 month={selectedMonth + 1}
@@ -1185,7 +1212,7 @@ function Dashboard() {
 
               <div className="dashboard-stat-value">
 
-                {employeeRole ===
+                {numbersHidden || employeeRole ===
                 "Staff"
                   ? "****"
                   : loading
@@ -1223,7 +1250,7 @@ function Dashboard() {
 
               <div className="dashboard-stat-value">
 
-                {loading
+                {numbersHidden ? "****" : loading
                   ? "..."
                   : totalCustomer}
 
@@ -1256,7 +1283,7 @@ function Dashboard() {
 
               <div className="dashboard-stat-value">
 
-                {loading
+                {numbersHidden ? "****" : loading
                   ? "..."
                   : totalBooking}
 
@@ -1441,12 +1468,18 @@ function Dashboard() {
               </div>
 
 
+              {numbersHidden || employeeRole === "Staff" ? (
+                <div className="dashboard-numbers-placeholder" role="status">
+                  Angka pendapatan disembunyikan
+                </div>
+              ) : (
               <RevenueTrendChart
                 current={monthlyRevenue}
                 comparison={previousMonthlyRevenue}
                 currentLabel={`${selectedYear}`}
                 comparisonLabel={`${selectedYear - 1}`}
               />
+              )}
 
             </div>
 

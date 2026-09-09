@@ -781,3 +781,22 @@
 .dashboard-section-heading{
   margin-bottom:14px!important;
 }
+
+/* Dashboard privacy control stays usable alongside the month picker. */
+#root .dashboard-performance-filter { flex-wrap: wrap; }
+#root .dashboard-numbers-toggle {
+  min-height: 44px;
+  padding: 0 14px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+#root .dashboard-numbers-placeholder {
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: var(--text-muted, #96989f);
+  font-size: 14px;
+  text-align: center;
+}

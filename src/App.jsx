@@ -288,7 +288,7 @@ function App() {
 
         {/* =================================================
             BOOKKEEPING
-            Founder / Administrator
+            Founder only
         ================================================= */}
 
         <Route
@@ -296,8 +296,9 @@ function App() {
           element={
 
             <ProtectedRoute
+              key="founder-bookkeeping"
               allowedRoles={
-                OPERATIONAL_ROLES
+                FOUNDER_ONLY
               }
             >
 
