@@ -1,0 +1,65 @@
+/* Keep dense data inside a scrollable panel at every viewport width.
+   Imported after the theme so legacy desktop fit-to-screen rules cannot
+   collapse action labels or clip columns. */
+#root :is(.booking-table-scroll, .gallery-table-scroll, .social-table-wrap,
+  .transactions-table-scroll, .customer-table-scroll, .spending-table-scroll,
+  .employee-table-scroll, .smm-table-wrap, .shared-table-wrap) {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+#root :is(.booking-table, .gallery-table, .social-table, .transactions-table,
+  .customer-table, .spending-table, .employee-table, .shared-table-wrap table) {
+  width: 100% !important;
+  max-width: none !important;
+  table-layout: auto !important;
+}
+#root .booking-table { min-width: 1160px !important; }
+#root .gallery-table { min-width: 1060px !important; }
+#root .social-table { min-width: 1040px !important; }
+#root .transactions-table { min-width: 1420px !important; }
+#root .customer-table { min-width: 1040px !important; }
+#root .spending-table { min-width: 900px !important; }
+#root .employee-table { min-width: 950px !important; }
+#root .shared-table-wrap table { min-width: 980px !important; }
+
+#root :is(.booking-table, .gallery-table, .social-table, .transactions-table,
+  .customer-table, .spending-table, .employee-table, .smm-table-wrap table,
+  .shared-table-wrap table) :is(th, td) {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* Controls must never shrink to a single letter, even in fixed-width tables. */
+#root table :is(button, a[role="button"]) {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+#root .transactions-row-actions {
+  flex-wrap: wrap !important;
+  min-width: max-content !important;
+}
+#root .transactions-table :is(th, td):last-child:not([colspan]) {
+  width: 160px !important;
+  min-width: 160px !important;
+}
+#root .transactions-table :is(.transaction-date-cell,
+  .transactions-payment-type, .transactions-payment, .transactions-booking-status) {
+  white-space: nowrap !important;
+}
+
+/* Retain the timeline's explicit column widths and mobile sticky identity. */
+@media (min-width: 1025px) {
+  #root .smm-table-wrap table {
+    width: 100% !important;
+    min-width: 1400px !important;
+    max-width: none !important;
+  }
+}
+@media (max-width: 760px) {
+  #root .transactions-row-actions button { min-height: 44px !important; }
+}

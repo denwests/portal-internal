@@ -11,6 +11,7 @@ import App from "./App.jsx";
 import "./pluno-theme.css";
 import "./pluno-night.css";
 import "./safe-area.css";
+import "./responsive-tables.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
